@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es6",
+    "jsx": "preserve",
+    "sourceMap": true,
+    "skipDefaultLibCheck": true,
+    "allowJs": true,
+    "outDir": "tsout"
+  },
+  "exclude": [
+      "bin",
+      "node_modules"
+  ]
+}
