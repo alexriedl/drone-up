@@ -51,46 +51,46 @@ Drone.prototype.PushRight = function(map) {
 	map.Move(toPush, 0, 1);
 };
 
-Drone.prototype.Perform = function(action) {
+Drone.prototype.Perform = function(action, map) {
 	switch(action){
 		case "MoveUp":
-			this.MoveUp();
+			this.MoveUp(map);
 			break;
 		case "MoveDown":
-			this.MoveDown();
+			this.MoveDown(map);
 			break;
 		case "MoveLeft":
-			this.MoveLeft();
+			this.MoveLeft(map);
 			break;
 		case "MoveRight":
-			this.MoveRight();
+			this.MoveRight(map);
 			break;
 		case "PullUp":
-			this.PullUp();
+			this.PullUp(map);
 			break;
 		case "PullDown":
-			this.PullDown();
+			this.PullDown(map);
 			break;
 		case "PullLeft":
-			this.PullLeft();
+			this.PullLeft(map);
 			break;
 		case "PullRight":
-			this.PullRight();
+			this.PullRight(map);
 			break;
 		case "PushUp":
-			this.PushUp();
+			this.PushUp(map);
 			break;
 		case "PushDown":
-			this.PushDown();
+			this.PushDown(map);
 			break;
 		case "PushLeft":
-			this.PushLeft();
+			this.PushLeft(map);
 			break;
 		case "PushRight":
-			this.PushRight();
+			this.PushRight(map);
 			break;
 		case "Scan":
-			this.Scan();
+			this.Scan(map);
 			break;
 		default:
 	}
