@@ -1,16 +1,51 @@
 {
-    "version": "0.1.0",
-    "command": "dotnet",
-    "isShellCommand": true,
-    "args": [],
-    "tasks": [
-        {
-            "taskName": "build",
-            "args": [
-                "${workspaceRoot}/DroneUp/DroneUp.csproj"
-            ],
-            "isBuildCommand": true,
-            "problemMatcher": "$msCompile"
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "taskName": "build",
+      "command": "dotnet",
+      "args": [ "build" ],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "taskName": "rebuild",
+      "command": "dotnet",
+      "problemMatcher": [],
+      "args": [ "build", "--no-incremental" ]
+    },
+    {
+      "taskName": "restore",
+      "command": "dotnet",
+      "args": [ "restore" ],
+      "problemMatcher": []
+    },
+    {
+      "taskName": "test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "dependsOn": [ "test site", "test integration" ],
+      "problemMatcher": []
+    },
+    {
+      "taskName": "npm install",
+      "command": "npm",
+      "args": [ "install" ],
+      "type": "shell",
+      "options": { "cwd": "${workspaceRoot}/src/Web" },
+      "problemMatcher": []
+    },
+    {
+      "taskName": "webpack",
+      "command": "webpack",
+      "type": "shell",
+      "problemMatcher": "$tsc",
+      "options": { "cwd": "${workspaceRoot}/src/Web" }
+    }
+  ]
 }
