@@ -136,15 +136,30 @@ class Map {
 	
 	move(Id, deltaX, deltaY) {
 		var mapObject = null;
+		var isPlayer = false;
 		for(var i = 0, objectCount = this.mapObjects.length; i < objectCount; i++) {
 			if(this.mapObjects[i].ID === Id) {
 				mapObject = this.mapObjects[i];
 			}
 		}
 		
-		if(mapObject !== null){
+		for(var j = 0, playerCount = this.players.length; j < playerCount; i++) {
+			if(this.players[i].ID === Id) {
+				isPlayer = true;
+			}
+		}
+		
+		if(mapObject !== null) {
 			mapObject.x += deltaX;
 			mapObject.y += deltaY;
+		}
+		
+		if(!isPlayer) {
+			for(var k = 0, objectCount = this.mapObjects.length; k < objectCount; k++) {
+				if(this.mapObjects[k].x === mapObject.x && this.mapObjects[k].y === mapObject.y && this.mapObjects[k].ID !== mapObject.ID) {
+					move(this.mapObjects[k].ID, deltaX, deltaY);
+				}
+			}
 		}
 	}
 	
