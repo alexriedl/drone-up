@@ -29,7 +29,7 @@ module.exports = {
 	module: {
 		loaders: [
 			{ test: /\.jsx?$/, loaders: ['babel-loader?' + JSON.stringify(babelSettings) ], exclude: /node_modules[\\/](?!@duel)/	},
-			{ test: /\.ts(x?)$/, include: /ClientApp/, loader: 'babel-loader' },
+			{ test: /\.ts(x?)$/, include: /scripts/, loader: 'babel-loader' },
 			{ test: /\.ts(x?)$/, loader: 'ts-loader', query: { silent: true }},
 			{ test: /\.css$/, loader: ExtractTextPlugin.extract(['css-loader']) },
 			{ test: /\.scss$/, loader: ExtractTextPlugin.extract('style-loader', [`css-loader`, 'postcss-loader', `sass-loader`]) },

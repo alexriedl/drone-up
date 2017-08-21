@@ -1,1 +1,2 @@
-import './renderer';
+import { test } from './renderer';
+test();
