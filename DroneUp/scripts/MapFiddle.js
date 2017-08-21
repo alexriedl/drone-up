@@ -19,6 +19,42 @@ class Map {
 		this.players = playerArray;
 		this.spikes = spikeArray;
 		this.mapObjects = playerArray.concat(spikeArray);
+		
+		this.Draw(playerArray, spikeArray, invalidArray);
+	}
+	
+	Draw(playerArray, spikeArray, invalidArray){
+		var mapVisual = "";
+		for(var x = 0; x < this.xSize; x++){
+			for(var y = 0; y < this.ySize; y++){
+				var thisSpot = " ";
+				for(var p = 0; p < playerArray.length; p++){
+					if(playerArray[p].x === x && playerArray[p].y === y){
+						if(thisSpot === " "){
+							thisSpot = "P";
+						}
+					}
+				}
+				for(var s = 0; s < spikeArray.length; s++){
+					if(spikeArray[s].x === x && spikeArray[s].y === y){
+						if(thisSpot === " "){
+							thisSpot = "S";
+						}
+					}
+				}
+				for(var i = 0; i < invalidArray.length; i++){
+					if(invalidArray[i].x === x && invalidArray[i].y === y){
+						if(thisSpot === " "){
+							thisSpot = "i";
+						}
+					}
+				}
+				mapVisual += thisSpot;
+			}
+			mapVisual += "\n";
+		}
+		
+		this.visual = mapVisual;
 	}
 
 	generatePlayers(randomizer, players, playerArray, invalidArray) {
@@ -152,6 +188,8 @@ players.push({ID: 'player1'});
 players.push({ID: 'player2'});
 players.push({ID: 'player3'});
 players.push({ID: 'player4'});
-var map = new Map(10, 10);
+players.push({ID: 'player5'});
+players.push({ID: 'player6'});
+var map = new Map(30, 30);
 map.initialize(new Random(12345), players, 15);
 console.log(map);
