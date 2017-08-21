@@ -1,35 +1,54 @@
-function Drone(controller){
+function Drone(controller, Id){
+	this.Id = Id;
 	this.controller = controller;
 	controller.actions = ["Scan", "MoveUp", "MoveDown", "MoveLeft", "MoveRight", "PullUp", "PullDown", "PullRight", "PullLeft", "PushUp", "PushDown", "PushRight", "PushLeft"];
 };
 
 Drone.prototype = GameObject.prototype;
 
-Drone.prototype.Scan = function(){
+Drone.prototype.Scan = function(map){
+	var scanResult = map.ScanFor(this.Id);
+	controller.ScanResult = scanResult;
 };
 
-Drone.prototype.PullUp = function() {
+Drone.prototype.PullUp = function(map) {
+	var toPull = map.GetNextObjectUpFrom(this.Id);
+	map.Move(toPull, -1, 0);
 };
 
-Drone.prototype.PullDown = function() {
+Drone.prototype.PullDown = function(map) {
+	var toPull = map.GetNextObjectDownFrom(this.Id);
+	map.Move(toPull, 1, 0);
 };
 
-Drone.prototype.PullLeft = function() {
+Drone.prototype.PullLeft = function(map) {
+	var toPull = map.GetNextObjectLeftFrom(this.Id);
+	map.Move(toPull, 0, 1);
 };
 
-Drone.prototype.PullRIght = function() {
+Drone.prototype.PullRIght = function(map) {
+	var toPull = map.GetNextObjectRightFrom(this.Id);
+	map.Move(toPull, 0, -1);
 };
 
-Drone.prototype.PushUp = function() {
+Drone.prototype.PushUp = function(map) {
+	var toPush = map.GetNextObjectUpFrom(this.Id);
+	map.Move(toPush, 1, 0);
 };
 
-Drone.prototype.PushDown = function() {
+Drone.prototype.PushDown = function(map) {
+	var toPush = map.GetNextObjectDownFrom(this.Id);
+	map.Move(toPush, -1, 0);
 };
 
-Drone.prototype.PushLeft = function() {
+Drone.prototype.PushLeft = function(map) {
+	var toPush = map.GetNextObjectLeftFrom(this.Id);
+	map.Move(toPush, 0, -1);
 };
 
-Drone.prototype.PushRIght = function() {
+Drone.prototype.PushRight = function(map) {
+	var toPush = map.GetNextObjectRightFrom(this.Id);
+	map.Move(toPush, 0, 1);
 };
 
 Drone.prototype.Perform = function(action) {

@@ -86,4 +86,12 @@ class Map {
 		this.xSize = xSize;
 		this.ySize = ySize;
 	}
+	
+	//GetCrashedDrones() returns a list of drone IDs that have crashed
+	//Move(Id, deltaX, deltaY) repositions the object at ID if it can be moved
+	//ScanFor(Id) returns the game objects visible to the object with the given ID
+	//GetNextObjectUpFrom(this.Id) returns an ID of the next object up from the object with the given ID
+	//GetNextObjectDownFrom(this.Id) returns an ID of the next object down from the object with the given ID
+	//GetNextObjectLeftFrom(this.Id) returns an ID of the next object left from the object with the given ID
+	//GetNextObjectRightFrom(this.Id) returns an ID of the next object right from the object with the given ID
 }
