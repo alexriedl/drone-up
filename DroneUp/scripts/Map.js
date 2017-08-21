@@ -1,30 +1,44 @@
 class Map {
-	constructor(randomizer, players, spikePercent, xSize, ySize) {
+	constructor(xSize, ySize) {
+		this.xSize = xSize;
+		this.ySize = ySize;
+
+	}
+
+	initialize(randomizer, player, spikePercent) {
 		var playerArray = [];
 		var spikeArray = [];
+		var invalidArray = [];
 
-		// first, generate all players (attempt up to 1000 times, if this fails bail out)
+		// first, generate all players and mark their "safe space" as invalid for further placements
+		this.generatePlayers(randomizer, players, playerArray, invalidArray);
+
+		// then, generate spikes (up to the percentage or 1000 failures, whichever happens first)
+		this.generateSpikes(randomizer, spikePercent, spikeArray, invalidArray);
+
+		this.players = playerArray;
+		this.spikes = spikeArray;
+		this.mapObjects = playerArray.concat(spikeArray);
+	}
+
+	generatePlayers(randomizer, players, playerArray, invalidArray) {
 		for (var p = 0, plen = players.length; p < plen; p++) {
 			var player = players[p];
 			var attempts = 0;
 			var validSpot = false;
 			while (!validSpot) {
+				// only attempt up to 1000 times to prevent an infinite loop; if we can't place a player, bail out
 				if (attempts > 1000) {
 					alert('player could not be placed after 1000 attempts, aborting');
 					return null;
 				}
 
-				var x = randomizer.next() % xSize;
-				var y = randomizer.next() % ySize;
+				var x = randomizer.next() % this.xSize;
+				var y = randomizer.next() % this.ySize;
 
-				var attemptValid = true;
-				for (var o = 0, olen = playerArray.length; o < olen && attemptValid; o++) {
-					var obj = playerArray[o];
-					// players get a "safe space" of 3 (manhattan) distance from other things
-					if ((Math.abs(x - obj.x) + Math.abs(y - obj.y)) <= 3) {
-						attemptValid = false;
-					}
-				}
+				// doublecheck all invalid spaces
+				var attemptValid = this.checkInvalid(x, y, invalidArray);
+				
 				if (attemptValid) {
 					playerArray.push({
 						ID: player.ID,
@@ -32,6 +46,9 @@ class Map {
 						y: y
 					})
 					validSpot = true;
+
+					// add the player's "safe space" (anything a distance of <= 3 tiles away)
+					this.markInvalid(x, y, 3, invalidArray);
 				}
 
 				if (!validSpot) {
@@ -39,38 +56,29 @@ class Map {
 				}
 			}
 		};
+	}
 
-		// then, generate spikes (up to the percentage or 1000 failures, whichever happens first)
+	generateSpikes(randomizer, spikePercent, spikeArray, invalidArray) {
 		var spikesGenned = 0;
 		var spikesFailed = 0;
-		var neededSpikes = (xSize * ySize * spikePercent) / 100
+		var neededSpikes = (this.xSize * this.ySize * spikePercent) / 100;
 		while (spikesGenned < neededSpikes && spikesFailed < 1000) {
 			var spikeId = '__reservedSpikeNumber' + (spikesGenned + 1) + '__';
 
-			var x = randomizer.next() % xSize;
-			var y = randomizer.next() % ySize;
+			var x = randomizer.next() % this.xSize;
+			var y = randomizer.next() % this.ySize;
 
-			var attemptValid = true;
-			// first check against players (they still get a safe space)
-			for (var o = 0, olen = playerArray.length; o < olen && attemptValid; o++) {
-				var obj = playerArray[o];
-				if ((Math.abs(x - obj.x) + Math.abs(y - obj.y)) <= 3) {
-					attemptValid = false;
-				}
-			}
-			// then check against the other spikes (which don't get a safe space)
-			for (var o = 0, olen = spikeArray.length; o < olen && attemptValid; o++) {
-				var obj = spikeArray[o];
-				if ((Math.abs(x - obj.x) + Math.abs(y - obj.y)) === 0) {
-					attemptValid = false;
-				}
-			}
+			var attemptValid = this.checkInvalid(x, y, invalidArray);
+
 			if (attemptValid) {
 				spikeArray.push({
 					ID: spikeId,
 					x: x,
 					y: y
-				})
+				});
+
+				// spikes only invalidate their tile, they get no "safe space"
+				this.markInvalid(x, y, 0, invalidArray);
 			}
 
 			if (attemptValid) {
@@ -79,11 +87,35 @@ class Map {
 				spikesFailed++;
 			}
 		}
+	}
 
-		this.players = playerArray;
-		this.spikes = spikeArray;
-		this.mapObjects = playerArray.concat(spikeArray);
-		this.xSize = xSize;
-		this.ySize = ySize;
+	checkInvalid(x, y, invalidArray) {
+		var attemptValid = true;
+
+		for (var i = 0, ilen = invalidArray.length; i < ilen && attemptValid; i++) {
+			var inv = invalidArray[i];
+			if (x === inv.x && y === inv.y) {
+				attemptValid = false;
+			}
+		}
+
+		return attemptValid;
+	}
+
+	markInvalid(x, y, numSpread, invalidArray) {
+		if (numSpread < 0)
+			return;
+
+		// check if the current tile is invalid to avoid adding duplicates
+		var invalidDoesNotExist = this.checkInvalid(x, y, invalidArray);
+		if(invalidDoesNotExist) {
+			invalidArray.push({x: x, y: y});
+		}
+
+		// recursively call out in cardinal directions
+		this.markInvalid((x + 1) % this.xSize, y, numSpread - 1, invalidArray);
+		this.markInvalid((x - 1 + this.xSize) % this.xSize, y, numSpread - 1, invalidArray);
+		this.markInvalid(x, (y + 1) % this.ySize, numSpread - 1, invalidArray);
+		this.markInvalid(x, (y - 1 + this.ySize) % this.ySize, numSpread - 1, invalidArray);
 	}
 }
