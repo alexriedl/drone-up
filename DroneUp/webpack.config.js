@@ -18,7 +18,7 @@ var babelSettings = {
 module.exports = {
 	devtool: isDevBuild ? 'source-map' : null,
 	entry: {
-		'main': './ClientApp/main.tsx'		
+		'main': './scripts/main.ts'
 	},
 	resolve: { extensions: ['', '.js', '.jsx', '.ts', '.tsx', '.scss' ] },
 	output: {
