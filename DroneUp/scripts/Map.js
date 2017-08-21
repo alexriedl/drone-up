@@ -119,8 +119,35 @@ class Map {
 		this.markInvalid(x, (y - 1 + this.ySize) % this.ySize, numSpread - 1, invalidArray);
 	}
 	
-	//GetCrashedDrones() returns a list of drone IDs that have crashed
-	//Move(Id, deltaX, deltaY) repositions the object at ID if it can be moved
+	getCrashedDrones() {
+		var crashed = [];
+		for(var i = 0, playerCount = this.players.length; i < playerCount; i++) {
+			for(var j = 0, mapObjectCount = this.mapObjects.length; j < mapObjectCount; j++) {
+				var player = this.players[i];
+				var otherObject = this.mapObjects[j];
+				if(player.x === otherObject.x && player.y === otherObject.y && player.ID !== otherObject.ID) {
+					crashed.push(player.ID);
+				}
+			}
+		}
+		
+		return crashed;
+	}
+	
+	move(Id, deltaX, deltaY) {
+		var mapObject = null;
+		for(var i = 0, objectCount = this.mapObjects.length; i < objectCount; i++) {
+			if(this.mapObjects[i].ID === Id) {
+				mapObject = this.mapObjects[i];
+			}
+		}
+		
+		if(mapObject !== null){
+			mapObject.x += deltaX;
+			mapObject.y += deltaY;
+		}
+	}
+	
 	//ScanFor(Id) returns the game objects visible to the object with the given ID
 	//GetNextObjectUpFrom(this.Id) returns an ID of the next object up from the object with the given ID
 	//GetNextObjectDownFrom(this.Id) returns an ID of the next object down from the object with the given ID

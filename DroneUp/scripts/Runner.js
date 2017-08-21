@@ -27,7 +27,7 @@ Runner.prototype.CheckGameDone = function() {
 };
 
 Runner.prototype.RemoveDeceased = function(){
-	var collisions = this.map.GetCrashedDrones();
+	var collisions = this.map.getCrashedDrones();
 	for(var i=0, len = this.gameObjects.length; i < len; i++) {
 		for(var j=0, collisionLen = collisions.length; j < collisionLen; j++){
 			if(this.gameObject[i].Id === collisions[j]){

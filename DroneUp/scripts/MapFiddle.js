@@ -19,31 +19,32 @@ class Map {
 		this.players = playerArray;
 		this.spikes = spikeArray;
 		this.mapObjects = playerArray.concat(spikeArray);
+		this.invalidArray = invalidArray;
 		
-		this.Draw(playerArray, spikeArray, invalidArray);
+		this.Draw();
 	}
 	
-	Draw(playerArray, spikeArray, invalidArray){
+	Draw(){
 		var mapVisual = "";
 		for(var x = 0; x < this.xSize; x++){
 			for(var y = 0; y < this.ySize; y++){
 				var thisSpot = " ";
-				for(var p = 0; p < playerArray.length; p++){
-					if(playerArray[p].x === x && playerArray[p].y === y){
+				for(var p = 0; p < this.players.length; p++){
+					if(this.players[p].x === x && this.players[p].y === y){
 						if(thisSpot === " "){
 							thisSpot = "P";
 						}
 					}
 				}
-				for(var s = 0; s < spikeArray.length; s++){
-					if(spikeArray[s].x === x && spikeArray[s].y === y){
+				for(var s = 0; s < this.spikes.length; s++){
+					if(this.spikes[s].x === x && this.spikes[s].y === y){
 						if(thisSpot === " "){
 							thisSpot = "S";
 						}
 					}
 				}
-				for(var i = 0; i < invalidArray.length; i++){
-					if(invalidArray[i].x === x && invalidArray[i].y === y){
+				for(var i = 0; i < this.invalidArray.length; i++){
+					if(this.invalidArray[i].x === x && this.invalidArray[i].y === y){
 						if(thisSpot === " "){
 							thisSpot = "i";
 						}
@@ -153,6 +154,37 @@ class Map {
 		this.markInvalid((x - 1 + this.xSize) % this.xSize, y, numSpread - 1, invalidArray);
 		this.markInvalid(x, (y + 1) % this.ySize, numSpread - 1, invalidArray);
 		this.markInvalid(x, (y - 1 + this.ySize) % this.ySize, numSpread - 1, invalidArray);
+	}
+	
+	getCrashedDrones() {
+		var crashed = [];
+		for(var i = 0, playerCount = this.players.length; i < playerCount; i++) {
+			for(var j = 0, mapObjectCount = this.mapObjects.length; j < mapObjectCount; j++) {
+				var player = this.players[i];
+				var otherObject = this.mapObjects[j];
+				if(player.x === otherObject.x && player.y === otherObject.y && player.ID !== otherObject.ID) {
+					crashed.push(player.ID);
+				}
+			}
+		}
+		
+		return crashed;
+	}
+	
+	move(Id, deltaX, deltaY) {
+		var mapObject = null;
+		for(var i = 0, objectCount = this.mapObjects.length; i < objectCount; i++) {
+			if(this.mapObjects[i].ID === Id) {
+				mapObject = this.mapObjects[i];
+			}
+		}
+		
+		if(mapObject !== null){
+			mapObject.x += deltaX;
+			mapObject.y += deltaY;
+		}
+		
+		this.Draw();
 	}
 }
 
