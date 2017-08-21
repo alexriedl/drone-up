@@ -1,7 +1,7 @@
 function Runner(gameObjectArray) {
 	this.gameObjects = gameObjectArray;
 	this.gameDone = false;
-}
+};
 
 Runner.prototype.Run = function() {
 	while(!GameDone) {
