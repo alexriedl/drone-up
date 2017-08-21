@@ -1,9 +1,0 @@
-C:\dev\proof-of-concept\DroneUp\DroneUp\bin\Debug\netcoreapp1.1\DroneUp.deps.json
-C:\dev\proof-of-concept\DroneUp\DroneUp\bin\Debug\netcoreapp1.1\DroneUp.runtimeconfig.json
-C:\dev\proof-of-concept\DroneUp\DroneUp\bin\Debug\netcoreapp1.1\DroneUp.runtimeconfig.dev.json
-C:\dev\proof-of-concept\DroneUp\DroneUp\bin\Debug\netcoreapp1.1\DroneUp.dll
-C:\dev\proof-of-concept\DroneUp\DroneUp\bin\Debug\netcoreapp1.1\DroneUp.pdb
-C:\dev\proof-of-concept\DroneUp\DroneUp\obj\Debug\netcoreapp1.1\DroneUp.csprojResolveAssemblyReference.cache
-C:\dev\proof-of-concept\DroneUp\DroneUp\obj\Debug\netcoreapp1.1\DroneUp.AssemblyInfo.cs
-C:\dev\proof-of-concept\DroneUp\DroneUp\obj\Debug\netcoreapp1.1\DroneUp.dll
-C:\dev\proof-of-concept\DroneUp\DroneUp\obj\Debug\netcoreapp1.1\DroneUp.pdb
