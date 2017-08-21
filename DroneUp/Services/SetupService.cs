@@ -16,7 +16,7 @@ namespace DroneUp.Services
 		    return random.Next(1, int.MaxValue);
 		}
 
-	    public bool UploadScript(string droneScriptName, string droneScriptContent)
+	    public bool UploadDroneScript(string droneScriptName, string droneScriptContent)
 	    {
 		    bool successfullyUploadedScript = false;
 		    string writePath = DRONES_DIRECTORY + "/" + droneScriptName;
@@ -38,7 +38,10 @@ namespace DroneUp.Services
 
 		    foreach (var file in files)
 		    {
-			    allDroneScriptNames.Add(file.Name);
+			    if (File.Exists(file.FullName))
+				{
+					allDroneScriptNames.Add(file.Name);
+				}
 		    }
 			
 			return allDroneScriptNames;

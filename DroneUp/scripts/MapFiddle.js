@@ -1,30 +1,81 @@
 class Map {
-	constructor(randomizer, players, spikePercent, xSize, ySize) {
+	constructor(xSize, ySize) {
+		this.xSize = xSize;
+		this.ySize = ySize;
+
+	}
+
+	initialize(randomizer, player, spikePercent) {
 		var playerArray = [];
 		var spikeArray = [];
+		var invalidArray = [];
 
-		// first, generate all players (attempt up to 1000 times, if this fails bail out)
+		// first, generate all players and mark their "safe space" as invalid for further placements
+		this.generatePlayers(randomizer, players, playerArray, invalidArray);
+
+		// then, generate spikes (up to the percentage or 1000 failures, whichever happens first)
+		this.generateSpikes(randomizer, spikePercent, spikeArray, invalidArray);
+
+		this.players = playerArray;
+		this.spikes = spikeArray;
+		this.mapObjects = playerArray.concat(spikeArray);
+		this.invalidArray = invalidArray;
+		
+		this.Draw();
+	}
+	
+	Draw(){
+		var mapVisual = "";
+		for(var x = 0; x < this.xSize; x++){
+			for(var y = 0; y < this.ySize; y++){
+				var thisSpot = " ";
+				for(var p = 0; p < this.players.length; p++){
+					if(this.players[p].x === x && this.players[p].y === y){
+						if(thisSpot === " "){
+							thisSpot = "P";
+						}
+					}
+				}
+				for(var s = 0; s < this.spikes.length; s++){
+					if(this.spikes[s].x === x && this.spikes[s].y === y){
+						if(thisSpot === " "){
+							thisSpot = "S";
+						}
+					}
+				}
+				for(var i = 0; i < this.invalidArray.length; i++){
+					if(this.invalidArray[i].x === x && this.invalidArray[i].y === y){
+						if(thisSpot === " "){
+							thisSpot = "i";
+						}
+					}
+				}
+				mapVisual += thisSpot;
+			}
+			mapVisual += "\n";
+		}
+		
+		this.visual = mapVisual;
+	}
+
+	generatePlayers(randomizer, players, playerArray, invalidArray) {
 		for (var p = 0, plen = players.length; p < plen; p++) {
 			var player = players[p];
 			var attempts = 0;
 			var validSpot = false;
 			while (!validSpot) {
+				// only attempt up to 1000 times to prevent an infinite loop; if we can't place a player, bail out
 				if (attempts > 1000) {
 					alert('player could not be placed after 1000 attempts, aborting');
 					return null;
 				}
 
-				var x = randomizer.next() % xSize;
-				var y = randomizer.next() % ySize;
+				var x = randomizer.next() % this.xSize;
+				var y = randomizer.next() % this.ySize;
 
-				var attemptValid = true;
-				for (var o = 0, olen = playerArray.length; o < olen && attemptValid; o++) {
-					var obj = playerArray[o];
-					// players get a "safe space" of 3 (manhattan) distance from other things
-					if ((Math.abs(x - obj.x) + Math.abs(y - obj.y)) <= 3) {
-						attemptValid = false;
-					}
-				}
+				// doublecheck all invalid spaces
+				var attemptValid = this.checkInvalid(x, y, invalidArray);
+				
 				if (attemptValid) {
 					playerArray.push({
 						ID: player.ID,
@@ -32,6 +83,9 @@ class Map {
 						y: y
 					})
 					validSpot = true;
+
+					// add the player's "safe space" (anything a distance of <= 3 tiles away)
+					this.markInvalid(x, y, 3, invalidArray);
 				}
 
 				if (!validSpot) {
@@ -39,38 +93,29 @@ class Map {
 				}
 			}
 		};
+	}
 
-		// then, generate spikes (up to the percentage or 1000 failures, whichever happens first)
+	generateSpikes(randomizer, spikePercent, spikeArray, invalidArray) {
 		var spikesGenned = 0;
 		var spikesFailed = 0;
-		var neededSpikes = (xSize * ySize * spikePercent) / 100
+		var neededSpikes = (this.xSize * this.ySize * spikePercent) / 100;
 		while (spikesGenned < neededSpikes && spikesFailed < 1000) {
 			var spikeId = '__reservedSpikeNumber' + (spikesGenned + 1) + '__';
 
-			var x = randomizer.next() % xSize;
-			var y = randomizer.next() % ySize;
+			var x = randomizer.next() % this.xSize;
+			var y = randomizer.next() % this.ySize;
 
-			var attemptValid = true;
-			// first check against players (they still get a safe space)
-			for (var o = 0, olen = playerArray.length; o < olen && attemptValid; o++) {
-				var obj = playerArray[o];
-				if ((Math.abs(x - obj.x) + Math.abs(y - obj.y)) <= 3) {
-					attemptValid = false;
-				}
-			}
-			// then check against the other spikes (which don't get a safe space)
-			for (var o = 0, olen = spikeArray.length; o < olen && attemptValid; o++) {
-				var obj = spikeArray[o];
-				if ((Math.abs(x - obj.x) + Math.abs(y - obj.y)) === 0) {
-					attemptValid = false;
-				}
-			}
+			var attemptValid = this.checkInvalid(x, y, invalidArray);
+
 			if (attemptValid) {
 				spikeArray.push({
 					ID: spikeId,
 					x: x,
 					y: y
-				})
+				});
+
+				// spikes only invalidate their tile, they get no "safe space"
+				this.markInvalid(x, y, 0, invalidArray);
 			}
 
 			if (attemptValid) {
@@ -79,12 +124,67 @@ class Map {
 				spikesFailed++;
 			}
 		}
+	}
 
-		this.players = playerArray;
-		this.spikes = spikeArray;
-		this.mapObjects = playerArray.concat(spikeArray);
-		this.xSize = xSize;
-		this.ySize = ySize;
+	checkInvalid(x, y, invalidArray) {
+		var attemptValid = true;
+
+		for (var i = 0, ilen = invalidArray.length; i < ilen && attemptValid; i++) {
+			var inv = invalidArray[i];
+			if (x === inv.x && y === inv.y) {
+				attemptValid = false;
+			}
+		}
+
+		return attemptValid;
+	}
+
+	markInvalid(x, y, numSpread, invalidArray) {
+		if (numSpread < 0)
+			return;
+
+		// check if the current tile is invalid to avoid adding duplicates
+		var invalidDoesNotExist = this.checkInvalid(x, y, invalidArray);
+		if(invalidDoesNotExist) {
+			invalidArray.push({x: x, y: y});
+		}
+
+		// recursively call out in cardinal directions
+		this.markInvalid((x + 1) % this.xSize, y, numSpread - 1, invalidArray);
+		this.markInvalid((x - 1 + this.xSize) % this.xSize, y, numSpread - 1, invalidArray);
+		this.markInvalid(x, (y + 1) % this.ySize, numSpread - 1, invalidArray);
+		this.markInvalid(x, (y - 1 + this.ySize) % this.ySize, numSpread - 1, invalidArray);
+	}
+	
+	getCrashedDrones() {
+		var crashed = [];
+		for(var i = 0, playerCount = this.players.length; i < playerCount; i++) {
+			for(var j = 0, mapObjectCount = this.mapObjects.length; j < mapObjectCount; j++) {
+				var player = this.players[i];
+				var otherObject = this.mapObjects[j];
+				if(player.x === otherObject.x && player.y === otherObject.y && player.ID !== otherObject.ID) {
+					crashed.push(player.ID);
+				}
+			}
+		}
+		
+		return crashed;
+	}
+	
+	move(Id, deltaX, deltaY) {
+		var mapObject = null;
+		for(var i = 0, objectCount = this.mapObjects.length; i < objectCount; i++) {
+			if(this.mapObjects[i].ID === Id) {
+				mapObject = this.mapObjects[i];
+			}
+		}
+		
+		if(mapObject !== null){
+			mapObject.x += deltaX;
+			mapObject.y += deltaY;
+		}
+		
+		this.Draw();
 	}
 }
 
@@ -116,13 +216,12 @@ Random.prototype.nextFloat = function (opt_minOrMax, opt_max) {
 };
 
 var players = [];
-var player1 = {ID: 'player1'};
-players.push(player1);
-var player2 = {ID: 'player2'};
-players.push(player2);
-var player3 = {ID: 'player3'};
-players.push(player3);
-var player4 = {ID: 'player4'};
-players.push(player4);
-var map = new Map(new Random(5), players, 15, 10, 10);
-
+players.push({ID: 'player1'});
+players.push({ID: 'player2'});
+players.push({ID: 'player3'});
+players.push({ID: 'player4'});
+players.push({ID: 'player5'});
+players.push({ID: 'player6'});
+var map = new Map(30, 30);
+map.initialize(new Random(12345), players, 15);
+console.log(map);
