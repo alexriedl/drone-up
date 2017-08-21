@@ -1,0 +1,19 @@
+{
+  "name": "drone-up",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@types/webgl-ext": "0.0.28"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.directs.com:jonmetzler-sandbox/Hackaton-DroneUp.git"
+  },
+  "author": "",
+  "license": "ISC"
+}
