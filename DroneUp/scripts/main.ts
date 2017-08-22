@@ -13,12 +13,33 @@ var main = function() {
 	document.getElementById("startButton").onclick = startGame;
 };
 
+var getRandomSeed = function() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("GET", "/api/mapseed", false);
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send();
+	var randomSeed = JSON.parse(xhttp.responseText);
+
+	return randomSeed;
+};
+
 var startGame = function() {
 	if(window['running']) {
 		console.log("Game is already running, but was told to run again.");
 	} else {
+		var inputSeedElement = (document.getElementById("seedInput") as HTMLInputElement);
+		inputSeedElement.disabled = true;
 		window['running'] = true;
-		seed = 12345;
+
+		var inputSeed = inputSeedElement.value;
+		if (inputSeed.length > 0) {
+			seed = inputSeed;
+		} else {
+			inputSeed = getRandomSeed();
+			inputSeedElement.value = inputSeed;
+		}
+
+		seed = +inputSeed > 0 ? inputSeed : getRandomSeed;
 	
 		var playerControllers = [
 			new LuigiBot(seed), 
