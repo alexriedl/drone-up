@@ -8,7 +8,7 @@ export default class Runner {
 		this.renderer = new Renderer("game-canvas");
 	}
 
-	run() {
+	run = () => {
 		if(!this.gameDone) {
 			for(var i = 0, len = this.gameObjects.length; i < len; i++) {
 				if(this.gameObjects[i] !== undefined) {
@@ -20,7 +20,7 @@ export default class Runner {
 			this.checkGameDone();
 			this.renderUi();
 			
-			setTimeout(run, 500);
+			setTimeout(this.run, 500);
 		}
 	}
 
