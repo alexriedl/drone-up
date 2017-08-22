@@ -1,10 +1,28 @@
+import Random from './Random';
+
+export interface ICoords {
+  x: number;
+  y: number;
+}
+export interface IEntity extends ICoords {
+  ID: string;
+}
+export interface IMapState {
+  invalidArray: ICoords[];
+  mapObjects: IEntity[];
+  players: IEntity[];
+  spikes: IEntity[];
+  xSize: number;
+  ySize: number;
+}
+
 export enum RenderObjectTypes {
+  Grid,
   Rectangle,
 }
-export interface IColor {
-  r: number;
-  g: number;
-  b: number;
+export class Color {
+  constructor(public r: number = 0, public g: number = 0, public b: number = 0) {
+  }
 }
 export interface IRenderObject {
   type: RenderObjectTypes;
@@ -12,7 +30,7 @@ export interface IRenderObject {
 }
 export interface Rectangle extends IRenderObject {
   size: TSM.vec2;
-  color: IColor;
+  color: Color;
 }
 export interface SimpleShaderProgramInfo {
   program: WebGLProgram;
@@ -26,7 +44,15 @@ export interface SimpleShaderProgramInfo {
   };
 }
 
-function InitWebGL(canvas) {
+
+const random = new Random(12345);
+const over = 2147483647;
+function getRandomColor() {
+  const r = () => random.next() / over;
+  return new Color(r(), r(), r());
+}
+
+function initWebGL(canvas) {
   let gl = <WebGLRenderingContext>(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
 
   // If we don't have a GL context, give up now
@@ -37,7 +63,7 @@ function InitWebGL(canvas) {
   return gl;
 }
 
-function CreateShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader {
+function createShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader {
   var shader: WebGLShader = gl.createShader(type);
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
@@ -50,9 +76,9 @@ function CreateShader(gl: WebGLRenderingContext, type: number, source: string): 
   gl.deleteShader(shader);
 }
 
-function CreateShaderProgram(gl: WebGLRenderingContext, vertexShaderSource: string, fragmentShaderSource: string): SimpleShaderProgramInfo {
-  var vertexShader = CreateShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-  var fragmentShader = CreateShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+function createShaderProgram(gl: WebGLRenderingContext, vertexShaderSource: string, fragmentShaderSource: string): SimpleShaderProgramInfo {
+  var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+  var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
   if(!vertexShader || !fragmentShader) {
     console.log("Failed to compile one of the shaders...");
@@ -105,7 +131,8 @@ const fragmentShaderSource = `
   }`;
 
 
-export class Renderer {
+export default class Renderer {
+  private playerColors: { [id: string]: Color } = {};
   private canvas: HTMLElement;
   private gl: WebGLRenderingContext;
   private programInfo: SimpleShaderProgramInfo;
@@ -113,10 +140,10 @@ export class Renderer {
   private rectangleVertexBuffer: WebGLBuffer;
   private rectangleColorBuffer: WebGLBuffer;
 
-  public Initialize(canvasId: string) {
+  public constructor(canvasId: string) {
     this.canvas = document.getElementById(canvasId);
 
-    const gl = InitWebGL(this.canvas);
+    const gl = initWebGL(this.canvas);
     if (!gl) return;
 
     this.gl = gl;
@@ -126,17 +153,17 @@ export class Renderer {
     gl.depthFunc(gl.LEQUAL);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    this.programInfo = CreateShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
+    this.programInfo = createShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
 
-    this.InitializeRectangleBuffers(gl);
+    this.initializeRectangleBuffers(gl);
   }
 
-  public InitializeRectangleBuffers(gl: WebGLRenderingContext) {
+  public initializeRectangleBuffers(gl: WebGLRenderingContext) {
     var positions = [
-      -0.5, -0.5,
-      0.5, -0.5,
-      0.5, 0.5,
-      -0.5, 0.5,
+      0, 0,
+      1, 0,
+      1, 1,
+      0, 1,
     ];
     this.rectangleVertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.rectangleVertexBuffer);
@@ -153,10 +180,29 @@ export class Renderer {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
   }
 
+  public renderState(state: IMapState) {
+    const group = new RenderGroup();
+
+    group.pushGrid(new TSM.vec2([state.xSize, state.ySize]), new Color(1, 0.7, 0), 1, 0.05);
+
+    const tileSize = new TSM.vec2([1, 1]);
+    const spikeColor = new Color(.6, .6, .6);
+
+    for(let i = 0; i < state.mapObjects.length; i++) {
+      const entity = state.mapObjects[i];
+      const isPlayer = entity.ID.startsWith("player");
+      let color = isPlayer ? this.getPlayerColor(entity.ID) : spikeColor;
+
+      group.pushRectangle(new TSM.vec3([entity.x, entity.y, 0]), tileSize, color);
+    }
+
+    this.renderOutput(group, state.xSize, state.ySize);
+  }
+
   /*************************************************************************
   *************************************************************************/
 
-  private RenderRectangle(gl: WebGLRenderingContext, object: Rectangle) {
+  private renderRectangle(gl: WebGLRenderingContext, object: Rectangle) {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.rectangleVertexBuffer);
     const info = this.programInfo;
 
@@ -170,24 +216,20 @@ export class Renderer {
     gl.enableVertexAttribArray(info.attributeLocations.positionAttributeLocation);
 
     var colors = [
-      object.color.r, object.color.b, object.color.g, 1,
-      object.color.r, object.color.b, object.color.g, 1,
-      object.color.r, object.color.b, object.color.g, 1,
-      object.color.r, object.color.b, object.color.g, 1,
+      object.color.r, object.color.g, object.color.b, 1,
+      object.color.r, object.color.g, object.color.b, 1,
+      object.color.r, object.color.g, object.color.b, 1,
+      object.color.r, object.color.g, object.color.b, 1,
     ];
     gl.bindBuffer(gl.ARRAY_BUFFER, this.rectangleColorBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
     gl.vertexAttribPointer(info.attributeLocations.colorAttributeLocation, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(info.attributeLocations.colorAttributeLocation);
 
-    // const modelViewMatrix = TSM.mat4.identity;
-    // modelViewMatrix.translate(object.origin);
-    // modelViewMatrix.scale(new TSM.vec3([...object.size.xy, 1]));
-
     const modelViewMatrix = TSM.mat4.identity
+      .copy()
       .translate(object.origin)
       .scale(new TSM.vec3([...object.size.xy, 1]));
-console.log(new TSM.vec3([...object.size.xy, 1]));
 
     gl.uniformMatrix4fv(
       info.uniformLocations.modelViewMatrix,
@@ -203,7 +245,7 @@ console.log(new TSM.vec3([...object.size.xy, 1]));
   /*************************************************************************
   *************************************************************************/
 
-  public RenderOutput(group: RenderGroup) {
+  public renderOutput(group: RenderGroup, mapWidth: number, mapHeight) {
     const gl: WebGLRenderingContext = this.gl;
     const info = this.programInfo;
 
@@ -211,19 +253,12 @@ console.log(new TSM.vec3([...object.size.xy, 1]));
     this.gl.viewport(0, 0, this.canvas['width'], this.canvas['height']);
     gl.useProgram(info.program);
 
-    // const fieldOfView = 45 * Math.PI / 180;   // in radians
-    // const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-    // const zNear = 0.1;
-    // const zFar = 100.0;
-    // const projectionMatrix = TSM.mat4.perspective(fieldOfView, aspect, zNear, zFar)
-
-    const halfSize = 20;
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
-    const left = -halfSize;
-    const right = halfSize;
-    const bottom = -halfSize / aspect;
-    const top = halfSize / aspect;
+    const left = 0;
+    const right = mapWidth;
+    const bottom = mapHeight / aspect;
+    const top = 0;
     const orthoMatrix = TSM.mat4.orthographic(left, right, bottom, top, -1, 1);
 
     gl.uniformMatrix4fv(
@@ -234,19 +269,27 @@ console.log(new TSM.vec3([...object.size.xy, 1]));
     group.objects.forEach(o => {
       switch ((<IRenderObject>o).type) {
         case RenderObjectTypes.Rectangle:
-          this.RenderRectangle(gl, <Rectangle>o);
+          this.renderRectangle(gl, <Rectangle>o);
           break;
         default:
           console.log("UNKNOWN OBJECT");
       }
     });
   }
+
+  private getPlayerColor(id: string): Color {
+    if(!this.playerColors[id]) {
+      this.playerColors[id] = getRandomColor();
+    }
+
+    return this.playerColors[id]
+  }
 }
 
 export class RenderGroup {
   public objects: Object[] = [];
 
-  public PushRectangle(origin: TSM.vec3, size: TSM.vec2, color: IColor = { r: 1, g: 1, b: 1 }) {
+  public pushRectangle(origin: TSM.vec3, size: TSM.vec2, color: Color = new Color(1, 1, 1)) {
     this.objects.push({
       type: RenderObjectTypes.Rectangle,
       origin: origin,
@@ -254,62 +297,17 @@ export class RenderGroup {
       color: color
     });
   }
-}
 
-export function test() {
-  console.log("Setting up");
-  const renderer = new Renderer();
-  renderer.Initialize("game-canvas");
+  public pushGrid(size: TSM.vec2, color: Color = new Color(1, 1, 1), space: number = 1, width: number = 0.2) {
+    const borderWidth = width;
+    const borderColor = color;
 
-  let state = {
-    startX: 0.5,
-    endX: -0.5,
-    currentX: 0,
-    increment: -1
-  };
-  let then = 0;
-  const render = ((now) => {
-    now *= 0.001;  // convert to seconds
-    const deltaTime = now - then;
-    then = now;
+    for(let x = 0; x < size.x; x += space) {
+      this.pushRectangle(new TSM.vec3([x, 0, 0]), new TSM.vec2([borderWidth, size.y]), borderColor);
+    }
 
-    state = updateState(deltaTime, state);
-    renderState(renderer, state);
-
-    setTimeout(() => requestAnimationFrame(render), 30);
-  });
-  requestAnimationFrame(render);
-}
-
-export interface IState {
-  startX: number;
-  endX: number;
-  currentX: number;
-  increment: number;
-}
-
-function swop(state: IState) {
-  return {
-    increment: -state.increment,
-    endX: state.startX,
-    startX: state.endX,
-    currentX: state.endX
-  };
-}
-
-function updateState(deltaTime, state: IState): IState {
-  state.currentX += state.increment * deltaTime;
-  if((state.increment < 0 && state.currentX < state.endX) ||
-    (state.increment > 0 && state.currentX > state.endX)) {
-      return swop(state);
+    for(let y = 0; y < size.y; y += space) {
+      this.pushRectangle(new TSM.vec3([0, y, 0]), new TSM.vec2([size.x, borderWidth]), borderColor);
+    }
   }
-
-  return state
-}
-
-function renderState(renderer: Renderer, state: IState) {
-  const frame = new RenderGroup();
-  frame.PushRectangle(new TSM.vec3([state.currentX, 0, 0]), new TSM.vec2([1, 1]));
-
-  renderer.RenderOutput(frame);
 }

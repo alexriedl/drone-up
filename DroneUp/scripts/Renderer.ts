@@ -122,37 +122,3 @@ export default class Renderer {
     this.context.context.stroke();
   }
 }
-
-export function test() {
-  const renderer = new Renderer("game-canvas");
-
-  renderer.renderState({
-    invalidArray: [],
-    mapObjects: [
-      { ID: "player1", x: 7, y: 1 },
-      { ID: "player2", x: 3, y: 1 },
-      { ID: "player3", x: 15, y: 6 },
-      { ID: "__reservedSpikeNumber1__", x: 3, y: 4 },
-    ],
-    players: [],
-    spikes: [],
-    xSize: 50,
-    ySize: 50
-  });
-
-  setTimeout(function() {
-    renderer.renderState({
-      invalidArray: [],
-      mapObjects: [
-        { ID: "player1", x: 10, y: 1 },
-        { ID: "player2", x: 15, y: 1 },
-        { ID: "player3", x: 15, y: 7 },
-        { ID: "__reservedSpikeNumber1__", x: 3, y: 4 },
-      ],
-      players: [],
-      spikes: [],
-      xSize: 50,
-      ySize: 50
-    });
-  }, 3000);
-}
