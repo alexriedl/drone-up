@@ -1,16 +1,5 @@
 import Game from './Game';
-
-function Random(seed) {
-  this._seed = seed % 2147483647;
-  if (this._seed <= 0) this._seed += 2147483646;
-}
-
-/**
- * Returns a pseudo-random value between 1 and 2^32 - 2.
- */
-Random.prototype.next = function () {
-  return this._seed = this._seed * 16807 % 2147483647;
-};
+import Random from './Random';
 
 class Controller {
   private randomizer;

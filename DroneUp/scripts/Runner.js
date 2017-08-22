@@ -1,4 +1,5 @@
-import Renderer from './Renderer';
+//import Renderer from './Renderer';
+import Renderer from './OpenGLRenderer';
 
 export default class Runner {
 	constructor(gameObjectArray, map) {
@@ -19,7 +20,7 @@ export default class Runner {
 			}
 			this.checkGameDone();
 			this.renderUi();
-			
+
 			setTimeout(this.run, 333);
 		}
 	}
