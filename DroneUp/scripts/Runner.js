@@ -7,7 +7,7 @@ class Runner {
 	}
 	
 	run() {
-		while(!this.gameDone) {
+		if(!this.gameDone) {
 			for(var i = 0, len = this.gameObjects.length; i < len; i++) {
 				if(this.gameObjects[i] !== undefined) {
 					var action = this.gameObjects[i].controller.getAction();
@@ -17,6 +17,8 @@ class Runner {
 			}
 			this.checkGameDone();
 			this.renderUi();
+			
+			setTimeout(run, 500);
 		}
 	}
 	
