@@ -134,14 +134,20 @@ export default class Map {
 
 	getCrashedDrones() {
 		var crashed = [];
+		var playerRemovalIndices = [];
 		for(var i = 0, playerCount = this.players.length; i < playerCount; i++) {
 			for(var j = 0, mapObjectCount = this.mapObjects.length; j < mapObjectCount; j++) {
 				var player = this.players[i];
 				var otherObject = this.mapObjects[j];
 				if(player.x === otherObject.x && player.y === otherObject.y && player.ID !== otherObject.ID) {
 					crashed.push(player.ID);
+					playerRemovalIndices.push(i);
 				}
 			}
+		}
+		
+		for(var j = 0, len = playerRemovalIndices.length; j < len; j++) {
+			this.players.splice(playerRemovalIndices[j], 1);
 		}
 
 		return crashed;
