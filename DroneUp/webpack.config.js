@@ -18,7 +18,7 @@ var babelSettings = {
 module.exports = {
 	devtool: isDevBuild ? 'source-map' : null,
 	entry: {
-		'main': './scripts/main.ts'
+		'main': './ClientApp/main.tsx'
 	},
 	resolve: { extensions: ['', '.js', '.jsx', '.ts', '.tsx', '.scss' ] },
 	output: {
@@ -28,9 +28,9 @@ module.exports = {
 	},
 	module: {
 		loaders: [
-			{ test: /\.jsx?$/, loaders: ['babel-loader?' + JSON.stringify(babelSettings) ], exclude: /node_modules[\\/](?!@duel)/	},
-			{ test: /\.ts(x?)$/, include: /scripts/, loader: 'babel-loader' },
-			{ test: /\.ts(x?)$/, loader: 'ts-loader', query: { silent: true }},
+			{ test: /\.jsx?$/, loaders: ['babel-loader?' + JSON.stringify(babelSettings)], exclude: /node_modules[\\/](?!@duel)/ },
+			{ test: /\.ts(x?)$/, include: /ClientApp/, loader: 'babel-loader' },
+			{ test: /\.ts(x?)$/, loader: 'ts-loader', query: { silent: true } },
 			{ test: /\.css$/, loader: ExtractTextPlugin.extract(['css-loader']) },
 			{ test: /\.scss$/, loader: ExtractTextPlugin.extract('style-loader', [`css-loader`, 'postcss-loader', `sass-loader`]) },
 			{ test: /\.(png|jpg|jpeg|gif|svg)$/, loader: 'url-loader', query: { limit: 25000 } },

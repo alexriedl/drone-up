@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@diamondlovesyou/tsm": "^0.7.4",
+    "@types/sylvester": "^0.1.5",
     "@types/webgl-ext": "0.0.28",
     "babel-core": "6.17.0",
     "babel-loader": "6.2.10",
