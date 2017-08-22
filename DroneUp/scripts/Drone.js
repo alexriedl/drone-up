@@ -34,12 +34,12 @@ export default class Drone extends GameObject{
 
 	pushUp() {
 		var toPush = this.map.getNextObjectUpFrom(this.ID);
-		this.map.move(toPush, 0, 1);
+		this.map.move(toPush, 0, -1);
 	}
 
 	pushDown() {
 		var toPush = this.map.getNextObjectDownFrom(this.ID);
-		this.map.move(toPush, 0, -1);
+		this.map.move(toPush, 0, 1);
 	}
 
 	pushLeft() {
