@@ -20,7 +20,7 @@ export default class Runner {
 			this.checkGameDone();
 			this.renderUi();
 			
-			setTimeout(this.run, 500);
+			setTimeout(this.run, 333);
 		}
 	}
 
