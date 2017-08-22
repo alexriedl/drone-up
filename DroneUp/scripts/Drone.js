@@ -1,6 +1,6 @@
 import GameObject from './GameObject';
 
-export default class Drone extends GameObject{
+export default class Drone extends GameObject {
 	constructor(controller, ID, map) {
 		super(controller, ID, map);
 		controller.actions = ["Scan", "moveUp", "moveDown", "moveLeft", "moveRight", "PullUp", "PullDown", "PullRight", "PullLeft", "PushUp", "PushDown", "PushRight", "PushLeft"];
@@ -53,7 +53,7 @@ export default class Drone extends GameObject{
 	}
 
 	perform(action) {
-		switch(action){
+		switch (action) {
 			case "moveUp":
 				this.moveUp();
 				break;

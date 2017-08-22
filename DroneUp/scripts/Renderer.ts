@@ -6,10 +6,7 @@ export interface IEntity extends ICoords {
   ID: string;
 }
 export interface IMapState {
-  invalidArray: ICoords[];
   mapObjects: IEntity[];
-  players: IEntity[];
-  spikes: IEntity[];
   xSize: number;
   ySize: number;
 }
@@ -68,6 +65,10 @@ export default class Renderer {
     state.mapObjects.forEach(entity => {
       this.renderObject(entity);
     });
+  }
+
+  public renderAction(state: IMapState, entity: IEntity, action: string) {
+    console.log("Animations are not implemented in the software renderer");
   }
 
   private getPlayerColor(id: string): string {

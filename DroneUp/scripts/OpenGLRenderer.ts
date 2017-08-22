@@ -8,10 +8,7 @@ export interface IEntity extends ICoords {
   ID: string;
 }
 export interface IMapState {
-  invalidArray: ICoords[];
   mapObjects: IEntity[];
-  players: IEntity[];
-  spikes: IEntity[];
   xSize: number;
   ySize: number;
 }
@@ -204,6 +201,38 @@ export default class Renderer {
     }
 
     this.renderOutput(group, state.xSize, state.ySize);
+  }
+
+  public renderAction(state: IMapState, entity: IEntity, action: string) {
+		switch (action) {
+			case "moveUp":
+				break;
+			case "moveDown":
+				break;
+			case "moveLeft":
+				break;
+			case "moveRight":
+				break;
+			case "PullUp":
+				break;
+			case "PullDown":
+				break;
+			case "PullLeft":
+				break;
+			case "PullRight":
+				break;
+			case "PushUp":
+				break;
+			case "PushDown":
+				break;
+			case "PushLeft":
+				break;
+			case "PushRight":
+				break;
+			case "Scan":
+				break;
+			default:
+		}
   }
 
   /*************************************************************************

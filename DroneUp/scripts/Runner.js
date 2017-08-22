@@ -15,6 +15,7 @@ export default class Runner {
 				if (this.gameObjects[i] !== undefined) {
 					var action = this.gameObjects[i].controller.getAction();
 					this.gameObjects[i].perform(action, this.map);
+					this.renderer.renderAction(this.map, this.gameObjects[i], action);
 				}
 				this.removeDeceased();
 			}
@@ -33,10 +34,7 @@ export default class Runner {
 
 	renderUi() {
 		this.renderer.renderState({
-			invalidArray: [],
 			mapObjects: this.map.getMapObjects(),
-			players: [],
-			spikes: [],
 			xSize: this.map.getXSize(),
 			ySize: this.map.getYSize()
 		});
