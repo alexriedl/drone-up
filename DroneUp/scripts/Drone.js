@@ -14,42 +14,42 @@ export default class Drone extends GameObject{
 
 	pullUp() {
 		var toPull = this.map.getNextObjectUpFrom(this.ID);
-		this.map.move(toPull, -1, 0);
+		this.map.move(toPull, 0, -1);
 	}
 
 	pullDown() {
 		var toPull = this.map.getNextObjectDownFrom(this.ID);
-		this.map.move(toPull, 1, 0);
+		this.map.move(toPull, 0, 1);
 	}
 
 	pullLeft() {
 		var toPull = this.map.getNextObjectLeftFrom(this.ID);
-		this.map.move(toPull, 0, 1);
+		this.map.move(toPull, 1, 0);
 	}
 
 	pullRight() {
 		var toPull = this.map.getNextObjectRightFrom(this.ID);
-		this.map.move(toPull, 0, -1);
+		this.map.move(toPull, -1, 0);
 	}
 
 	pushUp() {
 		var toPush = this.map.getNextObjectUpFrom(this.ID);
-		this.map.move(toPush, 1, 0);
+		this.map.move(toPush, 0, 1);
 	}
 
 	pushDown() {
 		var toPush = this.map.getNextObjectDownFrom(this.ID);
-		this.map.move(toPush, -1, 0);
+		this.map.move(toPush, 0, -1);
 	}
 
 	pushLeft() {
 		var toPush = this.map.getNextObjectLeftFrom(this.ID);
-		this.map.move(toPush, 0, -1);
+		this.map.move(toPush, -1, 0);
 	}
 
 	pushRight() {
 		var toPush = this.map.getNextObjectRightFrom(this.ID);
-		this.map.move(toPush, 0, 1);
+		this.map.move(toPush, 1, 0);
 	}
 
 	perform(action) {
