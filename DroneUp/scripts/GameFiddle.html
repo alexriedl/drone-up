@@ -32,14 +32,14 @@
 		constructor() {
 			this.randomizer = new Random(12345);
 		}
-		getAction() { 
+		getAction() {
+			return "Scan";
 			return this.actions[this.randomizer.next() % this.actions.length];
 		}
 	}
 	var playerControllers = [new Controller(), new Controller(), new Controller()];
 	
 	var game = new Game(12345, 15, playerControllers, 50, 50);
-	game.start();
 </script>
 </body>
 </html>
