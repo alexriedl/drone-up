@@ -1,94 +1,94 @@
-function Drone extends GameObject{
-	constructor(controller, Id, map) {
-		super(controller, Id, map);
+class Drone extends GameObject{
+	constructor(controller, ID, map) {
+		super(controller, ID, map);
 		controller.actions = ["Scan", "moveUp", "moveDown", "moveLeft", "moveRight", "PullUp", "PullDown", "PullRight", "PullLeft", "PushUp", "PushDown", "PushRight", "PushLeft"];
 	}
 
-	Scan() {
-		var scanResult = this.map.ScanFor(this.Id);
+	scan() {
+		var scanResult = this.map.ScanFor(this.ID);
 		this.controller.ScanResult = scanResult;
 	}
 
-	PullUp() {
-		var toPull = this.map.GetNextObjectUpFrom(this.Id);
+	pullUp() {
+		var toPull = this.map.GetNextObjectUpFrom(this.ID);
 		this.map.move(toPull, -1, 0);
 	}
 
-	PullDown() {
-		var toPull = this.map.GetNextObjectDownFrom(this.Id);
+	pullDown() {
+		var toPull = this.map.GetNextObjectDownFrom(this.ID);
 		this.map.move(toPull, 1, 0);
 	}
 
-	PullLeft() {
-		var toPull = map.GetNextObjectLeftFrom(this.Id);
+	pullLeft() {
+		var toPull = map.GetNextObjectLeftFrom(this.ID);
 		map.move(toPull, 0, 1);
 	}
 
-	PullRight() {
-		var toPull = this.map.GetNextObjectRightFrom(this.Id);
+	pullRight() {
+		var toPull = this.map.GetNextObjectRightFrom(this.ID);
 		this.map.move(toPull, 0, -1);
 	}
 
-	PushUp() {
-		var toPush =this. map.GetNextObjectUpFrom(this.Id);
+	pushUp() {
+		var toPush =this. map.GetNextObjectUpFrom(this.ID);
 		this.map.move(toPush, 1, 0);
 	}
 
-	PushDown() {
-		var toPush = this.map.GetNextObjectDownFrom(this.Id);
+	pushDown() {
+		var toPush = this.map.GetNextObjectDownFrom(this.ID);
 		this.map.move(toPush, -1, 0);
 	}
 
-	PushLeft() {
-		var toPush = map.GetNextObjectLeftFrom(this.Id);
+	pushLeft() {
+		var toPush = map.GetNextObjectLeftFrom(this.ID);
 		map.move(toPush, 0, -1);
 	}
 
-	PushRight() {
-		var toPush = map.GetNextObjectRightFrom(this.Id);
+	pushRight() {
+		var toPush = map.GetNextObjectRightFrom(this.ID);
 		map.move(toPush, 0, 1);
 	}
 
-	Perform() {
+	perform(action) {
 		switch(action){
 			case "moveUp":
-				this.moveUp(map);
+				this.moveUp();
 				break;
 			case "moveDown":
-				this.moveDown(map);
+				this.moveDown();
 				break;
 			case "moveLeft":
-				this.moveLeft(map);
+				this.moveLeft();
 				break;
 			case "moveRight":
-				this.moveRight(map);
+				this.moveRight();
 				break;
 			case "PullUp":
-				this.PullUp(map);
+				this.pullUp();
 				break;
 			case "PullDown":
-				this.PullDown(map);
+				this.pullDown();
 				break;
 			case "PullLeft":
-				this.PullLeft(map);
+				this.pullLeft();
 				break;
 			case "PullRight":
-				this.PullRight(map);
+				this.pullRight();
 				break;
 			case "PushUp":
-				this.PushUp(map);
+				this.pushUp();
 				break;
 			case "PushDown":
-				this.PushDown(map);
+				this.pushDown();
 				break;
 			case "PushLeft":
-				this.PushLeft(map);
+				this.pushLeft();
 				break;
 			case "PushRight":
-				this.PushRight(map);
+				this.pushRight();
 				break;
 			case "Scan":
-				this.Scan(map);
+				this.scan();
 				break;
 			default:
 		}

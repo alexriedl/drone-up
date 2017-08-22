@@ -5,7 +5,7 @@ class Map {
 
 	}
 
-	initialize(randomizer, player, spikePercent) {
+	initialize(randomizer, players, spikePercent) {
 		var playerArray = [];
 		var spikeArray = [];
 		var invalidArray = [];

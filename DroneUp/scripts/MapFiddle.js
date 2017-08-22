@@ -5,7 +5,7 @@ class Map {
 
 	}
 
-	initialize(randomizer, player, spikePercent) {
+	initialize(randomizer, players, spikePercent) {
 		var playerArray = [];
 		var spikeArray = [];
 		var invalidArray = [];
@@ -215,13 +215,13 @@ Random.prototype.nextFloat = function (opt_minOrMax, opt_max) {
   return (this.next() - 1) / 2147483646;
 };
 
-var players = [];
-players.push({ID: 'player1'});
-players.push({ID: 'player2'});
-players.push({ID: 'player3'});
-players.push({ID: 'player4'});
-players.push({ID: 'player5'});
-players.push({ID: 'player6'});
+var testPlayers = [];
+testPlayers.push({ID: 'player1'});
+testPlayers.push({ID: 'player2'});
+testPlayers.push({ID: 'player3'});
+testPlayers.push({ID: 'player4'});
+testPlayers.push({ID: 'player5'});
+testPlayers.push({ID: 'player6'});
 var map = new Map(30, 30);
-map.initialize(new Random(12345), players, 15);
+map.initialize(new Random(12345), testPlayers, 15);
 console.log(map);

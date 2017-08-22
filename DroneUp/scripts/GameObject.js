@@ -1,40 +1,40 @@
 class GameObject {
-	constructor(controller, Id, map) {
-		this.Id = Id;
+	constructor(controller, ID, map) {
+		this.ID = ID;
 		this.controller = controller;
 		controller.actions = ["MoveUp", "MoveDown", "MoveLeft", "MoveRight"];
 		this.map = map;
 	}
 
-	MoveUp() {
-		this.map.Move(this.Id, 1, 0);
+	moveUp() {
+		this.map.move(this.ID, 1, 0);
 	}
 
-	MoveDown() {
-		this.map.Move(this.Id, -1, 0);
+	moveDown() {
+		this.map.move(this.ID, -1, 0);
 	}
 
-	MoveLeft() {
-		this.map.Move(this.Id, 0, -1);
+	moveLeft() {
+		this.map.move(this.ID, 0, -1);
 	}
 
-	MoveRight() {
-		this.map.Move(this.Id, 0, 1);
+	moveRight() {
+		this.map.move(this.ID, 0, 1);
 	}
 
-	Perform = function(action) {
+	perform(action) {
 		switch(action){
 			case "MoveUp":
-				this.MoveUp();
+				this.moveUp();
 				break;
 			case "MoveDown":
-				this.MoveDown();
+				this.moveDown();
 				break;	
 			case "MoveLeft":
-				this.MoveLeft();
+				this.moveLeft();
 				break;	
 			case "MoveRight":
-				this.MoveRight();
+				this.moveRight();
 				break;	
 		}
 	}
