@@ -9,29 +9,31 @@ function Random(seed) {
   if (this._seed <= 0) this._seed += 2147483646;
 }
 
-var main = function() {
-	document.getElementById("startButton").onclick = startGame;
+var main = function () {
+  document.getElementById("startButton").onclick = () => {
+    if (game) {
+      console.log("Killing old game");
+      game.kill();
+    }
+    startGame();
+  }
 };
 
-var startGame = function() {
-	if(window['running']) {
-		console.log("Game is already running, but was told to run again.");
-	} else {
-		window['running'] = true;
-		seed = 12345;
-	
-		var playerControllers = [
-			new LuigiBot(seed), 
-			new PushBot(seed), 
-			new PullBot(seed), 
-			new ChickenBot(seed), 
-			new RandomBot(seed), 
-			new ShoveBot(seed)
-		];
-	
-		game = new Game(seed, 15, playerControllers, 50, 50);
-		game.start();
-	}
+var startGame = function () {
+  console.log("Starting up new game");
+  seed = 12345;
+
+  var playerControllers = [
+    new LuigiBot(seed),
+    new PushBot(seed),
+    new PullBot(seed),
+    new ChickenBot(seed),
+    new RandomBot(seed),
+    new ShoveBot(seed)
+  ];
+
+  game = new Game(seed, 15, playerControllers, 50, 50);
+  game.start();
 };
 
 main();

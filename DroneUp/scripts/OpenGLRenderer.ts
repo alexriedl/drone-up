@@ -44,11 +44,18 @@ export interface SimpleShaderProgramInfo {
   };
 }
 
-
 const random = new Random(12345);
 const over = 2147483647;
 function getRandomColor() {
-  const r = () => random.next() / over;
+
+  const raw = () => random.next() / over;
+  const r = () => {
+    let result = 0;
+    do {
+      result = raw();
+    } while(result < 0.3);
+    return result;
+  };
   return new Color(r(), r(), r());
 }
 
