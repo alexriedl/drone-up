@@ -3,6 +3,7 @@ class Runner {
 		this.gameObjects = gameObjectArray;
 		this.gameDone = false;
 		this.map = map;
+		this.renderer = new Renderer("game-canvas");
 	}
 	
 	run() {
@@ -15,12 +16,19 @@ class Runner {
 				this.removeDeceased();
 			}
 			this.checkGameDone();
+			this.renderUi();
 		}
-		
-		this.winner = null;
-		for(var i = 0, len = this.gameObjects.length; i < len; i++) {
-			this.winner = this.gameObjects[i];
-		}
+	}
+	
+	renderUi() {
+		renderer.renderState({
+			invalidArray: [],
+			mapObjects: this.map.getMapObjects(),
+			players: [],
+			spikes: [],
+			xSize: this.map.getXSize(),
+			ySize: this.map.getYSize()
+		});
 	}
 	
 	checkGameDone() {

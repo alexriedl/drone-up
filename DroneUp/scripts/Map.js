@@ -19,6 +19,18 @@ class Map {
 		this.spikes = spikeArray;
 		this.mapObjects = playerArray.concat(spikeArray);
 	}
+	
+	getMapObjects() {
+		return this.mapObjects;
+	}
+	
+	getXSize() {
+		return thsi.xSize;
+	}
+	
+	getYSize() {
+		return thsi.xSize;
+	}
 
 	generatePlayers(randomizer, players, playerArray, invalidArray) {
 		for (var p = 0, plen = players.length; p < plen; p++) {
