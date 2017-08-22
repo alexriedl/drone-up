@@ -1,4 +1,4 @@
-class Map {
+export default class Map {
 	constructor(xSize, ySize) {
 		this.xSize = xSize;
 		this.ySize = ySize;
@@ -19,15 +19,15 @@ class Map {
 		this.spikes = spikeArray;
 		this.mapObjects = playerArray.concat(spikeArray);
 	}
-	
+
 	getMapObjects() {
 		return this.mapObjects;
 	}
-	
+
 	getXSize() {
 		return this.xSize;
 	}
-	
+
 	getYSize() {
 		return this.ySize;
 	}
@@ -49,7 +49,7 @@ class Map {
 
 				// doublecheck all invalid spaces
 				var attemptValid = this.checkInvalid(x, y, invalidArray);
-				
+
 				if (attemptValid) {
 					playerArray.push({
 						ID: player.ID,
@@ -131,7 +131,7 @@ class Map {
 		this.markInvalid(x, (y + 1) % this.ySize, numSpread - 1, invalidArray);
 		this.markInvalid(x, (y - 1 + this.ySize) % this.ySize, numSpread - 1, invalidArray);
 	}
-	
+
 	getCrashedDrones() {
 		var crashed = [];
 		for(var i = 0, playerCount = this.players.length; i < playerCount; i++) {
@@ -143,10 +143,10 @@ class Map {
 				}
 			}
 		}
-		
+
 		return crashed;
 	}
-	
+
 	move(Id, deltaX, deltaY) {
 		var mapObject = null;
 		var isPlayer = false;
@@ -155,19 +155,19 @@ class Map {
 				mapObject = this.mapObjects[i];
 			}
 		}
-		
+
 		for(var j = 0, playerCount = this.players.length; j < playerCount; j++) {
 			if(this.players[j].ID === Id) {
 				isPlayer = true;
 			}
 		}
-		
+
 		if(mapObject !== null) {
 			mapObject.x += deltaX;
 			mapObject.y += deltaY;
 			this.wrapCoordinates(mapObject);
 		}
-		
+
 		if(!isPlayer) {
 			for(var k = 0, objectCount = this.mapObjects.length; k < objectCount; k++) {
 				if(this.mapObjects[k].x === mapObject.x && this.mapObjects[k].y === mapObject.y && this.mapObjects[k].ID !== mapObject.ID) {
@@ -176,43 +176,43 @@ class Map {
 			}
 		}
 	}
-	
+
 	wrapCoordinates(mapObject) {
-		if(mapObject.x > this.xSize) { 
+		if(mapObject.x > this.xSize) {
 			mapObject.x = 0;
 		}
-		if(mapObject.x < 0) { 
+		if(mapObject.x < 0) {
 			mapObject.x = this.xSize;
 		}
-		if(mapObject.y > this.ySize) { 
+		if(mapObject.y > this.ySize) {
 			mapObject.y = 0;
 		}
-		if(mapObject.y < 0) { 
+		if(mapObject.y < 0) {
 			mapObject.y = this.ySize;
 		}
 	}
-	
+
 	scanFor(Id) {
 		const scanDistance = 4;
 		var gameObject = null;
 		var scanSquares = [];
 		var gameObjectsInRange = [];
-		
+
 		for(var i = 0, len = this.mapObjects.length; i < len; i++) {
 			if(this.mapObjects[i].ID === Id){
 				gameObject = this.mapObjects[i];
 			}
 		}
-		
+
 		if(gameObject !== null) {
 			this.markInvalid(gameObject.x, gameObject.y, scanDistance, scanSquares);
-		
+
 			for(var j = 0, len = this.mapObjects.length; j < len; j++) {
 				if(!this.checkInvalid(this.mapObjects[j].x, this.mapObjects[j].y, scanSquares)) {
 					gameObjectsInRange.push(this.mapObjects[j]);
 				}
 			}
-			
+
 			for(var k = 0, scanLen = scanSquares.length; k < scanLen; k++) {
 				scanSquares[k].type = "empty";
 				for(var l = 0, objInRangeLen = gameObjectsInRange.length; l < objInRangeLen && scanSquares[k].type === "empty"; l++) {
@@ -225,7 +225,7 @@ class Map {
 					}
 				}
 			}
-			
+
 			for(var m = 0, len = scanSquares.length; m < len; m++) {
 				var square = scanSquares[m];
 				if(Math.abs(gameObject.x - scanSquares[m].x) > scanDistance) {
@@ -241,7 +241,7 @@ class Map {
 						scanSquares[m].x = scanSquares[m].x - gameObject.x
 					}
 				}
-				
+
 				if(Math.abs(gameObject.y - scanSquares[m].y) > scanDistance){
 					if(gameObject.y - scanSquares[m].y < 0) {
 						scanSquares[m].y = this.xSize + gameObject.y - scanSquares[m].y;
@@ -257,10 +257,10 @@ class Map {
 				}
 			}
 		}
-		
+
 		return scanSquares;
 	}
-	
+
 	//GetNextObjectUpFrom(this.Id) returns an ID of the next object up from the object with the given ID
 	getNextObjectUpFrom(Id) {
 		var referenceObject = undefined;

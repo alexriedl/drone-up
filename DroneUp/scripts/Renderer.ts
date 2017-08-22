@@ -30,7 +30,7 @@ function getRandomColor() {
   return color;
 }
 
-export class Renderer {
+export default class Renderer {
   private tileSize: number = 1;
   private context: IRenderContext;
   private xScale: number;
@@ -81,7 +81,6 @@ export class Renderer {
   private renderObject(entity: IEntity) {
     const isPlayer = entity.ID.startsWith("player");
     const color = isPlayer ? this.getPlayerColor(entity.ID) : "gray";
-    console.log("Rendering entity: " + entity.ID + " color: " + color);
 
     this.rectangle(entity.x, entity.y, this.tileSize, this.tileSize, color);
   }
