@@ -13,7 +13,6 @@ export interface IMapState {
   xSize: number;
   ySize: number;
 }
-
 export interface IRenderContext {
   canvas: any;
   context: any;
@@ -22,11 +21,21 @@ export interface IRenderContext {
   aspect: number;
 }
 
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
 export class Renderer {
   private tileSize: number = 1;
   private context: IRenderContext;
   private xScale: number;
   private yScale: number;
+  private playerColors: { [id: string]: string } = {};
 
   public constructor(canvasId: string) {
     let canvas = document.getElementById(canvasId);
@@ -61,20 +70,18 @@ export class Renderer {
     });
   }
 
-  private getPlayerColor(id: number): string {
-    switch(id) {
-      case 0: return "pink";
-      case 1: return "green";
-      case 2: return "blue";
-      case 3: return "yellow";
-      case 4: return "red";
+  private getPlayerColor(id: string): string {
+    if(!this.playerColors[id]) {
+      this.playerColors[id] = getRandomColor();
     }
+
+    return this.playerColors[id]
   }
 
   private renderObject(entity: IEntity) {
     const isPlayer = entity.ID.startsWith("player");
-    const id = isPlayer && entity.ID.substr(6);
-    const color = isPlayer ? this.getPlayerColor(+id) : "gray";
+    const color = isPlayer ? this.getPlayerColor(entity.ID) : "gray";
+    console.log("Rendering entity: " + entity.ID + " color: " + color);
 
     this.rectangle(entity.x, entity.y, this.tileSize, this.tileSize, color);
   }
@@ -115,7 +122,6 @@ export class Renderer {
     this.context.context.strokeStyle = style;
     this.context.context.stroke();
   }
-
 }
 
 export function test() {
