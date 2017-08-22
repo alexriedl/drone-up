@@ -1,5 +1,6 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@section metadata {
+    <meta name="Environment" content="@ViewBag.Environment" />
+    <meta name="Version" content="@ViewBag.Version" />
 }
 
 <canvas id="game-canvas" width="800" height="800"></canvas>

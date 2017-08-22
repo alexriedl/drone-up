@@ -193,7 +193,7 @@ export default class Map {
 	}
 
 	scanFor(Id) {
-		const scanDistance = 4;
+		const scanDistance = Math.ceil(.33 * Math.min(this.xSize, this.ySize, 15));
 		var gameObject = null;
 		var scanSquares = [];
 		var gameObjectsInRange = [];
