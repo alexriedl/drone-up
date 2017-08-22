@@ -1,54 +1,64 @@
 ﻿@section metadata {
-    <meta name="Environment" content="@ViewBag.Environment" />
-    <meta name="Version" content="@ViewBag.Version" />
+	<meta name="Environment" content="@ViewBag.Environment" />
+	<meta name="Version" content="@ViewBag.Version" />
 }
 
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello Bulma!</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.1/css/bulma.min.css">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Hello Bulma!</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.1/css/bulma.min.css">
 </head>
 <body>
-    <nav class="navbar" style="background-color: lightslategrey">
-        <div class="navbar-brand">
-           <h2 class="navbar-item"><strong style="color: white">DroneUp</strong></h2>
-            <div class="navbar-burger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </nav>
-    <div class="container">
-        <div class="columns" style="margin-top: 20px; margin-bottom: 20px;">
-            <div class="column">
-                <canvas id="game-canvas" width="800" height="800"></canvas>
-            </div>
-        </div>
-    </div>    
+	<nav class="navbar" style="background-color: lightslategrey">
+		<div class="navbar-brand">
+			<h2 class="navbar-item"><strong style="color: white">DroneUp</strong></h2>
+			<div class="navbar-burger">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+		</div>
+	</nav>
+	<div>
+		<button type="button" id="startButton">Start Game</button>
+	</div>
+	<div>
+		<input type="file" id="fileUploader">
+	</div>
+	<div>
+		<div>Loaded Drones</div>
+		<textarea disabled readonly cols="50" id="droneNameList"></textarea>
+	</div>
+	<div class="container">
+		<div class="columns" style="margin-top: 20px; margin-bottom: 20px;">
+			<div class="column">
+				<canvas id="game-canvas" width="800" height="800"></canvas>
+			</div>
+		</div>
+	</div>
 </body>
 <footer class="footer">
-    <div class="container">
-        <div class="content has-text-centered">
-            <p>
-                <strong>DroneUp 2017</strong>
-            </p>
-            <p>
-                <a class="icon" href="http://gitlab.directs.com/jonmetzler-sandbox/Hackaton-DroneUp">
-                    <i class="fa fa-github"></i>
-                </a>
-            </p>
-        </div>
-    </div>
+	<div class="container">
+		<div class="content has-text-centered">
+			<p>
+				<strong>DroneUp 2017</strong>
+			</p>
+			<p>
+				<a class="icon" href="http://gitlab.directs.com/jonmetzler-sandbox/Hackaton-DroneUp">
+					<i class="fa fa-github"></i>
+				</a>
+			</p>
+		</div>
+	</div>
 </footer>
 </html>
 
 @section scripts {
-  <script type='text/javascript' src='~/tsm-0.7.min.js' ></script>
-  <script type='text/javascript' src='~/dist/common.js' ></script>
-  <script type='text/javascript' src='~/dist/main.js' ></script>
+	<script type='text/javascript' src='~/tsm-0.7.min.js'></script>
+	<script type='text/javascript' src='~/dist/common.js'></script>
+	<script type='text/javascript' src='~/dist/main.js'></script>
 }
