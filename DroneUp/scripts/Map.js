@@ -2,7 +2,6 @@ class Map {
 	constructor(xSize, ySize) {
 		this.xSize = xSize;
 		this.ySize = ySize;
-
 	}
 
 	initialize(randomizer, players, spikePercent) {
@@ -19,6 +18,18 @@ class Map {
 		this.players = playerArray;
 		this.spikes = spikeArray;
 		this.mapObjects = playerArray.concat(spikeArray);
+	}
+	
+	getMapObjects() {
+		return this.mapObjects;
+	}
+	
+	getXSize() {
+		return thsi.xSize;
+	}
+	
+	getYSize() {
+		return thsi.xSize;
 	}
 
 	generatePlayers(randomizer, players, playerArray, invalidArray) {
@@ -42,6 +53,7 @@ class Map {
 				if (attemptValid) {
 					playerArray.push({
 						ID: player.ID,
+						type: "drone",
 						x: x,
 						y: y
 					})
@@ -73,6 +85,7 @@ class Map {
 			if (attemptValid) {
 				spikeArray.push({
 					ID: spikeId,
+					type: "spike",
 					x: x,
 					y: y
 				});
@@ -143,8 +156,8 @@ class Map {
 			}
 		}
 		
-		for(var j = 0, playerCount = this.players.length; j < playerCount; i++) {
-			if(this.players[i].ID === Id) {
+		for(var j = 0, playerCount = this.players.length; j < playerCount; j++) {
+			if(this.players[j].ID === Id) {
 				isPlayer = true;
 			}
 		}
@@ -152,18 +165,102 @@ class Map {
 		if(mapObject !== null) {
 			mapObject.x += deltaX;
 			mapObject.y += deltaY;
+			this.wrapCoordinates(mapObject);
 		}
 		
 		if(!isPlayer) {
 			for(var k = 0, objectCount = this.mapObjects.length; k < objectCount; k++) {
 				if(this.mapObjects[k].x === mapObject.x && this.mapObjects[k].y === mapObject.y && this.mapObjects[k].ID !== mapObject.ID) {
-					move(this.mapObjects[k].ID, deltaX, deltaY);
+					this.move(this.mapObjects[k].ID, deltaX, deltaY);
 				}
 			}
 		}
 	}
 	
-	//ScanFor(Id) returns the game objects visible to the object with the given ID
+	wrapCoordinates(mapObject) {
+		if(mapObject.x > this.xSize) { 
+			mapObject.x = 0;
+		}
+		if(mapObject.x < 0) { 
+			mapObject.x = this.xSize;
+		}
+		if(mapObject.y > this.ySize) { 
+			mapObject.y = 0;
+		}
+		if(mapObject.y < 0) { 
+			mapObject.y = this.ySize;
+		}
+	}
+	
+	scanFor(Id) {
+		const scanDistance = 4;
+		var gameObject = null;
+		var scanSquares = [];
+		var gameObjectsInRange = [];
+		
+		for(var i = 0, len = this.mapObjects.length; i < len; i++) {
+			if(this.mapObjects[i].ID === Id){
+				gameObject = this.mapObjects[i];
+			}
+		}
+		
+		if(gameObject !== null) {
+			this.markInvalid(gameObject.x, gameObject.y, scanDistance, scanSquares);
+		
+			for(var j = 0, len = this.mapObjects.length; j < len; j++) {
+				if(!this.checkInvalid(this.mapObjects[j].x, this.mapObjects[j].y, scanSquares)) {
+					gameObjectsInRange.push(this.mapObjects[j]);
+				}
+			}
+			
+			for(var k = 0, scanLen = scanSquares.length; k < scanLen; k++) {
+				scanSquares[k].type = "empty";
+				for(var l = 0, objInRangeLen = gameObjectsInRange.length; l < objInRangeLen && scanSquares[k].type === "empty"; l++) {
+					if(scanSquares[k].x === gameObjectsInRange[l].x && scanSquares[k].y === gameObjectsInRange[l].y) {
+						if(gameObjectsInRange[l].ID === Id){
+							scanSquares[k].type = "you";
+						} else {
+							scanSquares[k].type = gameObjectsInRange[l].type;
+						}
+					}
+				}
+			}
+			
+			for(var m = 0, len = scanSquares.length; m < len; m++) {
+				var square = scanSquares[m];
+				if(Math.abs(gameObject.x - scanSquares[m].x) > scanDistance) {
+					if(gameObject.x - scanSquares[m].x < 0) {
+						scanSquares[m].x = this.xSize + gameObject.x - scanSquares[m].x;
+					} else if(gameObject.x + scanSquares[m].x > this.xSize) {
+						0 - gameObject.x + scanSquares[m].x;
+					}
+				} else {
+					if(gameObject.x > scanSquares[m].x) {
+						scanSquares[m].x = gameObject.x - scanSquares[m].x;
+					} else {
+						scanSquares[m].x = scanSquares[m].x - gameObject.x
+					}
+				}
+				
+				if(Math.abs(gameObject.y - scanSquares[m].y) > scanDistance){
+					if(gameObject.y - scanSquares[m].y < 0) {
+						scanSquares[m].y = this.xSize + gameObject.y - scanSquares[m].y;
+					} else if(gameObject.y + scanSquares[m].y > this.ySize) {
+						0 - gameObject.y + scanSquares[m].y;
+					}
+				} else {
+					if(gameObject.y > scanSquares[m].y) {
+						scanSquares[m].y = gameObject.y - scanSquares[m].y;
+					} else {
+						scanSquares[m].y = scanSquares[m].y - gameObject.y
+					}
+				}
+			}
+		}
+		
+		return scanSquares;
+	}
+	
 	//GetNextObjectUpFrom(this.Id) returns an ID of the next object up from the object with the given ID
 	getNextObjectUpFrom(Id) {
 		var referenceObject = undefined;

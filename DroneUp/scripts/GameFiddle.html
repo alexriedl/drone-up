@@ -9,6 +9,7 @@
 <script src="Drone.js"></script>
 <script src="Map.js"></script>
 <script src="Game.js"></script>
+<script src="renderer.ts"></script>
 <script>
 	/**
 	 * Creates a pseudo-random value generator. The seed must be an integer.
@@ -32,14 +33,13 @@
 		constructor() {
 			this.randomizer = new Random(12345);
 		}
-		getAction() { 
+		getAction() {
 			return this.actions[this.randomizer.next() % this.actions.length];
 		}
 	}
 	var playerControllers = [new Controller(), new Controller(), new Controller()];
 	
 	var game = new Game(12345, 15, playerControllers, 50, 50);
-	game.start();
 </script>
 </body>
 </html>

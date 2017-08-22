@@ -3,23 +3,38 @@ class Runner {
 		this.gameObjects = gameObjectArray;
 		this.gameDone = false;
 		this.map = map;
+		this.renderer = new Renderer("game-canvas");
 	}
 	
 	run() {
 		while(!this.gameDone) {
 			for(var i = 0, len = this.gameObjects.length; i < len; i++) {
-				var action = this.gameObjects[i].controller.getAction();
-				this.gameObjects[i].perform(action, this.map);
+				if(this.gameObjects[i] !== undefined) {
+					var action = this.gameObjects[i].controller.getAction();
+					this.gameObjects[i].perform(action, this.map);
+				}
 				this.removeDeceased();
-				this.checkGameDone();
 			}
+			this.checkGameDone();
+			this.renderUi();
 		}
+	}
+	
+	renderUi() {
+		renderer.renderState({
+			invalidArray: [],
+			mapObjects: this.map.getMapObjects(),
+			players: [],
+			spikes: [],
+			xSize: this.map.getXSize(),
+			ySize: this.map.getYSize()
+		});
 	}
 	
 	checkGameDone() {
 		var dronesLeft = 0;
 		for(var i=0, len = this.gameObjects.length; i < len; i++) {
-			if(typeof this.gameObjects[i] === "Drone") {
+			if(this.gameObjects[i].type !== undefined && this.gameObjects[i].type ===  "Drone") {
 				dronesLeft++;
 			}
 		}
@@ -29,12 +44,18 @@ class Runner {
 
 	removeDeceased(){
 		var collisions = this.map.getCrashedDrones();
+		var indicesToRemove = [];
+		
 		for(var i=0, len = this.gameObjects.length; i < len; i++) {
 			for(var j=0, collisionLen = collisions.length; j < collisionLen; j++){
-				if(this.gameObject[i].Id === collisions[j]){
-					gameObject.splice(i, 1);
+				if(this.gameObjects[i].ID === collisions[j]){
+					indicesToRemove.push(i);
 				}
 			}
+		}
+		
+		for(var j=0, len = indicesToRemove.length; j < len; j++) {
+			this.gameObjects.splice(indicesToRemove[j], 1);
 		}
 	}
 };
