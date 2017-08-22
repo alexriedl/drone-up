@@ -33,7 +33,6 @@
 			this.randomizer = new Random(12345);
 		}
 		getAction() {
-			return "Scan";
 			return this.actions[this.randomizer.next() % this.actions.length];
 		}
 	}

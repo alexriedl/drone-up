@@ -2,6 +2,7 @@ class Drone extends GameObject{
 	constructor(controller, ID, map) {
 		super(controller, ID, map);
 		controller.actions = ["Scan", "moveUp", "moveDown", "moveLeft", "moveRight", "PullUp", "PullDown", "PullRight", "PullLeft", "PushUp", "PushDown", "PushRight", "PushLeft"];
+		this.type = "Drone";
 	}
 
 	scan() {
@@ -20,8 +21,8 @@ class Drone extends GameObject{
 	}
 
 	pullLeft() {
-		var toPull = map.getNextObjectLeftFrom(this.ID);
-		map.move(toPull, 0, 1);
+		var toPull = this.map.getNextObjectLeftFrom(this.ID);
+		this.map.move(toPull, 0, 1);
 	}
 
 	pullRight() {
@@ -30,7 +31,7 @@ class Drone extends GameObject{
 	}
 
 	pushUp() {
-		var toPush =this. map.getNextObjectUpFrom(this.ID);
+		var toPush = this.map.getNextObjectUpFrom(this.ID);
 		this.map.move(toPush, 1, 0);
 	}
 
@@ -40,13 +41,13 @@ class Drone extends GameObject{
 	}
 
 	pushLeft() {
-		var toPush = map.getNextObjectLeftFrom(this.ID);
-		map.move(toPush, 0, -1);
+		var toPush = this.map.getNextObjectLeftFrom(this.ID);
+		this.map.move(toPush, 0, -1);
 	}
 
 	pushRight() {
-		var toPush = map.getNextObjectRightFrom(this.ID);
-		map.move(toPush, 0, 1);
+		var toPush = this.map.getNextObjectRightFrom(this.ID);
+		this.map.move(toPush, 0, 1);
 	}
 
 	perform(action) {

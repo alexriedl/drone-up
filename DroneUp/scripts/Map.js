@@ -144,8 +144,8 @@ class Map {
 			}
 		}
 		
-		for(var j = 0, playerCount = this.players.length; j < playerCount; i++) {
-			if(this.players[i].ID === Id) {
+		for(var j = 0, playerCount = this.players.length; j < playerCount; j++) {
+			if(this.players[j].ID === Id) {
 				isPlayer = true;
 			}
 		}
@@ -159,7 +159,7 @@ class Map {
 		if(!isPlayer) {
 			for(var k = 0, objectCount = this.mapObjects.length; k < objectCount; k++) {
 				if(this.mapObjects[k].x === mapObject.x && this.mapObjects[k].y === mapObject.y && this.mapObjects[k].ID !== mapObject.ID) {
-					move(this.mapObjects[k].ID, deltaX, deltaY);
+					this.move(this.mapObjects[k].ID, deltaX, deltaY);
 				}
 			}
 		}
@@ -204,19 +204,24 @@ class Map {
 			for(var k = 0, scanLen = scanSquares.length; k < scanLen; k++) {
 				scanSquares[k].type = "empty";
 				for(var l = 0, objInRangeLen = gameObjectsInRange.length; l < objInRangeLen && scanSquares[k].type === "empty"; l++) {
-					if(gameObjectsInRange[l].ID === Id){
-						scanSquares[k] = "you";
-					} else if(scanSquares[k].x === gameObjectsInRange[l].x && scanSquares[k].y === gameObjectsInRange[l].y) {
-						scanSquares[k].type = gameObjectsInRange[l].type;
+					if(scanSquares[k].x === gameObjectsInRange[l].x && scanSquares[k].y === gameObjectsInRange[l].y) {
+						if(gameObjectsInRange[l].ID === Id){
+							scanSquares[k].type = "you";
+						} else {
+							scanSquares[k].type = gameObjectsInRange[l].type;
+						}
 					}
 				}
 			}
 			
 			for(var m = 0, len = scanSquares.length; m < len; m++) {
-				if(gameObject.x - scanSquares[m].x < 0) {
-					scanSquares[m].x = this.xSize + gameObject.x - scanSquares[m].x;
-				} else if(gameObject.x + scanSquares[m].x > this.xSize) {
-					0 - gameObject.x + scanSquares[m].x;
+				var square = scanSquares[m];
+				if(Math.abs(gameObject.x - scanSquares[m].x) > scanDistance) {
+					if(gameObject.x - scanSquares[m].x < 0) {
+						scanSquares[m].x = this.xSize + gameObject.x - scanSquares[m].x;
+					} else if(gameObject.x + scanSquares[m].x > this.xSize) {
+						0 - gameObject.x + scanSquares[m].x;
+					}
 				} else {
 					if(gameObject.x > scanSquares[m].x) {
 						scanSquares[m].x = gameObject.x - scanSquares[m].x;
@@ -225,10 +230,12 @@ class Map {
 					}
 				}
 				
-				if(gameObject.y - scanSquares[m].y < 0) {
-					scanSquares[m].y = this.xSize + gameObject.y - scanSquares[m].y;
-				} else if(gameObject.y + scanSquares[m].y > this.ySize) {
-					0 - gameObject.y + scanSquares[m].y;
+				if(Math.abs(gameObject.y - scanSquares[m].y) > scanDistance){
+					if(gameObject.y - scanSquares[m].y < 0) {
+						scanSquares[m].y = this.xSize + gameObject.y - scanSquares[m].y;
+					} else if(gameObject.y + scanSquares[m].y > this.ySize) {
+						0 - gameObject.y + scanSquares[m].y;
+					}
 				} else {
 					if(gameObject.y > scanSquares[m].y) {
 						scanSquares[m].y = gameObject.y - scanSquares[m].y;
