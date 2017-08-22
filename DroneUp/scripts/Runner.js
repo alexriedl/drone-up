@@ -21,7 +21,7 @@ class Runner {
 	}
 	
 	renderUi() {
-		renderer.renderState({
+		this.renderer.renderState({
 			invalidArray: [],
 			mapObjects: this.map.getMapObjects(),
 			players: [],

@@ -25,11 +25,11 @@ class Map {
 	}
 	
 	getXSize() {
-		return thsi.xSize;
+		return this.xSize;
 	}
 	
 	getYSize() {
-		return thsi.xSize;
+		return this.ySize;
 	}
 
 	generatePlayers(randomizer, players, playerArray, invalidArray) {
