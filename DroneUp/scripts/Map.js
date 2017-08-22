@@ -165,7 +165,101 @@ class Map {
 	
 	//ScanFor(Id) returns the game objects visible to the object with the given ID
 	//GetNextObjectUpFrom(this.Id) returns an ID of the next object up from the object with the given ID
-	//GetNextObjectDownFrom(this.Id) returns an ID of the next object down from the object with the given ID
-	//GetNextObjectLeftFrom(this.Id) returns an ID of the next object left from the object with the given ID
-	//GetNextObjectRightFrom(this.Id) returns an ID of the next object right from the object with the given ID
+	getNextObjectUpFrom(Id) {
+		var referenceObject = undefined;
+		for(var k = 0, objectCount = this.mapObjects.length; k < objectCount && referenceObject === undefined; k++) {
+			if (this.mapObjects[k].ID === Id)
+				referenceObject = this.mapObjects[k];
+		}
+		var lineObjects = this.getAllObjectsOnSameX(referenceObject.x);
+
+		// sort the objects and find the ID -- we can then go one index further to find it
+		var sortedObjects = lineObjects.sort(function(a, b) {
+			return b.y - a.y;
+		});
+
+		for(var k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
+			if (sortedObjects[k].ID === Id) {
+				return sortedObjects[(k + 1) % sortedObjects.length].ID;
+			}
+		}
+	}
+
+	getNextObjectDownFrom(Id) {
+		var referenceObject = undefined;
+		for(var k = 0, objectCount = this.mapObjects.length; k < objectCount && referenceObject === undefined; k++) {
+			if (this.mapObjects[k].ID === Id)
+				referenceObject = this.mapObjects[k];
+		}
+		var lineObjects = this.getAllObjectsOnSameX(referenceObject.x);
+
+		// sort the objects and find the ID -- we can then go one index further to find it
+		var sortedObjects = lineObjects.sort(function(a, b) {
+			return a.y - b.y;
+		});
+
+		for(var k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
+			if (sortedObjects[k].ID === Id) {
+				return sortedObjects[(k + 1) % sortedObjects.length].ID;
+			}
+		}
+	}
+
+	getNextObjectLeftFrom(Id) {
+		var referenceObject = undefined;
+		for(var k = 0, objectCount = this.mapObjects.length; k < objectCount && referenceObject === undefined; k++) {
+			if (this.mapObjects[k].ID === Id)
+				referenceObject = this.mapObjects[k];
+		}
+		var lineObjects = this.getAllObjectsOnSameY(referenceObject.y);
+
+		// sort the objects and find the ID -- we can then go one index further to find it
+		var sortedObjects = lineObjects.sort(function(a, b) {
+			return b.x - a.x;
+		});
+
+		for(var k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
+			if (sortedObjects[k].ID === Id) {
+				return sortedObjects[(k + 1) % sortedObjects.length].ID;
+			}
+		}
+	}
+
+	getNextObjectRightFrom(Id) {
+		var referenceObject = undefined;
+		for(var k = 0, objectCount = this.mapObjects.length; k < objectCount && referenceObject === undefined; k++) {
+			if (this.mapObjects[k].ID === Id)
+				referenceObject = this.mapObjects[k];
+		}
+		var lineObjects = this.getAllObjectsOnSameY(referenceObject.y);
+
+		// sort the objects and find the ID -- we can then go one index further to find it
+		var sortedObjects = lineObjects.sort(function(a, b) {
+			return a.x - b.x;
+		});
+
+		for(var k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
+			if (sortedObjects[k].ID === Id) {
+				return sortedObjects[(k + 1) % sortedObjects.length].ID;
+			}
+		}
+	}
+
+	getAllObjectsOnSameY(y) {
+		var sameYList = [];
+		for(var k = 0, objectCount = this.mapObjects.length; k < objectCount; k++) {
+			if (this.mapObjects[k].y === y)
+				sameYList.push(this.mapObjects[k]);
+		}
+		return sameYList;
+	}
+
+	getAllObjectsOnSameX(x) {
+		var sameXList = [];
+		for(var k = 0, objectCount = this.mapObjects.length; k < objectCount; k++) {
+			if (this.mapObjects[k].x === x)
+				sameXList.push(this.mapObjects[k]);
+		}
+		return sameXList;
+	}
 }
