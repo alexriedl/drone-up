@@ -22,6 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ClientApp\actions\" />
+    <Folder Include="scripts\loadedBots\" />
   </ItemGroup>
 
 </Project>
