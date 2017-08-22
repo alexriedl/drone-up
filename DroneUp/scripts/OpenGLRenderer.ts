@@ -1,3 +1,5 @@
+import Random from './Random';
+
 export interface ICoords {
   x: number;
   y: number;
@@ -42,10 +44,13 @@ export interface SimpleShaderProgramInfo {
   };
 }
 
-function getRandomColor() {
-  return new Color(Math.random(), Math.random(), Math.random());
-}
 
+const random = new Random(12345);
+const over = 2147483647;
+function getRandomColor() {
+  const r = () => random.next() / over;
+  return new Color(r(), r(), r());
+}
 
 function initWebGL(canvas) {
   let gl = <WebGLRenderingContext>(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
