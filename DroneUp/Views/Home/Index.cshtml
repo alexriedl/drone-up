@@ -1,13 +1,15 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@section metadata {
+    <meta name="Environment" content="@ViewBag.Environment" />
+    <meta name="Version" content="@ViewBag.Version" />
 }
 
-
+<div id="react-app">
+    <div style="text-align: center; width: 100%; font-family: Open Sans; font-size: 27px; margin-top: 100px;">
+        Starting OGM 3
+    </div>
+</div>
 
 @section scripts {
-  <script type='text/javascript' src='~/tsm-0.7.min.js' ></script>
-  <script type='text/javascript' src='~/dist/common.js' ></script>
-  <script type='text/javascript' src='~/dist/main.js' ></script>
-
+<link rel="stylesheet" href="~/dist/main.css" asp-append-version="true" />
+    <script src="~/dist/main.js" asp-append-version="true"></script>
 }
-
