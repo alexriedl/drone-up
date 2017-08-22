@@ -16,7 +16,7 @@ Random.prototype.next = function () {
   return this._seed = this._seed * 16807 % 2147483647;
 };
 
-class Controller {
+export class Controller {
 	constructor(seed) {
 		this.randomizer = new Random(seed);
 	}
@@ -25,15 +25,15 @@ class Controller {
 	}
 }
 
-class LuigiBot extends Controller {
+export class LuigiBot extends Controller {
 	getAction() {
 		return "Scan";
 	}
 }
 
-class PushBot extends Controller {
+export class PushBot extends Controller {
 	getAction() {
-		var action = randomize.next() % 4;
+		var action = this.randomizer.next() % 4;
 		switch(action) {
 			case 1:
 				return "PushUp";
@@ -52,9 +52,9 @@ class PushBot extends Controller {
 	}
 }
 
-class PullBot extends Controller {
+export class PullBot extends Controller {
 	getAction() {
-		var action = randomize.next() % 4;
+		var action = this.randomizer.next() % 4;
 		switch(action) {
 			case 1:
 				return "PullUp";
@@ -73,9 +73,9 @@ class PullBot extends Controller {
 	}
 }
 
-class ChickenBot extends Controller {
+export class ChickenBot extends Controller {
 	getAction() {
-		var action = randomize.next() % 4;
+		var action = this.randomizer.next() % 4;
 		switch(action) {
 			case 1:
 				return "MoveUp";
@@ -94,7 +94,29 @@ class ChickenBot extends Controller {
 	}
 }
 
-class RandomBot extends Controller {
+export class ShoveBot extends Controller {
+	getAction() {
+		if (this.nextAction === undefined)
+			this.nextAction = 0;
+
+		var action;
+		switch(this.nextAction) {
+			case 0:
+				action = "PushRight";
+				break;
+			case 1:
+				action = "PushUp";
+				break;
+			case 2:
+				action = "MoveRight";
+				break;
+		}
+		this.nextAction = (this.nextAction + 1) % 3;
+		return action;
+	}
+}
+
+export class RandomBot extends Controller {
 	getAction() {
 		return this.actions[this.randomizer.next() % this.actions.length];
 	}

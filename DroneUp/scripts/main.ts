@@ -1,4 +1,5 @@
 import Game from './Game';
+import {LuigiBot, PushBot, PullBot, ChickenBot, RandomBot, ShoveBot} from './PremadeBots'
 
 function Random(seed) {
   this._seed = seed % 2147483647;
@@ -12,18 +13,8 @@ Random.prototype.next = function () {
   return this._seed = this._seed * 16807 % 2147483647;
 };
 
-class Controller {
-  private randomizer;
-  private actions;
+var seed = 12345;
+var playerControllers = [new LuigiBot(seed), new PushBot(seed), new PullBot(seed), new ChickenBot(seed), new RandomBot(seed), new ShoveBot(seed)];
 
-  constructor() {
-    this.randomizer = new Random(12345);
-  }
-  getAction() {
-    return this.actions[this.randomizer.next() % this.actions.length];
-  }
-}
-var playerControllers = [new Controller(), new Controller(), new Controller()];
-
-var game = new Game(12345, 15, playerControllers, 50, 50);
+var game = new Game(seed, 15, playerControllers, 50, 50);
 game.start();
