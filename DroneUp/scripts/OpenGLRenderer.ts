@@ -8,10 +8,7 @@ export interface IEntity extends ICoords {
   ID: string;
 }
 export interface IMapState {
-  invalidArray: ICoords[];
   mapObjects: IEntity[];
-  players: IEntity[];
-  spikes: IEntity[];
   xSize: number;
   ySize: number;
 }
@@ -44,11 +41,18 @@ export interface SimpleShaderProgramInfo {
   };
 }
 
-
 const random = new Random(12345);
 const over = 2147483647;
 function getRandomColor() {
-  const r = () => random.next() / over;
+
+  const raw = () => random.next() / over;
+  const r = () => {
+    let result = 0;
+    do {
+      result = raw();
+    } while(result < 0.3);
+    return result;
+  };
   return new Color(r(), r(), r());
 }
 
@@ -197,6 +201,38 @@ export default class Renderer {
     }
 
     this.renderOutput(group, state.xSize, state.ySize);
+  }
+
+  public renderAction(state: IMapState, entity: IEntity, action: string) {
+		switch (action) {
+			case "moveUp":
+				break;
+			case "moveDown":
+				break;
+			case "moveLeft":
+				break;
+			case "moveRight":
+				break;
+			case "PullUp":
+				break;
+			case "PullDown":
+				break;
+			case "PullLeft":
+				break;
+			case "PullRight":
+				break;
+			case "PushUp":
+				break;
+			case "PushDown":
+				break;
+			case "PushLeft":
+				break;
+			case "PushRight":
+				break;
+			case "Scan":
+				break;
+			default:
+		}
   }
 
   /*************************************************************************

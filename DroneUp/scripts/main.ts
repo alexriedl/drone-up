@@ -9,8 +9,14 @@ function Random(seed) {
   if (this._seed <= 0) this._seed += 2147483646;
 }
 
-var main = function() {
-	document.getElementById("startButton").onclick = startGame;
+var main = function () {
+  document.getElementById("startButton").onclick = () => {
+    if (game) {
+      console.log("Killing old game");
+      game.kill();
+    }
+    startGame();
+  }
 };
 
 var getRandomSeed = function() {
@@ -24,12 +30,8 @@ var getRandomSeed = function() {
 };
 
 var startGame = function() {
-	if(window['running']) {
-		console.log("Game is already running, but was told to run again.");
-	} else {
 		var inputSeedElement = (document.getElementById("seedInput") as HTMLInputElement);
 		inputSeedElement.disabled = true;
-		window['running'] = true;
 
 		var inputSeed = inputSeedElement.value;
 		if (inputSeed.length > 0) {
@@ -52,7 +54,6 @@ var startGame = function() {
 	
 		game = new Game(seed, 15, playerControllers, 50, 50);
 		game.start();
-	}
 };
 
 main();
