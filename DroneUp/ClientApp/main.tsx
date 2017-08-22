@@ -17,15 +17,17 @@ import { routerMiddleware, routerReducer, syncHistoryWithStore } from 'react-rou
 import { supportsHistory } from 'history/lib/DOMUtils';
 import thunk from 'redux-thunk';
 import reducers from './reducers';
+import { reducer as toastrReducer } from 'react-redux-toastr';
+import ReduxToastr from 'react-redux-toastr';
 import routes from './routes';
-
+import { IntlProvider } from 'react-intl';
 
 const historyType = (
     supportsHistory() ? browserHistory : hashHistory
 );
 
 const store = createStore(
-    combineReducers({ ...reducers, routing: routerReducer }),
+    combineReducers({ ...reducers, routing: routerReducer, toastr: toastrReducer }),
     applyMiddleware(thunk, routerMiddleware(historyType))
 );
 
@@ -33,13 +35,19 @@ const history = syncHistoryWithStore(historyType, store);
 
 // This code starts up the React app when it runs in a browser. It sets up the routing configuration
 // and injects the app into a DOM element.
-ReactDOM.render(
-
-    <Provider store={store}>
-        <div className="react-root">
-
-        </div>
-
-    </Provider>,
+ReactDOM.render(    
+        <Provider store={store}>
+            <div className="react-root">
+                <Router history={history} children={routes} />
+                <ReduxToastr
+                    timeOut={4000}
+                    newestOnTop={false}
+                    preventDuplicates={true}
+                    position="bottom-left"
+                    transitionIn="fadeIn"
+                    transitionOut="fadeOut"
+                    progressBar />
+            </div>
+        </Provider>,
     document.getElementById('react-app')
 );

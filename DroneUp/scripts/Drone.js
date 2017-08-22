@@ -1,4 +1,6 @@
-class Drone extends GameObject{
+import GameObject from './GameObject';
+
+export default class Drone extends GameObject{
 	constructor(controller, ID, map) {
 		super(controller, ID, map);
 		controller.actions = ["Scan", "moveUp", "moveDown", "moveLeft", "moveRight", "PullUp", "PullDown", "PullRight", "PullLeft", "PushUp", "PushDown", "PushRight", "PushLeft"];

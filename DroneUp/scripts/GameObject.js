@@ -1,4 +1,4 @@
-class GameObject {
+export default class GameObject {
 	constructor(controller, ID, map) {
 		this.ID = ID;
 		this.controller = controller;
@@ -29,13 +29,13 @@ class GameObject {
 				break;
 			case "MoveDown":
 				this.moveDown();
-				break;	
+				break;
 			case "MoveLeft":
 				this.moveLeft();
-				break;	
+				break;
 			case "MoveRight":
 				this.moveRight();
-				break;	
+				break;
 		}
 	}
 }
