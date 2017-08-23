@@ -4,19 +4,29 @@ import { LuigiBot, PushBot, PullBot, ChickenBot, RandomBot, ShoveBot } from './P
 var game;
 var seed;
 
-function Random(seed) {
-  this._seed = seed % 2147483647;
-  if (this._seed <= 0) this._seed += 2147483646;
-}
-
 var main = function () {
-  document.getElementById("startButton").onclick = () => {
-    if (game) {
-      console.log("Killing old game");
-      game.kill();
-    }
-    startGame();
-  }
+  document.getElementById("pauseResumeButton").onclick = () => pauseResumeButtonClick();
+  document.getElementById("startStopButton").onclick = () => startStopButtonClick();
+};
+
+var pauseResumeButtonClick = function() {
+	if (game && game.started && !game.paused) {
+		console.log("Pausing game");
+		pauseGame();
+	} else {
+		console.log("Resuming game");
+		resumeGame();
+	}
+};
+
+var startStopButtonClick = function() {
+	if (game && game.started) {
+		console.log("Terminating game");
+		stopGame();
+	} else {
+		console.log("Starting game");
+		startGame();
+	}
 };
 
 var getRandomSeed = function() {
@@ -29,9 +39,28 @@ var getRandomSeed = function() {
 	return randomSeed;
 };
 
+var stopGame = function() {
+	var inputSeedElement = (document.getElementById("seedInput") as HTMLInputElement);
+	var startStopButtonElement = (document.getElementById("startStopButton") as HTMLButtonElement);
+	var pauseResumeButtonElement = (document.getElementById("pauseResumeButton") as HTMLButtonElement);
+
+	inputSeedElement.disabled = false;
+	startStopButtonElement.innerHTML = "Start Game"; 
+	pauseResumeButtonElement.disabled = true;
+	pauseResumeButtonElement.innerHTML = "Pause Game";
+
+	game.kill();
+};
+
 var startGame = function() {
 		var inputSeedElement = (document.getElementById("seedInput") as HTMLInputElement);
+		var startStopButtonElement = (document.getElementById("startStopButton") as HTMLButtonElement);
+		var pauseResumeButtonElement = (document.getElementById("pauseResumeButton") as HTMLButtonElement);
+
 		inputSeedElement.disabled = true;
+		pauseResumeButtonElement.disabled = false;
+		pauseResumeButtonElement.innerHTML = "Pause Game";
+		startStopButtonElement.innerHTML = "End Game";
 
 		var inputSeed = inputSeedElement.value;
 		if (inputSeed.length > 0) {
@@ -54,6 +83,21 @@ var startGame = function() {
 	
 		game = new Game(seed, 15, playerControllers, 50, 50);
 		game.start();
+};
+
+var pauseGame = function() {
+	var pauseResumeButtonElement = (document.getElementById("pauseResumeButton") as HTMLButtonElement);
+
+	pauseResumeButtonElement.innerHTML = "Resume Game";
+
+	game.pause();
+};
+var resumeGame = function() {
+	var pauseResumeButtonElement = (document.getElementById("pauseResumeButton") as HTMLButtonElement);
+
+	pauseResumeButtonElement.innerHTML = "Pause Game";
+
+	game.resume();
 };
 
 main();

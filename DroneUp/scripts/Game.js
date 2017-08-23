@@ -5,6 +5,8 @@ import Map from './Map';
 
 export default class Game {
 	constructor(seed, spikePercent, playerCodeArray, xSize, ySize) {
+		this.started = false;
+		this.paused = false;
 		this.drones = [];
 		this.map = new Map(xSize, ySize);
 		for (var i = 0, len = playerCodeArray.length; i < len; i++) {
@@ -17,9 +19,21 @@ export default class Game {
 
 	start() {
 		this.runner.run();
+		this.started = true;
 	}
 
 	kill() {
 		this.runner.kill();
+		this.started = false;
 	}
+
+	pause() {
+		this.runner.pause();
+		this.paused = true;
+	}
+
+	resume() {
+		this.runner.resume();
+		this.paused = false;
+	}	
 }

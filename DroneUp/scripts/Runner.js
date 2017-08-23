@@ -5,12 +5,22 @@ export default class Runner {
 	constructor(gameObjectArray, map) {
 		this.gameObjects = gameObjectArray;
 		this.gameDone = false;
+		this.gamePaused = false;
 		this.map = map;
 		this.renderer = new Renderer("game-canvas");
 	}
 
+	pause = () => {
+		this.gamePaused = true;
+	}
+	
+	resume = () => {
+		this.gamePaused = false;
+		this.run();
+	}
+
 	run = () => {
-		if (!this.gameDone) {
+		if (!this.gameDone && !this.gamePaused) {
 			for (var i = 0, len = this.gameObjects.length; i < len; i++) {
 				if (this.gameObjects[i] !== undefined) {
 					var action = this.gameObjects[i].controller.getAction();
