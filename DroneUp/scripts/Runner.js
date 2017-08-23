@@ -1,5 +1,5 @@
-//import Renderer from './Renderer';
-import Renderer from './OpenGLRenderer';
+//import Renderer from './Renderer/Renderer';
+import Renderer from './Renderer/OpenGLRenderer';
 
 export default class Runner {
 	constructor(gameObjectArray, map) {
