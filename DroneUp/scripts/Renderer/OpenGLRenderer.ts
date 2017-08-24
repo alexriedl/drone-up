@@ -23,15 +23,8 @@ export interface IMapState {
 }
 
 const random = new Random(12345);
-const over = 2147483647;
 function getRandomColor() {
-  const r = () => {
-    let result = 0;
-    do {
-      result = random.next() / over;
-    } while (result < 0.3);
-    return result;
-  };
+  const r = () => random.nextRangeFloat(0.3, 1);
   return new Color(r(), r(), r());
 }
 
