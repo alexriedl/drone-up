@@ -10,7 +10,7 @@ export interface SimpleShaderProgramInfo {
   };
 }
 
-export function initWebGL(canvas) {
+export function initWebGL(canvas): WebGLRenderingContext{
   let gl = <WebGLRenderingContext>(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
 
   // If we don't have a GL context, give up now

@@ -13,28 +13,28 @@ export default class Random {
     if (this.seed <= 0) this.seed *= -1;
   }
 
-  public next() {
+  public next(): number {
     return this.seed = this.seed * 16807 % this.MAX;
   }
 
   /**
    * Returns a positive int (0 - 32^2-2)
    */
-  public nextInt() {
+  public nextInt(): number {
     return this.next();
   }
 
   /**
    * Returns a float between 0 and 1
    */
-  public nextFloat() {
+  public nextFloat(): number {
     return this.nextInt() / (this.MAX - 1);
   }
 
   /**
    * Returns a float between 'start' and 'end'
    */
-  public nextRangeFloat(start: number, end: number) {
+  public nextRangeFloat(start: number, end: number): number {
     const rangeSize = end - start;
     const randomUnder1 = this.nextInt() / this.MAX;
     return start + (randomUnder1 * rangeSize);
@@ -43,7 +43,7 @@ export default class Random {
   /**
    * Returns an int between 'start' and 'end'
    */
-  public nextRangeInt(start: number, end: number) {
+  public nextRangeInt(start: number, end: number): number {
     const rangeSize = end - start;
     const randomUnder1 = this.nextInt() / this.MAX;
     return start + Math.floor(randomUnder1 * rangeSize);
@@ -52,7 +52,7 @@ export default class Random {
   /**
    * Returns a random element from an array
    */
-  public choice(array: any[]) {
+  public choice<T>(array: T[]): T {
     return array[this.nextRangeInt(0, array.length)];
   }
 }

@@ -23,7 +23,7 @@ export interface IMapState {
 }
 
 const random = new Random(12345);
-function getRandomColor() {
+function getRandomColor(): Color {
   const r = () => random.nextRangeFloat(0.3, 1);
   return new Color(r(), r(), r());
 }
@@ -97,7 +97,7 @@ export default class Renderer {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
   }
 
-  public renderState(state: IMapState) {
+  public renderState(state: IMapState): void {
     const group = new RenderGroup();
 
     group.pushGrid(new TSM.vec2([state.xSize, state.ySize]), gridColor, gridThickness, 1);
@@ -115,7 +115,7 @@ export default class Renderer {
     this.renderOutput(group, state.xSize, state.ySize);
   }
 
-  public renderAction(state: IMapState, entity: IEntity, action: string) {
+  public renderAction(state: IMapState, entity: IEntity, action: string): void {
     switch (action) {
       case "moveUp":
         break;
@@ -150,7 +150,7 @@ export default class Renderer {
   /*************************************************************************
   *************************************************************************/
 
-  private renderRectangle(gl: WebGLRenderingContext, object: Rectangle) {
+  private renderRectangle(gl: WebGLRenderingContext, object: Rectangle): void {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.rectangleVertexBuffer);
     const info = this.programInfo;
 
@@ -181,7 +181,7 @@ export default class Renderer {
   /*************************************************************************
   *************************************************************************/
 
-  private renderOutput(group: RenderGroup, mapWidth: number, mapHeight) {
+  private renderOutput(group: RenderGroup, mapWidth: number, mapHeight): void {
     const gl: WebGLRenderingContext = this.gl;
     const info = this.programInfo;
 
