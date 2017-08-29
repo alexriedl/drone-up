@@ -5,7 +5,7 @@ import Map from '../Map';
 export default class Drone extends Entity {
 	public constructor(controller: Controller, ID: string) {
 		super(controller, ID, "Drone");
-		controller.setActions(["Scan", "moveUp", "moveDown", "moveLeft", "moveRight", "PullUp", "PullDown", "PullRight", "PullLeft", "PushUp", "PushDown", "PushRight", "PushLeft"]);
+		controller.setActions(["Scan", "MoveUp", "MoveDown", "MoveLeft", "MoveRight", "PullUp", "PullDown", "PullRight", "PullLeft", "PushUp", "PushDown", "PushRight", "PushLeft"]);
 	}
 
 	public scan(map: Map): void {
@@ -55,16 +55,16 @@ export default class Drone extends Entity {
 
 	public perform(action: string, map: Map): void {
 		switch (action) {
-			case "moveUp":
+			case "MoveUp":
 				this.moveUp(map);
 				break;
-			case "moveDown":
+			case "MoveDown":
 				this.moveDown(map);
 				break;
-			case "moveLeft":
+			case "MoveLeft":
 				this.moveLeft(map);
 				break;
-			case "moveRight":
+			case "MoveRight":
 				this.moveRight(map);
 				break;
 			case "PullUp":

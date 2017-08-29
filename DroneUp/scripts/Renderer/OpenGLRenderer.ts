@@ -118,13 +118,13 @@ export default class Renderer {
 
   public renderAction(state: Map, entity: IEntity, action: string): void {
     switch (action) {
-      case "moveUp":
+      case "MoveUp":
         break;
-      case "moveDown":
+      case "MoveDown":
         break;
-      case "moveLeft":
+      case "MoveLeft":
         break;
-      case "moveRight":
+      case "MoveRight":
         break;
       case "PullUp":
         break;
