@@ -1,4 +1,5 @@
 import { IRenderObject, Rectangle, RenderObjectTypes } from './RenderObjects';
+import Map from '../Map';
 import { SimpleShaderProgramInfo, initWebGL, createShaderProgram } from './WebGL';
 import Color, { BLACK } from './Color';
 import Random from '../Random';
@@ -115,7 +116,7 @@ export default class Renderer {
     this.renderOutput(group, state.xSize, state.ySize);
   }
 
-  public renderAction(state: IMapState, entity: IEntity, action: string): void {
+  public renderAction(state: Map, entity: IEntity, action: string): void {
     switch (action) {
       case "moveUp":
         break;

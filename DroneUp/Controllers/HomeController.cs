@@ -31,12 +31,6 @@ namespace DroneUp.Controllers
 			throw new Exception();
 		}
 
-		[HttpGet("/api/mapseed")]
-		public IActionResult GetMapSeed()
-		{
-			return Ok(setupService.GetMapSeed());
-		}
-
 		[HttpGet("/api/dronenames")]
 		public IActionResult GetDroneScriptNames()
 		{

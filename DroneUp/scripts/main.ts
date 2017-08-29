@@ -1,62 +1,51 @@
+import Random from './Random';
 import Game from './Game';
-import { LuigiBot, PushBot, PullBot, ChickenBot, RandomBot, ShoveBot } from './PremadeBots'
+import { LuigiBot, PushBot, PullBot, ChickenBot, RandomBot, ShoveBot } from './Bots/PremadeBots'
 
-var game;
-var seed;
+let game: Game;
+let seed: number;
 
-var main = function () {
-  document.getElementById("pauseResumeButton").onclick = () => pauseResumeButtonClick();
-  document.getElementById("startStopButton").onclick = () => startStopButtonClick();
-};
+const inputSeedElement = (document.getElementById("seedInput") as HTMLInputElement);
+const startStopButtonElement = (document.getElementById("startStopButton") as HTMLButtonElement);
+const pauseResumeButtonElement = (document.getElementById("pauseResumeButton") as HTMLButtonElement);
 
-var pauseResumeButtonClick = function() {
-	if (game && game.started && !game.paused) {
+pauseResumeButtonElement.onclick = () => pauseResumeButtonClick();
+startStopButtonElement.onclick = () => startStopButtonClick();
+
+function pauseResumeButtonClick(): void {
+	if (game && game.isStarted() && !game.isPaused()) {
 		console.log("Pausing game");
 		pauseGame();
 	} else {
 		console.log("Resuming game");
 		resumeGame();
 	}
-};
+}
 
-var startStopButtonClick = function() {
-	if (game && game.started) {
+function startStopButtonClick(): void {
+	if (game && game.isStarted()) {
 		console.log("Terminating game");
 		stopGame();
 	} else {
 		console.log("Starting game");
 		startGame();
 	}
-};
+}
 
-var getRandomSeed = function() {
-	var xhttp = new XMLHttpRequest();
-	xhttp.open("GET", "/api/mapseed", false);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send();
-	var randomSeed = JSON.parse(xhttp.responseText);
+function getRandomSeed(): number {
+	return new Date().getTime();
+}
 
-	return randomSeed;
-};
-
-var stopGame = function() {
-	var inputSeedElement = (document.getElementById("seedInput") as HTMLInputElement);
-	var startStopButtonElement = (document.getElementById("startStopButton") as HTMLButtonElement);
-	var pauseResumeButtonElement = (document.getElementById("pauseResumeButton") as HTMLButtonElement);
-
+function stopGame(): void {
 	inputSeedElement.disabled = false;
-	startStopButtonElement.innerHTML = "Start Game"; 
+	startStopButtonElement.innerHTML = "Start Game";
 	pauseResumeButtonElement.disabled = true;
 	pauseResumeButtonElement.innerHTML = "Pause Game";
 
 	game.kill();
-};
+}
 
-var startGame = function() {
-		var inputSeedElement = (document.getElementById("seedInput") as HTMLInputElement);
-		var startStopButtonElement = (document.getElementById("startStopButton") as HTMLButtonElement);
-		var pauseResumeButtonElement = (document.getElementById("pauseResumeButton") as HTMLButtonElement);
-
+function startGame(): void {
 		inputSeedElement.disabled = true;
 		pauseResumeButtonElement.disabled = false;
 		pauseResumeButtonElement.innerHTML = "Pause Game";
@@ -64,40 +53,35 @@ var startGame = function() {
 
 		var inputSeed = inputSeedElement.value;
 		if (inputSeed.length > 0) {
-			seed = inputSeed;
+			seed = +inputSeed;
 		} else {
-			inputSeed = getRandomSeed();
+			inputSeed = getRandomSeed().toString();
 			inputSeedElement.value = inputSeed;
 		}
 
-		seed = +inputSeed > 0 ? inputSeed : getRandomSeed;
-	
-		var playerControllers = [
-			new LuigiBot(seed), 
-			new PushBot(seed), 
-			new PullBot(seed), 
-			new ChickenBot(seed), 
-			new RandomBot(seed), 
-			new ShoveBot(seed)
+		seed = +inputSeed > 0 ? +inputSeed : getRandomSeed();
+
+		const randomizer = new Random(seed);
+
+		const playerControllers = [
+			new LuigiBot(randomizer),
+			new PushBot(randomizer),
+			new PullBot(randomizer),
+			new ChickenBot(randomizer),
+			new RandomBot(randomizer),
+			new ShoveBot(randomizer)
 		];
-	
+
 		game = new Game(seed, 15, playerControllers, 50, 50);
 		game.start();
-};
+}
 
-var pauseGame = function() {
-	var pauseResumeButtonElement = (document.getElementById("pauseResumeButton") as HTMLButtonElement);
-
+function pauseGame(): void {
 	pauseResumeButtonElement.innerHTML = "Resume Game";
-
 	game.pause();
-};
-var resumeGame = function() {
-	var pauseResumeButtonElement = (document.getElementById("pauseResumeButton") as HTMLButtonElement);
+}
 
+function resumeGame(): void {
 	pauseResumeButtonElement.innerHTML = "Pause Game";
-
 	game.resume();
-};
-
-main();
+}
