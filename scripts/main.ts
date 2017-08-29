@@ -85,3 +85,9 @@ function resumeGame(): void {
 	pauseResumeButtonElement.innerHTML = "Pause Game";
 	game.resume();
 }
+
+// Allow Hot Module Reloading
+declare var module: any;
+if (module.hot) {
+	module.hot.accept();
+}
