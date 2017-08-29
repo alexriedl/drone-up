@@ -24,7 +24,7 @@ namespace DroneUp.Controllers
 		[HttpPost("/api/upload")]
 		public IActionResult UploadDroneScript(string droneName, string droneScriptContent)
 		{
-			if (setupService.UploadDroneScript(droneName, droneScriptContent))
+			if(setupService.UploadDroneScript(droneName, droneScriptContent))
 			{
 				return Ok();
 			}

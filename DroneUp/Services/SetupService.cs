@@ -6,60 +6,54 @@ using System.Threading.Tasks;
 
 namespace DroneUp.Services
 {
-		public class SetupService
+	public class SetupService
+	{
+		private const string DRONES_DIRECTORY = "./drones";
+
+		public bool UploadDroneScript(string droneScriptName, string droneScriptContent)
 		{
-			private const string DRONES_DIRECTORY = "./drones";
+			bool successfullyUploadedScript = false;
+			string writePath = DRONES_DIRECTORY + "/" + droneScriptName;
 
-		public int GetMapSeed()
+			if(!File.Exists(writePath))
 			{
-			Random random = new Random();
-				return random.Next(1, int.MaxValue);
-		}
-
-			public bool UploadDroneScript(string droneScriptName, string droneScriptContent)
-			{
-				bool successfullyUploadedScript = false;
-				string writePath = DRONES_DIRECTORY + "/" + droneScriptName;
-
-				if (!File.Exists(writePath))
-				{
 				File.WriteAllText(writePath, droneScriptContent);
 
-					successfullyUploadedScript = File.Exists(writePath);
-				}
-
-			return successfullyUploadedScript;
+				successfullyUploadedScript = File.Exists(writePath);
 			}
 
-			public List<string> GetDroneScriptNames()
-			{
-				List<string> allDroneScriptNames = new List<string>();
-				var files = new DirectoryInfo(DRONES_DIRECTORY).GetFiles();
+			return successfullyUploadedScript;
+		}
 
-				foreach (var file in files)
-				{
-					if (File.Exists(file.FullName))
+		public List<string> GetDroneScriptNames()
+		{
+			List<string> allDroneScriptNames = new List<string>();
+			var files = new DirectoryInfo(DRONES_DIRECTORY).GetFiles();
+
+			foreach(var file in files)
+			{
+				if(File.Exists(file.FullName))
 				{
 					allDroneScriptNames.Add(file.Name);
 				}
-				}
-			
-			return allDroneScriptNames;
 			}
 
-			public Dictionary<string, string> GetDroneScripts(List<string> droneScriptNames)
-			{
-				Dictionary<string, string> droneScripts = new Dictionary<string, string>();
+			return allDroneScriptNames;
+		}
 
-				foreach (var droneScriptName in droneScriptNames)
-				{
+		public Dictionary<string, string> GetDroneScripts(List<string> droneScriptNames)
+		{
+			Dictionary<string, string> droneScripts = new Dictionary<string, string>();
+
+			foreach(var droneScriptName in droneScriptNames)
+			{
 				var readPath = DRONES_DIRECTORY + "/" + droneScriptName;
-					var droneScriptContent = File.ReadAllText(readPath);
+				var droneScriptContent = File.ReadAllText(readPath);
 
 				droneScripts.Add(droneScriptName, droneScriptContent);
-				}
-
-				return droneScripts;
 			}
+
+			return droneScripts;
 		}
+	}
 }
