@@ -4,7 +4,7 @@ import Map from '../Map';
 
 export default class Drone extends Entity {
 	public constructor(controller: Controller, ID: string) {
-		super(controller, "Drone", ID);
+		super(controller, ID, "Drone");
 		controller.setActions(["Scan", "moveUp", "moveDown", "moveLeft", "moveRight", "PullUp", "PullDown", "PullRight", "PullLeft", "PushUp", "PushDown", "PushRight", "PushLeft"]);
 	}
 
