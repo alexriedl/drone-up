@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/DroneUp/bin/Debug/netcoreapp1.1/DroneUp.dll",
+            "program": "${workspaceRoot}/bin/Debug/netcoreapp1.1/DroneUp.dll",
             "args": [],
-            "cwd": "${workspaceRoot}/DroneUp",
+            "cwd": "${workspaceRoot}",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {

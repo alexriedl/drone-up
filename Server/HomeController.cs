@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DroneUp.Services;
-using Microsoft.AspNetCore.Mvc;
 
-namespace DroneUp.Controllers
+namespace Server
 {
 	public class HomeController : Controller
 	{
@@ -41,7 +40,6 @@ namespace DroneUp.Controllers
 		public IActionResult GetDroneScripts(List<string> droneScriptNames)
 		{
 			return Ok(setupService.GetDroneScripts(droneScriptNames));
-
 		}
 	}
 }

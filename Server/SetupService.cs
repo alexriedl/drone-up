@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DroneUp.Services
+namespace Server
 {
 	public class SetupService
 	{

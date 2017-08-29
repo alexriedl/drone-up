@@ -22,30 +22,6 @@
       "command": "dotnet",
       "args": [ "restore" ],
       "problemMatcher": []
-    },
-    {
-      "taskName": "test",
-      "group": {
-        "kind": "test",
-        "isDefault": true
-      },
-      "dependsOn": [ "test site", "test integration" ],
-      "problemMatcher": []
-    },
-    {
-      "taskName": "npm install",
-      "command": "npm",
-      "args": [ "install" ],
-      "type": "shell",
-      "options": { "cwd": "${workspaceRoot}/src/Web" },
-      "problemMatcher": []
-    },
-    {
-      "taskName": "webpack",
-      "command": "webpack",
-      "type": "shell",
-      "problemMatcher": "$tsc",
-      "options": { "cwd": "${workspaceRoot}/src/Web" }
     }
   ]
 }

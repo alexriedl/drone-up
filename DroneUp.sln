@@ -1,22 +1,34 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DroneUp", "DroneUp\DroneUp.csproj", "{11C79289-A313-4455-82A0-CC7D8FD1FA0E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DroneUp", "DroneUp.csproj", "{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}"
 EndProject
 Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{11C79289-A313-4455-82A0-CC7D8FD1FA0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{11C79289-A313-4455-82A0-CC7D8FD1FA0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{11C79289-A313-4455-82A0-CC7D8FD1FA0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{11C79289-A313-4455-82A0-CC7D8FD1FA0E}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Debug|x64.ActiveCfg = Debug|x64
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Debug|x64.Build.0 = Debug|x64
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Debug|x86.ActiveCfg = Debug|x86
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Debug|x86.Build.0 = Debug|x86
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Release|x64.ActiveCfg = Release|x64
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Release|x64.Build.0 = Release|x64
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Release|x86.ActiveCfg = Release|x86
+		{8F74E4FF-C7D8-4CBA-BA0D-C55BB39C0901}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 EndGlobal
