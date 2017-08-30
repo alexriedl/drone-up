@@ -1,3 +1,5 @@
+import Map from '../Map';
+
 export interface ICoords {
   x: number;
   y: number;
@@ -67,7 +69,7 @@ export default class Renderer {
     });
   }
 
-  public renderAction(state: IMapState, entity: IEntity, action: string) {
+  public renderAction(state: Map, entity: IEntity, action: string): void {
     console.log("Animations are not implemented in the software renderer");
   }
 

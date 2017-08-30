@@ -1,7 +1,7 @@
-//import Renderer from './Renderer/Renderer';
-import Renderer from './Renderer/OpenGLRenderer';
-import Map from './Map';
 import { Drone } from './GameObjects';
+import Map from './Map';
+import Renderer from './Renderer/OpenGLRenderer';
+//import Renderer from './Renderer/SWRenderer';
 
 export default class Runner {
 	private players: Drone[];
@@ -10,7 +10,7 @@ export default class Runner {
 	private map: Map;
 	private renderer: Renderer;
 
-	public constructor(players: Drone[] , map: Map) {
+	public constructor(players: Drone[], map: Map) {
 		this.players = players;
 		this.gameDone = false;
 		this.gamePaused = false;
@@ -18,16 +18,16 @@ export default class Runner {
 		this.renderer = new Renderer("game-canvas");
 	}
 
-	public pause = (): void => {
+	public pause(): void {
 		this.gamePaused = true;
 	}
 
-	public resume = (): void => {
+	public resume(): void {
 		this.gamePaused = false;
 		this.run();
 	}
 
-	run = (): void => {
+	public run(): void {
 		if (!this.gameDone && !this.gamePaused) {
 			for (var i = 0, len = this.players.length; i < len; i++) {
 				if (this.players[i] !== undefined) {
@@ -41,7 +41,7 @@ export default class Runner {
 			this.renderUi();
 
 			if (!this.gameDone) {
-				setTimeout(this.run, 333);
+				setTimeout(() => this.run(), 333);
 			}
 		}
 	}
