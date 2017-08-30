@@ -1,7 +1,20 @@
-import { Drone } from './GameObjects';
+import { Drone, GameObject } from './GameObjects';
 import Map from './Map';
 import Renderer from './Renderer/OpenGLRenderer';
 //import Renderer from './Renderer/SWRenderer';
+
+export interface IAnimationState {
+	player: Drone;
+	action: string;
+	gameObjects: GameObject[];
+	xSize: number;
+	ySize: number;
+}
+
+export interface ITickState {
+	isAnimating: boolean;
+	loopPosition: number;
+}
 
 export default class Runner {
 	private players: Drone[];
@@ -27,32 +40,52 @@ export default class Runner {
 		this.run();
 	}
 
-	public updateAnimation(state: any): boolean {
-		return true;
-	}
+	public runWithAnimations() {
+		let then: number = 0;
+		let animationState: IAnimationState;
+		let tickState: ITickState = {
+			isAnimating: false,
+			loopPosition: 0
+		};
 
-	private animationState = {};
+		const frame = (now) => {
+			now *= 0.001;
+			const deltaTime = now - then;
+			then = now;
 
-	public runWithState(tickState?: any): void {
-		if(!tickState) {
-			tickState = {
-				isAnimating: false,
-				loopPosition: 0
-			};
-		}
+			if (!tickState.isAnimating) {
+				tickState.loopPosition = (tickState.loopPosition + 1) % this.players.length;
+				const player = this.players[tickState.loopPosition];
+				// TODO: player could be undefined. Skip?
+				const action = player.controller.getAction();
 
-		if(!tickState.isAnimating) {
-			tickState.loopPosition = (tickState.loopPosition + 1) % this.players.length;
-			const player = this.players[tickState.loopPosition];
-			const action = player.controller.getAction();
-		}
+				if (action) {
+					animationState = {
+						player: <Drone>{ ...player },
+						action: action,
+						gameObjects: [...this.map.getMapObjects().filter(e => e.ID !== player.ID)],
+						xSize: this.map.getXSize(),
+						ySize: this.map.getYSize()
+					};
 
-		if(tickState.isAnimating) {
-			const finished = this.updateAnimation(this.animationState);
-			if(finished) {
-				tickState.isAnimating = false;
+					tickState.isAnimating = true;
+				}
+				else {
+					// TODO: Run the the next iteration right away?
+				}
 			}
-		}
+
+			if (tickState.isAnimating) {
+				// TODO: Update animation state
+				// TODO: Render animation state
+				let finished = true;
+				if (finished) {
+					tickState.isAnimating = false;
+				}
+			}
+		};
+
+		requestAnimationFrame(frame);
 	}
 
 	public run(): void {

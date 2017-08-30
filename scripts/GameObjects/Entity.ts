@@ -3,7 +3,7 @@ import GameObject from './GameObject';
 import Map from '../Map';
 
 export default class Entity extends GameObject {
-	public readonly controller;
+	public readonly controller: Controller;
 
 	public constructor(controller: Controller, ID: string, type: string) {
 		super(ID, type);

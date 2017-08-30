@@ -1,7 +1,9 @@
 import Random from '../Random';
+import { GameObject } from '../GameObjects';
 
 export abstract class Controller {
 	protected actions: string[];
+	public scanResult: GameObject[];
 
 	constructor(protected readonly randomizer: Random) { }
 	public abstract getAction(): string;
