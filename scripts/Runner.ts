@@ -27,6 +27,34 @@ export default class Runner {
 		this.run();
 	}
 
+	public updateAnimation(state: any): boolean {
+		return true;
+	}
+
+	private animationState = {};
+
+	public runWithState(tickState?: any): void {
+		if(!tickState) {
+			tickState = {
+				isAnimating: false,
+				loopPosition: 0
+			};
+		}
+
+		if(!tickState.isAnimating) {
+			tickState.loopPosition = (tickState.loopPosition + 1) % this.players.length;
+			const player = this.players[tickState.loopPosition];
+			const action = player.controller.getAction();
+		}
+
+		if(tickState.isAnimating) {
+			const finished = this.updateAnimation(this.animationState);
+			if(finished) {
+				tickState.isAnimating = false;
+			}
+		}
+	}
+
 	public run(): void {
 		if (!this.gameDone && !this.gamePaused) {
 			for (var i = 0, len = this.players.length; i < len; i++) {
