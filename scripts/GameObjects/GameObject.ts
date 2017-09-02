@@ -1,15 +1,15 @@
 import { Controller } from '../Bots/PremadeBots';
-import { ICoords, IMoveInfo, Animation } from '../Utils';
+import { ICoords, IMoveInfo, Animation, ObjectType } from '../Utils';
 import Map from '../Map';
 
 export default class GameObject implements ICoords {
 	public readonly ID: string
-	public readonly type: string;
+	public readonly type: ObjectType;
 	public readonly controller?: Controller;
 	public x: number;
 	public y: number;
 
-	public constructor(ID: string, type: string, controller?: Controller, x?: number, y?: number) {
+	public constructor(ID: string, type: ObjectType, controller?: Controller, x?: number, y?: number) {
 		this.ID = ID;
 		this.type = type;
 		this.x = x || 0;
@@ -73,13 +73,23 @@ export default class GameObject implements ICoords {
 		this.wrapCoordinates(map);
 
 		let result: IMoveInfo[] = [
-			{ ID: this.ID, startPos: startPos, endPos: endPos, curPos: startPos, animation: animation || Animation.Move }
+			{
+				ID: this.ID,
+				type: this.type,
+				startPos: startPos,
+				endPos: endPos,
+				curPos: startPos,
+				animation: animation || Animation.Move
+			}
 		];
 
-		let collisions = this.findCollided(possibleAffected);
-		for(let i = 0; i < collisions.length; i++) {
-			const go = collisions[i];
-			result.push.apply(result, go.internalMove(deltaX, deltaY, map, possibleAffected, Animation.Bump));
+		if (this.type !== ObjectType.Drone) {
+			let collisions = this.findCollided(possibleAffected);
+			for (let i = 0; i < collisions.length; i++) {
+				const go = collisions[i];
+				if(go.type === ObjectType.Drone) continue;
+				result.push.apply(result, go.internalMove(deltaX, deltaY, map, possibleAffected, Animation.Bump));
+			}
 		}
 
 		return result;

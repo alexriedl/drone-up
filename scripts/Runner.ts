@@ -50,7 +50,7 @@ export default class Runner {
 	}
 
 	public runWithAnimations() {
-		let then: number = 0;
+		let then = Date.now() * 0.001;
 		let animationState: IAnimationState;
 		let tickState: ITickState = {
 			isAnimating: false,

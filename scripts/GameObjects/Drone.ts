@@ -1,11 +1,11 @@
 import { Controller } from '../Bots/PremadeBots';
-import { IMoveInfo, Animation } from '../Utils';
+import { IMoveInfo, Animation, ObjectType } from '../Utils';
 import GameObject from './GameObject';
 import Map from '../Map';
 
 export default class Drone extends GameObject {
 	public constructor(ID: string, controller: Controller) {
-		super(ID, "Drone", controller);
+		super(ID, ObjectType.Drone, controller);
 		controller.setActions(["Scan", "MoveUp", "MoveDown", "MoveLeft", "MoveRight", "PullUp", "PullDown", "PullRight", "PullLeft", "PushUp", "PushDown", "PushRight", "PushLeft"]);
 	}
 

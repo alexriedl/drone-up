@@ -4,3 +4,8 @@ export enum Animation {
   Pull, // Pulled with gun
   Push, // Pushed with gun
 }
+
+export enum ObjectType {
+  Drone,
+  Spike,
+}

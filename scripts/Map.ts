@@ -1,5 +1,5 @@
 import { Drone, GameObject } from './GameObjects';
-import { Random, ICoords } from './Utils';
+import { Random, ICoords, ObjectType } from './Utils';
 
 export default class Map {
 	private mapObjects: GameObject[];
@@ -87,7 +87,7 @@ export default class Map {
 			var attemptValid = this.checkInvalid(x, y, invalidArray);
 
 			if (attemptValid) {
-				spikeArray.push(new GameObject(spikeId, "spike", undefined, x, y));
+				spikeArray.push(new GameObject(spikeId, ObjectType.Spike, undefined, x, y));
 
 				// spikes only invalidate their tile, they get no "safe space"
 				this.markInvalid(x, y, 0, invalidArray);
@@ -132,14 +132,16 @@ export default class Map {
 	}
 
 	public removeCrashedDrones(): Drone[] {
-		var crashed: Drone[] = [];
-		var playerRemovalIndices = [];
+		let crashed: Drone[] = [];
+		let playerRemovalIndices = [];
+		let gameObjectRemovalIndices = [];
 
 		for (var i = 0, playerCount = this.players.length; i < playerCount; i++) {
 			for (var j = 0, mapObjectCount = this.mapObjects.length; j < mapObjectCount; j++) {
 				var player = this.players[i];
 				var otherObject = this.mapObjects[j];
-				if (player.x === otherObject.x && player.y === otherObject.y && player.ID !== otherObject.ID) {
+
+				if(player.ID !== otherObject.ID && player.x === otherObject.x && player.y === otherObject.y) {
 					crashed.push(player);
 					playerRemovalIndices.push(i);
 				}
@@ -148,6 +150,14 @@ export default class Map {
 
 		for (var j = 0, len = playerRemovalIndices.length; j < len; j++) {
 			this.players.splice(playerRemovalIndices[j], 1);
+		}
+
+		for (let i = 0; i < crashed.length; i++) {
+			const c = crashed[i];
+			const index = this.mapObjects.indexOf(c);
+			if(index > -1) {
+				this.mapObjects.splice(index, 1);
+			}
 		}
 
 		return crashed;

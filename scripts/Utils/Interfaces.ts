@@ -1,4 +1,4 @@
-import { Animation } from './Enums';
+import { Animation, ObjectType } from './Enums';
 
 export interface ICoords {
 	x: number;
@@ -7,6 +7,7 @@ export interface ICoords {
 
 export interface IMoveInfo {
 	ID: string;
+	type: ObjectType;
 	startPos: ICoords;
 	endPos: ICoords;
 	curPos: ICoords;

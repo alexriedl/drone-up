@@ -103,6 +103,9 @@ export default class Renderer {
     switch (info.animation) {
       case Animation.Move: return 0.5;
       case Animation.Bump: return 0.25;
+      case Animation.Pull:
+      case Animation.Push:
+        return -0.5;
     }
     return 0;
   }
