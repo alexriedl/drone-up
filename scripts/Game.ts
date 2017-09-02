@@ -1,7 +1,7 @@
 import { Controller } from './Bots/PremadeBots';
+import { Random } from './Utils';
 import Drone from './GameObjects/Drone';
 import Map from './Map';
-import Random from './Random';
 import Runner from './Runner';
 
 export default class Game {
@@ -18,7 +18,7 @@ export default class Game {
 		this.started = false;
 
 		for (var i = 0, len = playerControllers.length; i < len; i++) {
-			this.drones.push(new Drone(playerControllers[i], "player" + i));
+			this.drones.push(new Drone("player" + i, playerControllers[i]));
 		}
 		this.map.initialize(new Random(seed), this.drones, spikePercent);
 

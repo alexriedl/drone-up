@@ -1,5 +1,5 @@
-import { Drone, Coords, Entity, GameObject } from './GameObjects';
-import Random from './Random';
+import { Drone, GameObject } from './GameObjects';
+import { Random, ICoords } from './Utils';
 
 export default class Map {
 	private mapObjects: GameObject[];
@@ -11,7 +11,7 @@ export default class Map {
 
 	initialize(randomizer: Random, players: Drone[], spikePercent: number) {
 		var spikeArray: GameObject[] = [];
-		var invalidArray: Coords[] = [];
+		var invalidArray: ICoords[] = [];
 
 		// first, generate all players and mark their "safe space" as invalid for further placements
 		this.generatePlayers(randomizer, players, invalidArray);
@@ -36,7 +36,7 @@ export default class Map {
 		return this.ySize;
 	}
 
-	public generatePlayers(randomizer: Random, players: Drone[], invalidArray: Coords[]): void {
+	public generatePlayers(randomizer: Random, players: Drone[], invalidArray: ICoords[]): void {
 		for (let p = 0, plen = players.length; p < plen; p++) {
 			const player = players[p];
 			let attempts = 0;
@@ -70,7 +70,7 @@ export default class Map {
 		};
 	}
 
-	public generateSpikes(randomizer: Random, spikePercent: number, spikeArray: GameObject[], invalidArray: Coords[]) {
+	public generateSpikes(randomizer: Random, spikePercent: number, spikeArray: GameObject[], invalidArray: ICoords[]) {
 		var spikesGenned = 0;
 		var spikesFailed = 0;
 		var neededSpikes = (this.xSize * this.ySize * spikePercent) / 100;
@@ -83,12 +83,7 @@ export default class Map {
 			var attemptValid = this.checkInvalid(x, y, invalidArray);
 
 			if (attemptValid) {
-				spikeArray.push({
-					ID: spikeId,
-					type: "spike",
-					x: x,
-					y: y
-				});
+				spikeArray.push(new GameObject(spikeId, "spike", undefined, x, y));
 
 				// spikes only invalidate their tile, they get no "safe space"
 				this.markInvalid(x, y, 0, invalidArray);
@@ -102,7 +97,7 @@ export default class Map {
 		}
 	}
 
-	public checkInvalid(x: number, y: number, invalidArray: Coords[]) {
+	public checkInvalid(x: number, y: number, invalidArray: ICoords[]) {
 		var attemptValid = true;
 
 		for (var i = 0, ilen = invalidArray.length; i < ilen && attemptValid; i++) {
@@ -115,7 +110,7 @@ export default class Map {
 		return attemptValid;
 	}
 
-	public markInvalid(x: number, y: number, numSpread: number, invalidArray: Coords[]): void {
+	public markInvalid(x: number, y: number, numSpread: number, invalidArray: ICoords[]): void {
 		if (numSpread < 0)
 			return;
 

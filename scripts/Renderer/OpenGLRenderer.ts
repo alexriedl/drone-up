@@ -1,8 +1,9 @@
 import { IRenderObject, Rectangle, RenderObjectTypes } from './RenderObjects';
-import Map from '../Map';
+import { Random } from '../Utils';
 import { SimpleShaderProgramInfo, initWebGL, createShaderProgram } from './WebGL';
+import { GameObject } from '../GameObjects';
 import Color, { BLACK } from './Color';
-import Random from '../Random';
+import Map from '../Map';
 import RenderGroup from './RenderGroup';
 
 const backgroundColor = BLACK;
@@ -10,15 +11,8 @@ const gridThickness = 0.05;
 const gridColor = new Color(1, 0.7, 0);
 const spikeColor = new Color(.6, .6, .6);
 
-export interface ICoords {
-  x: number;
-  y: number;
-}
-export interface IEntity extends ICoords {
-  ID: string;
-}
 export interface IMapState {
-  mapObjects: IEntity[];
+  mapObjects: GameObject[];
   xSize: number;
   ySize: number;
 }
@@ -116,7 +110,7 @@ export default class Renderer {
     this.renderOutput(group, state.xSize, state.ySize);
   }
 
-  public renderAction(state: Map, entity: IEntity, action: string): void {
+  public renderAction(state: Map, entity: GameObject, action: string): void {
     switch (action) {
       case "MoveUp":
         break;

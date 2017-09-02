@@ -58,6 +58,7 @@ export default class Runner {
 				const player = this.players[tickState.loopPosition];
 				// TODO: player could be undefined. Skip?
 				const action = player.controller.getAction();
+				player.perform(action, this.map);
 
 				if (action) {
 					animationState = {
