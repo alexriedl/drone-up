@@ -1,15 +1,15 @@
 import Color from './Color';
 
 export enum RenderObjectTypes {
-  Rectangle,
+	Rectangle,
 }
 
 export interface IRenderObject {
-  type: RenderObjectTypes;
-  origin: TSM.vec3;
+	type: RenderObjectTypes;
+	origin: TSM.vec3;
 }
 
 export interface Rectangle extends IRenderObject {
-  size: TSM.vec3;
-  color: Color;
+	size: TSM.vec3;
+	color: Color;
 }

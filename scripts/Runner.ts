@@ -49,7 +49,7 @@ export default class Runner {
 		this.gameDone = this.map.getPlayers().length <= 1;
 	}
 
-	public runWithAnimations() {
+	public run() {
 		let then = Date.now() * 0.001;
 		let animationState: IAnimationState;
 		let tickState: ITickState = {
@@ -88,8 +88,7 @@ export default class Runner {
 				animationState.index++;
 
 				// Update animation state
-
-				for(let i = 0; i < animationState.moveInfos.length; i++) {
+				for (let i = 0; i < animationState.moveInfos.length; i++) {
 					const info = animationState.moveInfos[i];
 
 					// TODO: Come up with a more reliable way to know animations are finished
@@ -108,19 +107,19 @@ export default class Runner {
 				}
 			}
 			else {
-				this.renderer.renderState({
-					gameObjects: this.map.getMapObjects(),
-					xSize: this.map.getXSize(),
-					ySize: this.map.getYSize()
-				});
+				this.renderer.renderMap(this.map);
 			}
 
 			if (!tickState.isAnimating) {
 				this.checkGameDone();
 			}
 
-			if(!this.gameDone && !this.gamePaused) {
+			if (!this.gameDone && !this.gamePaused) {
 				requestAnimationFrame(this.frame);
+			}
+
+			if(this.gameDone) {
+				this.renderer.renderMap(this.map);
 			}
 		};
 

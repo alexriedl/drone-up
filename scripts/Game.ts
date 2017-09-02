@@ -26,8 +26,7 @@ export default class Game {
 	}
 
 	public start(): void {
-		//this.runner.run();
-		this.runner.runWithAnimations();
+		this.runner.run();
 		this.started = true;
 	}
 
