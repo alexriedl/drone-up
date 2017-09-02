@@ -141,7 +141,7 @@ export default class Map {
 				var player = this.players[i];
 				var otherObject = this.mapObjects[j];
 
-				if(player.ID !== otherObject.ID && player.x === otherObject.x && player.y === otherObject.y) {
+				if (player.ID !== otherObject.ID && player.x === otherObject.x && player.y === otherObject.y) {
 					crashed.push(player);
 					playerRemovalIndices.push(i);
 				}
@@ -155,7 +155,7 @@ export default class Map {
 		for (let i = 0; i < crashed.length; i++) {
 			const c = crashed[i];
 			const index = this.mapObjects.indexOf(c);
-			if(index > -1) {
+			if (index > -1) {
 				this.mapObjects.splice(index, 1);
 			}
 		}

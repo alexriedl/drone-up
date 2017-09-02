@@ -87,7 +87,7 @@ export default class GameObject implements ICoords {
 			let collisions = this.findCollided(possibleAffected);
 			for (let i = 0; i < collisions.length; i++) {
 				const go = collisions[i];
-				if(go.type === ObjectType.Drone) continue;
+				if (go.type === ObjectType.Drone) continue;
 				result.push.apply(result, go.internalMove(deltaX, deltaY, map, possibleAffected, Animation.Bump));
 			}
 		}

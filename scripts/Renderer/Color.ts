@@ -1,6 +1,6 @@
 export default class Color {
-  constructor(public r: number = 0, public g: number = 0, public b: number = 0, public a: number = 1) {
-  }
+	constructor(public r: number = 0, public g: number = 0, public b: number = 0, public a: number = 1) {
+	}
 }
 
 export const BLACK = new Color();

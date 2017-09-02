@@ -3,9 +3,9 @@ import { Animation, ObjectType } from './Enums';
 import Random from './Random';
 
 export {
-  Animation,
-  ObjectType,
-  ICoords,
-  IMoveInfo,
-  Random,
+	Animation,
+	ObjectType,
+	ICoords,
+	IMoveInfo,
+	Random,
 }

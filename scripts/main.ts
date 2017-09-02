@@ -52,7 +52,7 @@ function startGame(): void {
 	startStopButtonElement.innerHTML = "End Game";
 
 	var inputSeed = inputSeedElement.value;
-	if(!inputSeed || inputSeed.length <= 0) {
+	if (!inputSeed || inputSeed.length <= 0) {
 		inputSeed = getRandomSeed().toString();
 	}
 

@@ -118,7 +118,7 @@ export default class Runner {
 				requestAnimationFrame(this.frame);
 			}
 
-			if(this.gameDone) {
+			if (this.gameDone) {
 				this.renderer.renderMap(this.map);
 			}
 		};

@@ -15,7 +15,7 @@ export abstract class Controller {
 
 export class LuigiBot extends Controller {
 	public getAction(): string {
-		if(this.randomizer.nextFloat() > 0.2) return "Scan";
+		if (this.randomizer.nextFloat() > 0.2) return "Scan";
 		return "MoveRight";
 	}
 }
