@@ -21,69 +21,49 @@ export default class GameObject implements ICoords {
 		}
 	}
 
-	public moveUp(map: Map): void {
-		map.move(this.ID, 1, 0);
-	}
-
-	public moveDown(map: Map): void {
-		map.move(this.ID, -1, 0);
-	}
-
-	public moveLeft(map: Map): void {
-		map.move(this.ID, 0, -1);
-	}
-
-	public moveRight(map: Map): void {
-		map.move(this.ID, 0, 1);
-	}
-
-	public perform(action: string, map: Map): void {
+	public perform(action: string, map: Map): IMoveInfo[] {
 		switch (action) {
 			case "MoveUp":
-				this.moveUp(map);
-				break;
+				return this.move(0, -1, map);
 			case "MoveDown":
-				this.moveDown(map);
-				break;
+				return this.move(0, 1, map);
 			case "MoveLeft":
-				this.moveLeft(map);
-				break;
+				return this.move(-1, 0, map);
 			case "MoveRight":
-				this.moveRight(map);
-				break;
+				return this.move(1, 0, map);
 		}
+
+		return null;
 	}
 
 	/**
 	 * Returns an array of affected objects. Assumes a change in either x or y direction, but not both.
 	 * Also assumes either delta is -1, 0, or 1
 	 */
-	public move(deltaX: number, deltaY: number, map: Map, interalOnly?: GameObject[]): IMoveInfo[] {
+	public move(deltaX: number, deltaY: number, map: Map): IMoveInfo[] {
+		return this.internalMove(deltaX, deltaY, map);
+	}
+
+	private internalMove(deltaX: number, deltaY: number, map: Map, possibleAffected?: GameObject[], animation?: Animation): IMoveInfo[] {
+		if (!possibleAffected) {
+			if (deltaX) possibleAffected = map.getAllObjectsOnSameY(this.y);
+			if (deltaY) possibleAffected = map.getAllObjectsOnSameX(this.x);
+		}
+
 		const startPos = { x: this.x, y: this.y };
 		this.x += deltaX;
 		this.y += deltaY;
 		const endPos = { x: this.x, y: this.y }
 		this.wrapCoordinates(map);
 
-		let result: IMoveInfo[] = [];
-
-		let possibleAffected = interalOnly;
-		if (!possibleAffected) {
-			if (deltaX) possibleAffected = map.getAllObjectsOnSameY(this.y);
-			if (deltaY) possibleAffected = map.getAllObjectsOnSameX(this.x);
-
-			result = [
-				{ startPos: startPos, endPos: endPos, animation: Animation.Move }
-			];
-		}
+		let result: IMoveInfo[] = [
+			{ ID: this.ID, startPos: startPos, endPos: endPos, curPos: startPos, animation: animation || Animation.Move }
+		];
 
 		let collisions = this.findCollided(possibleAffected);
 		for(let i = 0; i < collisions.length; i++) {
 			const go = collisions[i];
-			const sp = { x: go.x, y: go.y };
-			result.push.apply(result, go.move(deltaX, deltaY, map, possibleAffected));
-			const ep = { x: go.x, y: go.y };
-			result.push({ startPos: sp, endPos: ep, animation: Animation.Bump });
+			result.push.apply(result, go.internalMove(deltaX, deltaY, map, possibleAffected, Animation.Bump));
 		}
 
 		return result;
@@ -108,7 +88,16 @@ export default class GameObject implements ICoords {
 	}
 
 	protected findCollided(tests: GameObject[]): GameObject[] {
-		if(!tests || tests.length <= 0) return [];
-		return [];
+		const result = [];
+		if (!tests) return result;
+
+		for (let i = 0; i < tests.length; i++) {
+			const t = tests[i];
+			if (this.ID !== t.ID && this.x === t.x && this.y === t.y) {
+				result.push(t);
+			}
+		}
+
+		return result;
 	}
 }

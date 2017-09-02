@@ -1,5 +1,5 @@
-import Random from '../Random';
 import { GameObject } from '../GameObjects';
+import { Random } from '../Utils';
 
 export abstract class Controller {
 	protected actions: string[];

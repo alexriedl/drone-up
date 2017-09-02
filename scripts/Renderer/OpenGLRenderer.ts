@@ -1,7 +1,8 @@
-import { IRenderObject, Rectangle, RenderObjectTypes } from './RenderObjects';
-import { Random } from '../Utils';
-import { SimpleShaderProgramInfo, initWebGL, createShaderProgram } from './WebGL';
 import { GameObject } from '../GameObjects';
+import { IAnimationState } from "../Runner";
+import { IRenderObject, Rectangle, RenderObjectTypes } from './RenderObjects';
+import { Random, Animation, IMoveInfo } from '../Utils';
+import { SimpleShaderProgramInfo, initWebGL, createShaderProgram } from './WebGL';
 import Color, { BLACK } from './Color';
 import Map from '../Map';
 import RenderGroup from './RenderGroup';
@@ -12,7 +13,7 @@ const gridColor = new Color(1, 0.7, 0);
 const spikeColor = new Color(.6, .6, .6);
 
 export interface IMapState {
-  mapObjects: GameObject[];
+  gameObjects: GameObject[];
   xSize: number;
   ySize: number;
 }
@@ -94,51 +95,48 @@ export default class Renderer {
 
   public renderState(state: IMapState): void {
     const group = new RenderGroup();
+    this.pushState(group, state);
+    this.renderOutput(group, state.xSize, state.ySize);
+  }
 
-    group.pushGrid(new TSM.vec2([state.xSize, state.ySize]), gridColor, gridThickness, 1);
+  private getBonusSize(info: IMoveInfo): number {
+    switch(info.animation) {
+      case Animation.Move: return 0.5;
+      case Animation.Bump: return 0.25;
+    }
+    return 0;
+  }
 
-    const tileSize = new TSM.vec2([1, 1]);
+  public renderAnimationState(state: IAnimationState): void {
+    const group = new RenderGroup();
 
-    for (let i = 0; i < state.mapObjects.length; i++) {
-      const entity = state.mapObjects[i];
+    this.pushState(group, state);
+
+    for (let i = 0; i < state.moveInfos.length; i++) {
+      const entity = state.moveInfos[i];
       const isPlayer = entity.ID.startsWith("player");
       let color = isPlayer ? this.getPlayerColor(entity.ID) : spikeColor;
+      const bonusSize = this.getBonusSize(entity);
+      const halfBonusSize = bonusSize / 2;
+      const animationSize = new TSM.vec2([1 + bonusSize, 1 + bonusSize]);
 
-      group.pushRectangle(new TSM.vec3([entity.x, entity.y, 0]), tileSize, color);
+      group.pushRectangle(new TSM.vec3([entity.curPos.x-halfBonusSize, entity.curPos.y-halfBonusSize, 0]), animationSize, color);
     }
 
     this.renderOutput(group, state.xSize, state.ySize);
   }
 
-  public renderAction(state: Map, entity: GameObject, action: string): void {
-    switch (action) {
-      case "MoveUp":
-        break;
-      case "MoveDown":
-        break;
-      case "MoveLeft":
-        break;
-      case "MoveRight":
-        break;
-      case "PullUp":
-        break;
-      case "PullDown":
-        break;
-      case "PullLeft":
-        break;
-      case "PullRight":
-        break;
-      case "PushUp":
-        break;
-      case "PushDown":
-        break;
-      case "PushLeft":
-        break;
-      case "PushRight":
-        break;
-      case "Scan":
-        break;
-      default:
+  private pushState(group: RenderGroup, state: IMapState) {
+    group.pushGrid(new TSM.vec2([state.xSize, state.ySize]), gridColor, gridThickness, 1);
+
+    const tileSize = new TSM.vec2([1, 1]);
+
+    for (let i = 0; i < state.gameObjects.length; i++) {
+      const entity = state.gameObjects[i];
+      const isPlayer = entity.ID.startsWith("player");
+      let color = isPlayer ? this.getPlayerColor(entity.ID) : spikeColor;
+
+      group.pushRectangle(new TSM.vec3([entity.x, entity.y, 0]), tileSize, color);
     }
   }
 

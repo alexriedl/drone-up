@@ -1,11 +1,12 @@
 import { Drone, GameObject } from './GameObjects';
+import { IMoveInfo } from './Utils';
 import Map from './Map';
 import Renderer from './Renderer/OpenGLRenderer';
 //import Renderer from './Renderer/SWRenderer';
 
 export interface IAnimationState {
-	player: Drone;
-	action: string;
+	index: number;
+	moveInfos: IMoveInfo[];
 	gameObjects: GameObject[];
 	xSize: number;
 	ySize: number;
@@ -58,15 +59,15 @@ export default class Runner {
 				const player = this.players[tickState.loopPosition];
 				// TODO: player could be undefined. Skip?
 				const action = player.controller.getAction();
-				player.perform(action, this.map);
+				const infos = player.perform(action, this.map);
 
-				if (action) {
+				if (action && infos) {
 					animationState = {
-						player: <Drone>{ ...player },
-						action: action,
-						gameObjects: [...this.map.getMapObjects().filter(e => e.ID !== player.ID)],
+						index: 0,
+						moveInfos: infos,
+						gameObjects: this.map.getMapObjects().filter(go => !infos.some(info => info.ID === go.ID)),
 						xSize: this.map.getXSize(),
-						ySize: this.map.getYSize()
+						ySize: this.map.getYSize(),
 					};
 
 					tickState.isAnimating = true;
@@ -77,12 +78,35 @@ export default class Runner {
 			}
 
 			if (tickState.isAnimating) {
-				// TODO: Update animation state
-				// TODO: Render animation state
-				let finished = true;
+				const speed = 0.1;
+				animationState.index++;
+
+				// Update animation state
+
+				for(let i = 0; i < animationState.moveInfos.length; i++) {
+					const info = animationState.moveInfos[i];
+
+					// TODO: Come up with a more reliable way to know animations are finished
+					info.curPos.x += Math.sign(info.endPos.x - info.startPos.x) * speed;
+					info.curPos.y += Math.sign(info.endPos.y - info.startPos.y) * speed;
+				}
+
+				// Render animation state
+				this.renderer.renderAnimationState(animationState);
+
+				// TODO: Come up with a more reliable way to know animations are finished
+				let finished = animationState.index > 10;
 				if (finished) {
+					this.removeDeceased();
 					tickState.isAnimating = false;
 				}
+			}
+			else {
+				this.renderUi();
+			}
+
+			if(!this.gameDone && !this.gamePaused) {
+				requestAnimationFrame(frame);
 			}
 		};
 
@@ -95,7 +119,6 @@ export default class Runner {
 				if (this.players[i] !== undefined) {
 					var action = this.players[i].controller.getAction();
 					this.players[i].perform(action, this.map);
-					this.renderer.renderAction(this.map, this.players[i], action);
 				}
 				this.removeDeceased();
 			}
@@ -114,7 +137,7 @@ export default class Runner {
 
 	public renderUi(): void {
 		this.renderer.renderState({
-			mapObjects: this.map.getMapObjects(),
+			gameObjects: this.map.getMapObjects(),
 			xSize: this.map.getXSize(),
 			ySize: this.map.getYSize()
 		});

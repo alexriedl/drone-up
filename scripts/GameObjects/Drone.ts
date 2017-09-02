@@ -1,4 +1,5 @@
 import { Controller } from '../Bots/PremadeBots';
+import { IMoveInfo } from '../Utils';
 import GameObject from './GameObject';
 import Map from '../Map';
 
@@ -53,20 +54,12 @@ export default class Drone extends GameObject {
 		map.move(toPush, 1, 0);
 	}
 
-	public perform(action: string, map: Map): void {
+	public perform(action: string, map: Map): IMoveInfo[] {
+		// NOTE: TEST CODE
+		let r = true;
+		if (r) return super.perform(action, map);
+
 		switch (action) {
-			case "MoveUp":
-				this.moveUp(map);
-				break;
-			case "MoveDown":
-				this.moveDown(map);
-				break;
-			case "MoveLeft":
-				this.moveLeft(map);
-				break;
-			case "MoveRight":
-				this.moveRight(map);
-				break;
 			case "PullUp":
 				this.pullUp(map);
 				break;
@@ -95,6 +88,7 @@ export default class Drone extends GameObject {
 				this.scan(map);
 				break;
 			default:
+				return super.perform(action, map);
 		}
 	}
 }

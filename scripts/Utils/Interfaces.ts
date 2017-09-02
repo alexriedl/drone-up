@@ -6,7 +6,9 @@ export interface ICoords {
 }
 
 export interface IMoveInfo {
+	ID: string;
 	startPos: ICoords;
 	endPos: ICoords;
+	curPos: ICoords;
 	animation: Animation;
 }
