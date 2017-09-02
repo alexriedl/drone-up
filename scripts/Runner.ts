@@ -46,7 +46,7 @@ export default class Runner {
 	}
 
 	private checkGameDone(): void {
-		this.gameDone = this.map.getPlayers().length <= 1;
+		this.gameDone = this.gameDone || this.map.getPlayers().length <= 1;
 	}
 
 	public run() {

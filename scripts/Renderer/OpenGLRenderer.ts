@@ -11,7 +11,6 @@ const backgroundColor = BLACK;
 const gridThickness = 0.05;
 const gridColor = new Color(1, 0.7, 0);
 const spikeColor = new Color(.6, .6, .6);
-const playerSize = new TSM.vec3([0.95, 0.95, 0]);
 const tileSize = new TSM.vec3([1, 1, 0]);
 const halfTileSize = new TSM.vec3([0.5, 0.5, 0]);
 
@@ -143,9 +142,8 @@ export default class Renderer {
 			const entity = state.gameObjects[i];
 			const isPlayer = entity.ID.startsWith("player");
 			let color = isPlayer ? this.getPlayerColor(entity.ID) : spikeColor;
-			let size = isPlayer ? playerSize : tileSize;
 
-			group.pushRectangle(new TSM.vec3([entity.x, entity.y, 0]), size, color);
+			group.pushRectangle(new TSM.vec3([entity.x, entity.y, 0]), tileSize, color);
 		}
 	}
 
