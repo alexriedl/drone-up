@@ -11,17 +11,14 @@ const backgroundColor = BLACK;
 const gridThickness = 0.05;
 const gridColor = new Color(1, 0.7, 0);
 const spikeColor = new Color(.6, .6, .6);
+const playerSize = new TSM.vec3([0.95, 0.95, 0]);
+const tileSize = new TSM.vec3([1, 1, 0]);
+const halfTileSize = new TSM.vec3([0.5, 0.5, 0]);
 
 export interface IMapState {
   gameObjects: GameObject[];
   xSize: number;
   ySize: number;
-}
-
-const random = new Random(12345);
-function getRandomColor(): Color {
-  const r = () => random.nextRangeFloat(0.3, 1);
-  return new Color(r(), r(), r());
 }
 
 const vertexShaderSource = `
@@ -55,7 +52,10 @@ export default class Renderer {
   private rectangleVertexBuffer: WebGLBuffer;
   private rectangleColorBuffer: WebGLBuffer;
 
-  public constructor(canvasId: string) {
+  private randomizer: Random;
+
+  public constructor(canvasId: string, randomizer: Random) {
+    this.randomizer = randomizer;
     this.canvas = document.getElementById(canvasId);
 
     const gl = initWebGL(this.canvas);
@@ -120,26 +120,24 @@ export default class Renderer {
       const isPlayer = entity.ID.startsWith("player");
       let color = isPlayer ? this.getPlayerColor(entity.ID) : spikeColor;
       const bonusSize = this.getBonusSize(entity);
-      const halfBonusSize = bonusSize / 2;
-      const animationSize = new TSM.vec2([1 + bonusSize, 1 + bonusSize]);
+      const animationSize = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 0]);
 
-      group.pushRectangle(new TSM.vec3([entity.curPos.x - halfBonusSize, entity.curPos.y - halfBonusSize, 0]), animationSize, color);
+      group.pushRectangle(new TSM.vec3([entity.curPos.x, entity.curPos.y, 0]), animationSize, color);
     }
 
     this.renderOutput(group, state.xSize, state.ySize);
   }
 
   private pushState(group: RenderGroup, state: IMapState) {
-    group.pushGrid(new TSM.vec2([state.xSize, state.ySize]), gridColor, gridThickness, 1);
-
-    const tileSize = new TSM.vec2([1, 1]);
+    group.pushGrid(new TSM.vec3([state.xSize, state.ySize, 0]), gridColor, gridThickness, 1);
 
     for (let i = 0; i < state.gameObjects.length; i++) {
       const entity = state.gameObjects[i];
       const isPlayer = entity.ID.startsWith("player");
       let color = isPlayer ? this.getPlayerColor(entity.ID) : spikeColor;
+      let size = isPlayer ? playerSize : tileSize;
 
-      group.pushRectangle(new TSM.vec3([entity.x, entity.y, 0]), tileSize, color);
+      group.pushRectangle(new TSM.vec3([entity.x, entity.y, 0]), size, color);
     }
   }
 
@@ -164,10 +162,11 @@ export default class Renderer {
     gl.vertexAttribPointer(info.attributeLocations.colorAttributeLocation, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(info.attributeLocations.colorAttributeLocation);
 
+    const offset = new TSM.vec3([halfTileSize.x - object.size.x / 2, halfTileSize.y - object.size.y / 2, 0]);
     const modelViewMatrix = TSM.mat4.identity
       .copy()
-      .translate(object.origin)
-      .scale(new TSM.vec3([...object.size.xy, 1]));
+      .translate(object.origin.add(offset))
+      .scale(new TSM.vec3([...object.size.xy, 1, 0]));
 
     gl.uniformMatrix4fv(info.uniformLocations.modelViewMatrix, false, new Float32Array(modelViewMatrix.all()));
 
@@ -207,9 +206,26 @@ export default class Renderer {
     });
   }
 
+  private predefinedColors: Color[] = [
+    // new Color(0, 0, 0),
+    new Color(0, 0, 1),
+    new Color(0, 1, 0),
+    new Color(0, 1, 1),
+    new Color(1, 0, 1),
+    new Color(1, 1, 0),
+    new Color(1, 0, 0),
+    // new Color(1, 1, 1),
+  ];
+
   private getPlayerColor(id: string): Color {
     if (!this.playerColors[id]) {
-      this.playerColors[id] = getRandomColor();
+      if (this.predefinedColors && this.predefinedColors.length > 0) {
+        this.playerColors[id] = this.predefinedColors.pop()
+      }
+      else {
+        const r = () => this.randomizer.nextRangeFloat(0.3, 1);
+        this.playerColors[id] = new Color(r(), r(), r());
+      }
     }
 
     return this.playerColors[id]
