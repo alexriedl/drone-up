@@ -163,68 +163,59 @@ export default class Map {
 		return crashed;
 	}
 
-	public scanFor(Id: string): GameObject[] {
+	public scanFor(entity: GameObject): GameObject[] {
 		const scanDistance = Math.ceil(.33 * Math.min(this.xSize, this.ySize, 15));
-		var gameObject = null;
 		var scanSquares = [];
 		var gameObjectsInRange = [];
 
-		for (var i = 0, len = this.mapObjects.length; i < len; i++) {
-			if (this.mapObjects[i].ID === Id) {
-				gameObject = this.mapObjects[i];
+		this.markInvalid(entity.x, entity.y, scanDistance, scanSquares);
+
+		for (var j = 0, len = this.mapObjects.length; j < len; j++) {
+			if (!this.checkInvalid(this.mapObjects[j].x, this.mapObjects[j].y, scanSquares)) {
+				gameObjectsInRange.push(this.mapObjects[j]);
 			}
 		}
 
-		if (gameObject !== null) {
-			this.markInvalid(gameObject.x, gameObject.y, scanDistance, scanSquares);
-
-			for (var j = 0, len = this.mapObjects.length; j < len; j++) {
-				if (!this.checkInvalid(this.mapObjects[j].x, this.mapObjects[j].y, scanSquares)) {
-					gameObjectsInRange.push(this.mapObjects[j]);
-				}
-			}
-
-			for (var k = 0, scanLen = scanSquares.length; k < scanLen; k++) {
-				scanSquares[k].type = "empty";
-				for (var l = 0, objInRangeLen = gameObjectsInRange.length; l < objInRangeLen && scanSquares[k].type === "empty"; l++) {
-					if (scanSquares[k].x === gameObjectsInRange[l].x && scanSquares[k].y === gameObjectsInRange[l].y) {
-						if (gameObjectsInRange[l].ID === Id) {
-							scanSquares[k].type = "you";
-						} else {
-							scanSquares[k].type = gameObjectsInRange[l].type;
-						}
+		for (var k = 0, scanLen = scanSquares.length; k < scanLen; k++) {
+			scanSquares[k].type = "empty";
+			for (var l = 0, objInRangeLen = gameObjectsInRange.length; l < objInRangeLen && scanSquares[k].type === "empty"; l++) {
+				if (scanSquares[k].x === gameObjectsInRange[l].x && scanSquares[k].y === gameObjectsInRange[l].y) {
+					if (gameObjectsInRange[l].ID === entity.ID) {
+						scanSquares[k].type = "you";
+					} else {
+						scanSquares[k].type = gameObjectsInRange[l].type;
 					}
 				}
 			}
+		}
 
-			for (var m = 0, len = scanSquares.length; m < len; m++) {
-				var square = scanSquares[m];
-				if (Math.abs(gameObject.x - scanSquares[m].x) > scanDistance) {
-					if (gameObject.x - scanSquares[m].x < 0) {
-						scanSquares[m].x = this.xSize + gameObject.x - scanSquares[m].x;
-					} else if (gameObject.x + scanSquares[m].x > this.xSize) {
-						0 - gameObject.x + scanSquares[m].x;
-					}
-				} else {
-					if (gameObject.x > scanSquares[m].x) {
-						scanSquares[m].x = gameObject.x - scanSquares[m].x;
-					} else {
-						scanSquares[m].x = scanSquares[m].x - gameObject.x
-					}
+		for (var m = 0, len = scanSquares.length; m < len; m++) {
+			var square = scanSquares[m];
+			if (Math.abs(entity.x - scanSquares[m].x) > scanDistance) {
+				if (entity.x - scanSquares[m].x < 0) {
+					scanSquares[m].x = this.xSize + entity.x - scanSquares[m].x;
+				} else if (entity.x + scanSquares[m].x > this.xSize) {
+					0 - entity.x + scanSquares[m].x;
 				}
-
-				if (Math.abs(gameObject.y - scanSquares[m].y) > scanDistance) {
-					if (gameObject.y - scanSquares[m].y < 0) {
-						scanSquares[m].y = this.xSize + gameObject.y - scanSquares[m].y;
-					} else if (gameObject.y + scanSquares[m].y > this.ySize) {
-						0 - gameObject.y + scanSquares[m].y;
-					}
+			} else {
+				if (entity.x > scanSquares[m].x) {
+					scanSquares[m].x = entity.x - scanSquares[m].x;
 				} else {
-					if (gameObject.y > scanSquares[m].y) {
-						scanSquares[m].y = gameObject.y - scanSquares[m].y;
-					} else {
-						scanSquares[m].y = scanSquares[m].y - gameObject.y
-					}
+					scanSquares[m].x = scanSquares[m].x - entity.x
+				}
+			}
+
+			if (Math.abs(entity.y - scanSquares[m].y) > scanDistance) {
+				if (entity.y - scanSquares[m].y < 0) {
+					scanSquares[m].y = this.xSize + entity.y - scanSquares[m].y;
+				} else if (entity.y + scanSquares[m].y > this.ySize) {
+					0 - entity.y + scanSquares[m].y;
+				}
+			} else {
+				if (entity.y > scanSquares[m].y) {
+					scanSquares[m].y = entity.y - scanSquares[m].y;
+				} else {
+					scanSquares[m].y = scanSquares[m].y - entity.y
 				}
 			}
 		}

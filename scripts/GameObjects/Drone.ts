@@ -9,9 +9,19 @@ export default class Drone extends GameObject {
 		controller.setActions(["Scan", "MoveUp", "MoveDown", "MoveLeft", "MoveRight", "PullUp", "PullDown", "PullRight", "PullLeft", "PushUp", "PushDown", "PushRight", "PushLeft"]);
 	}
 
-	public scan(map: Map): void {
-		var scanResult = map.scanFor(this.ID);
+	public scan(map: Map): IMoveInfo[] {
+		const scanResult = map.scanFor(this);
 		this.controller.scanResult = scanResult;
+		return [
+			{
+				ID: this.ID,
+				type: this.type,
+				startPos: { x: this.x, y: this.y },
+				endPos: { x: this.x, y: this.y },
+				curPos: { x: this.x, y: this.y },
+				animation: null
+			}
+		];
 	}
 
 	public pullUp(map: Map): IMoveInfo[] {
