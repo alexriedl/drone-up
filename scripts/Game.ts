@@ -5,24 +5,23 @@ import Map from './Map';
 import Runner from './Runner';
 
 export default class Game {
-	private drones: Drone[];
 	private map: Map;
 	private runner: Runner;
 	private paused: boolean;
 	private started: boolean;
 
-	public constructor(seed: number, spikePercent: number, playerControllers: Controller[], xSize: number, ySize: number) {
-		this.drones = [];
+	public constructor(randomizer: Random, spikePercent: number, playerControllers: Controller[], xSize: number, ySize: number) {
 		this.map = new Map(xSize, ySize);
 		this.paused = false;
 		this.started = false;
 
+		let drones = [];
 		for (var i = 0, len = playerControllers.length; i < len; i++) {
-			this.drones.push(new Drone("player" + i, playerControllers[i]));
+			drones.push(new Drone("player" + i, playerControllers[i]));
 		}
-		this.map.initialize(new Random(seed), this.drones, spikePercent);
+		this.map.initialize(randomizer, drones, spikePercent);
 
-		this.runner = new Runner(this.map);
+		this.runner = new Runner(this.map, randomizer);
 		//if we add any game objects that move on their own we need to generate them here and supply them to the map like the drones so the runner can run them
 	}
 

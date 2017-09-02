@@ -1,5 +1,5 @@
 import { Drone, GameObject } from './GameObjects';
-import { IMoveInfo } from './Utils';
+import { IMoveInfo, Random } from './Utils';
 import Map from './Map';
 import Renderer from './Renderer/OpenGLRenderer';
 //import Renderer from './Renderer/SWRenderer';
@@ -25,11 +25,11 @@ export default class Runner {
 
 	private frame: (now: number) => void;
 
-	public constructor(map: Map) {
+	public constructor(map: Map, randomizer: Random) {
 		this.gameDone = false;
 		this.gamePaused = false;
 		this.map = map;
-		this.renderer = new Renderer("game-canvas");
+		this.renderer = new Renderer("game-canvas", randomizer);
 	}
 
 	public pause(): void {
@@ -45,8 +45,8 @@ export default class Runner {
 		this.gameDone = true;
 	}
 
-	public isGameDone(): boolean {
-		return this.map.getPlayers().length <= 1;
+	private checkGameDone(): void {
+		this.gameDone = this.map.getPlayers().length <= 1;
 	}
 
 	public runWithAnimations() {
@@ -113,6 +113,10 @@ export default class Runner {
 					xSize: this.map.getXSize(),
 					ySize: this.map.getYSize()
 				});
+			}
+
+			if (!tickState.isAnimating) {
+				this.checkGameDone();
 			}
 
 			if(!this.gameDone && !this.gamePaused) {

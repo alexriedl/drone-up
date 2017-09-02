@@ -46,34 +46,32 @@ function stopGame(): void {
 }
 
 function startGame(): void {
-		inputSeedElement.disabled = true;
-		pauseResumeButtonElement.disabled = false;
-		pauseResumeButtonElement.innerHTML = "Pause Game";
-		startStopButtonElement.innerHTML = "End Game";
+	inputSeedElement.disabled = true;
+	pauseResumeButtonElement.disabled = false;
+	pauseResumeButtonElement.innerHTML = "Pause Game";
+	startStopButtonElement.innerHTML = "End Game";
 
-		var inputSeed = inputSeedElement.value;
-		if (inputSeed.length > 0) {
-			seed = +inputSeed;
-		} else {
-			inputSeed = getRandomSeed().toString();
-			inputSeedElement.value = inputSeed;
-		}
+	var inputSeed = inputSeedElement.value;
+	if(!inputSeed || inputSeed.length <= 0) {
+		inputSeed = getRandomSeed().toString();
+	}
 
-		seed = +inputSeed > 0 ? +inputSeed : getRandomSeed();
+	seed = +inputSeed > 0 ? +inputSeed : getRandomSeed();
+	inputSeedElement.value = seed.toString();
 
-		const randomizer = new Random(seed);
+	const randomizer = new Random(seed);
+	const playerControllers = [
+		new LuigiBot(randomizer),
+		new PushBot(randomizer),
+		new PullBot(randomizer),
+		new ChickenBot(randomizer),
+		new RandomBot(randomizer),
+		new ShoveBot(randomizer)
+	];
 
-		const playerControllers = [
-			new LuigiBot(randomizer),
-			new PushBot(randomizer),
-			new PullBot(randomizer),
-			new ChickenBot(randomizer),
-			new RandomBot(randomizer),
-			new ShoveBot(randomizer)
-		];
-
-		game = new Game(seed, 15, playerControllers, 50, 50);
-		game.start();
+	game = new Game(randomizer, 15, playerControllers, 20, 20);
+	// game = new Game(randomizer, 15, playerControllers, 50, 50);
+	game.start();
 }
 
 function pauseGame(): void {
