@@ -18,14 +18,14 @@ export interface ITickState {
 }
 
 export default class Runner {
-	private players: Drone[];
 	private gameDone: boolean;
 	private gamePaused: boolean;
 	private map: Map;
 	private renderer: Renderer;
 
-	public constructor(players: Drone[], map: Map) {
-		this.players = players;
+	private frame: (now: number) => void;
+
+	public constructor(map: Map) {
 		this.gameDone = false;
 		this.gamePaused = false;
 		this.map = map;
@@ -38,7 +38,15 @@ export default class Runner {
 
 	public resume(): void {
 		this.gamePaused = false;
-		this.run();
+		this.frame(Date.now());
+	}
+
+	public kill(): void {
+		this.gameDone = true;
+	}
+
+	public isGameDone(): boolean {
+		return this.map.getPlayers().length <= 1;
 	}
 
 	public runWithAnimations() {
@@ -49,19 +57,20 @@ export default class Runner {
 			loopPosition: 0
 		};
 
-		const frame = (now) => {
+		this.frame = (now: number) => {
 			now *= 0.001;
 			const deltaTime = now - then;
 			then = now;
 
+			const players = this.map.getPlayers();
+
 			if (!tickState.isAnimating) {
-				tickState.loopPosition = (tickState.loopPosition + 1) % this.players.length;
-				const player = this.players[tickState.loopPosition];
-				// TODO: player could be undefined. Skip?
+				tickState.loopPosition = (tickState.loopPosition + 1) % players.length;;
+				const player = players[tickState.loopPosition];
 				const action = player.controller.getAction();
 				const infos = player.perform(action, this.map);
 
-				if (action && infos) {
+				if (action && infos && infos.length > 0) {
 					animationState = {
 						index: 0,
 						moveInfos: infos,
@@ -71,9 +80,6 @@ export default class Runner {
 					};
 
 					tickState.isAnimating = true;
-				}
-				else {
-					// TODO: Run the the next iteration right away?
 				}
 			}
 
@@ -95,79 +101,25 @@ export default class Runner {
 				this.renderer.renderAnimationState(animationState);
 
 				// TODO: Come up with a more reliable way to know animations are finished
-				let finished = animationState.index > 10;
+				let finished = animationState.index > 9;
 				if (finished) {
-					this.removeDeceased();
+					const deadDrones = this.map.removeCrashedDrones();
 					tickState.isAnimating = false;
 				}
 			}
 			else {
-				this.renderUi();
+				this.renderer.renderState({
+					gameObjects: this.map.getMapObjects(),
+					xSize: this.map.getXSize(),
+					ySize: this.map.getYSize()
+				});
 			}
 
 			if(!this.gameDone && !this.gamePaused) {
-				requestAnimationFrame(frame);
+				requestAnimationFrame(this.frame);
 			}
 		};
 
-		requestAnimationFrame(frame);
-	}
-
-	public run(): void {
-		if (!this.gameDone && !this.gamePaused) {
-			for (var i = 0, len = this.players.length; i < len; i++) {
-				if (this.players[i] !== undefined) {
-					var action = this.players[i].controller.getAction();
-					this.players[i].perform(action, this.map);
-				}
-				this.removeDeceased();
-			}
-			this.checkGameDone();
-			this.renderUi();
-
-			if (!this.gameDone) {
-				setTimeout(() => this.run(), 333);
-			}
-		}
-	}
-
-	public kill(): void {
-		this.gameDone = true;
-	}
-
-	public renderUi(): void {
-		this.renderer.renderState({
-			gameObjects: this.map.getMapObjects(),
-			xSize: this.map.getXSize(),
-			ySize: this.map.getYSize()
-		});
-	}
-
-	public checkGameDone(): void {
-		let dronesLeft = 0;
-		for (let i = 0, len = this.players.length; i < len; i++) {
-			if (this.players[i].type !== undefined && this.players[i].type === "Drone") {
-				dronesLeft++;
-			}
-		}
-
-		this.gameDone = dronesLeft <= 1;
-	}
-
-	public removeDeceased(): void {
-		let collisions = this.map.getCrashedDrones();
-		let indicesToRemove = [];
-
-		for (let i = 0, len = this.players.length; i < len; i++) {
-			for (let j = 0, collisionLen = collisions.length; j < collisionLen; j++) {
-				if (this.players[i].ID === collisions[j]) {
-					indicesToRemove.push(i);
-				}
-			}
-		}
-
-		for (let j = 0, len = indicesToRemove.length; j < len; j++) {
-			this.players.splice(indicesToRemove[j], 1);
-		}
+		requestAnimationFrame(this.frame);
 	}
 };

@@ -21,16 +21,32 @@ export default class GameObject implements ICoords {
 		}
 	}
 
+	public moveUp(map: Map, animation?: Animation): IMoveInfo[] {
+		return this.move(0, -1, map, animation);
+	}
+
+	public moveDown(map: Map, animation?: Animation): IMoveInfo[] {
+		return this.move(0, 1, map, animation);
+	}
+
+	public moveLeft(map: Map, animation?: Animation): IMoveInfo[] {
+		return this.move(-1, 0, map, animation);
+	}
+
+	public moveRight(map: Map, animation?: Animation): IMoveInfo[] {
+		return this.move(1, 0, map, animation);
+	}
+
 	public perform(action: string, map: Map): IMoveInfo[] {
 		switch (action) {
 			case "MoveUp":
-				return this.move(0, -1, map);
+				return this.moveUp(map);
 			case "MoveDown":
-				return this.move(0, 1, map);
+				return this.moveDown(map);
 			case "MoveLeft":
-				return this.move(-1, 0, map);
+				return this.moveLeft(map);
 			case "MoveRight":
-				return this.move(1, 0, map);
+				return this.moveRight(map);
 		}
 
 		return null;
@@ -40,8 +56,8 @@ export default class GameObject implements ICoords {
 	 * Returns an array of affected objects. Assumes a change in either x or y direction, but not both.
 	 * Also assumes either delta is -1, 0, or 1
 	 */
-	public move(deltaX: number, deltaY: number, map: Map): IMoveInfo[] {
-		return this.internalMove(deltaX, deltaY, map);
+	public move(deltaX: number, deltaY: number, map: Map, animation?: Animation): IMoveInfo[] {
+		return this.internalMove(deltaX, deltaY, map, undefined, animation);
 	}
 
 	private internalMove(deltaX: number, deltaY: number, map: Map, possibleAffected?: GameObject[], animation?: Animation): IMoveInfo[] {

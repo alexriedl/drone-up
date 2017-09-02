@@ -100,7 +100,7 @@ export default class Renderer {
   }
 
   private getBonusSize(info: IMoveInfo): number {
-    switch(info.animation) {
+    switch (info.animation) {
       case Animation.Move: return 0.5;
       case Animation.Bump: return 0.25;
     }
@@ -120,7 +120,7 @@ export default class Renderer {
       const halfBonusSize = bonusSize / 2;
       const animationSize = new TSM.vec2([1 + bonusSize, 1 + bonusSize]);
 
-      group.pushRectangle(new TSM.vec3([entity.curPos.x-halfBonusSize, entity.curPos.y-halfBonusSize, 0]), animationSize, color);
+      group.pushRectangle(new TSM.vec3([entity.curPos.x - halfBonusSize, entity.curPos.y - halfBonusSize, 0]), animationSize, color);
     }
 
     this.renderOutput(group, state.xSize, state.ySize);

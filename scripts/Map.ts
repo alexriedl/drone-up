@@ -28,6 +28,10 @@ export default class Map {
 		return this.mapObjects;
 	}
 
+	public getPlayers(): Drone[] {
+		return this.players;
+	}
+
 	public getXSize(): number {
 		return this.xSize;
 	}
@@ -127,15 +131,16 @@ export default class Map {
 		this.markInvalid(x, (y - 1 + this.ySize) % this.ySize, numSpread - 1, invalidArray);
 	}
 
-	public getCrashedDrones(): string[] {
-		var crashed: string[] = [];
+	public removeCrashedDrones(): Drone[] {
+		var crashed: Drone[] = [];
 		var playerRemovalIndices = [];
+
 		for (var i = 0, playerCount = this.players.length; i < playerCount; i++) {
 			for (var j = 0, mapObjectCount = this.mapObjects.length; j < mapObjectCount; j++) {
 				var player = this.players[i];
 				var otherObject = this.mapObjects[j];
 				if (player.x === otherObject.x && player.y === otherObject.y && player.ID !== otherObject.ID) {
-					crashed.push(player.ID);
+					crashed.push(player);
 					playerRemovalIndices.push(i);
 				}
 			}
@@ -146,51 +151,6 @@ export default class Map {
 		}
 
 		return crashed;
-	}
-
-	public move(Id: string, deltaX: number, deltaY: number): void {
-		var mapObject = null;
-		var isPlayer = false;
-		for (var i = 0, objectCount = this.mapObjects.length; i < objectCount; i++) {
-			if (this.mapObjects[i].ID === Id) {
-				mapObject = this.mapObjects[i];
-			}
-		}
-
-		for (var j = 0, playerCount = this.players.length; j < playerCount; j++) {
-			if (this.players[j].ID === Id) {
-				isPlayer = true;
-			}
-		}
-
-		if (mapObject !== null) {
-			mapObject.x += deltaX;
-			mapObject.y += deltaY;
-			this.wrapCoordinates(mapObject);
-		}
-
-		if (!isPlayer) {
-			for (var k = 0, objectCount = this.mapObjects.length; k < objectCount; k++) {
-				if (this.mapObjects[k].x === mapObject.x && this.mapObjects[k].y === mapObject.y && this.mapObjects[k].ID !== mapObject.ID) {
-					this.move(this.mapObjects[k].ID, deltaX, deltaY);
-				}
-			}
-		}
-	}
-
-	public wrapCoordinates(mapObject): void {
-		if (mapObject.x > this.xSize) {
-			mapObject.x = 0;
-		}
-		if (mapObject.x < 0) {
-			mapObject.x = this.xSize;
-		}
-		if (mapObject.y > this.ySize) {
-			mapObject.y = 0;
-		}
-		if (mapObject.y < 0) {
-			mapObject.y = this.ySize;
-		}
 	}
 
 	public scanFor(Id: string): GameObject[] {
@@ -263,13 +223,8 @@ export default class Map {
 	}
 
 	//GetNextObjectUpFrom(this.Id) returns an ID of the next object up from the object with the given ID
-	public getNextObjectUpFrom(Id): string {
-		let referenceObject = undefined;
-		for (let k = 0, objectCount = this.mapObjects.length; k < objectCount && referenceObject === undefined; k++) {
-			if (this.mapObjects[k].ID === Id)
-				referenceObject = this.mapObjects[k];
-		}
-		const lineObjects = this.getAllObjectsOnSameX(referenceObject.x);
+	public getNextObjectUpFrom(entity: GameObject): GameObject {
+		const lineObjects = this.getAllObjectsOnSameX(entity.x);
 
 		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort(function (a, b) {
@@ -277,19 +232,14 @@ export default class Map {
 		});
 
 		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
-			if (sortedObjects[k].ID === Id) {
-				return sortedObjects[(k + 1) % sortedObjects.length].ID;
+			if (sortedObjects[k].ID === entity.ID) {
+				return sortedObjects[(k + 1) % sortedObjects.length];
 			}
 		}
 	}
 
-	public getNextObjectDownFrom(Id): string {
-		let referenceObject = undefined;
-		for (let k = 0, objectCount = this.mapObjects.length; k < objectCount && referenceObject === undefined; k++) {
-			if (this.mapObjects[k].ID === Id)
-				referenceObject = this.mapObjects[k];
-		}
-		const lineObjects = this.getAllObjectsOnSameX(referenceObject.x);
+	public getNextObjectDownFrom(entity: GameObject): GameObject {
+		const lineObjects = this.getAllObjectsOnSameX(entity.x);
 
 		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort(function (a, b) {
@@ -297,39 +247,29 @@ export default class Map {
 		});
 
 		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
-			if (sortedObjects[k].ID === Id) {
-				return sortedObjects[(k + 1) % sortedObjects.length].ID;
+			if (sortedObjects[k].ID === entity.ID) {
+				return sortedObjects[(k + 1) % sortedObjects.length];
 			}
 		}
 	}
 
-	public getNextObjectLeftFrom(Id): string {
-		let referenceObject = undefined;
-		for (let k = 0, objectCount = this.mapObjects.length; k < objectCount && referenceObject === undefined; k++) {
-			if (this.mapObjects[k].ID === Id)
-				referenceObject = this.mapObjects[k];
-		}
-		const lineObjects = this.getAllObjectsOnSameY(referenceObject.y);
+	public getNextObjectLeftFrom(entity: GameObject): GameObject {
+		const lineObjects = this.getAllObjectsOnSameY(entity.y);
 
 		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort(function (a, b) {
 			return b.x - a.x;
 		});
 
-		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
-			if (sortedObjects[k].ID === Id) {
-				return sortedObjects[(k + 1) % sortedObjects.length].ID;
+		for (let k = 0; k < sortedObjects.length; k++) {
+			if (sortedObjects[k].ID === entity.ID) {
+				return sortedObjects[(k + 1) % sortedObjects.length];
 			}
 		}
 	}
 
-	public getNextObjectRightFrom(Id): string {
-		let referenceObject = undefined;
-		for (let k = 0, objectCount = this.mapObjects.length; k < objectCount && referenceObject === undefined; k++) {
-			if (this.mapObjects[k].ID === Id)
-				referenceObject = this.mapObjects[k];
-		}
-		const lineObjects = this.getAllObjectsOnSameY(referenceObject.y);
+	public getNextObjectRightFrom(entity: GameObject): GameObject {
+		const lineObjects = this.getAllObjectsOnSameY(entity.y);
 
 		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort(function (a, b) {
@@ -337,8 +277,8 @@ export default class Map {
 		});
 
 		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
-			if (sortedObjects[k].ID === Id) {
-				return sortedObjects[(k + 1) % sortedObjects.length].ID;
+			if (sortedObjects[k].ID === entity.ID) {
+				return sortedObjects[(k + 1) % sortedObjects.length];
 			}
 		}
 	}
