@@ -69,13 +69,13 @@ export default class GameObject implements ICoords {
 		const xMax = map.getXSize() - 1;
 		const yMax = map.getYSize() - 1;
 
-		if (this.x >= xMax) {
+		if (this.x > xMax) {
 			this.x = 0;
 		}
 		if (this.x < 0) {
 			this.x = xMax;
 		}
-		if (this.y >= yMax) {
+		if (this.y > yMax) {
 			this.y = 0;
 		}
 		if (this.y < 0) {
