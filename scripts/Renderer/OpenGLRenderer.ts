@@ -9,12 +9,15 @@ import Map from '../Map';
 import Color, { BLACK } from '../Utils/Color';
 import RenderGroup from './RenderGroup';
 
+// NOTE: Configurable options
 const backgroundColor = BLACK;
 const gridThickness = 0.05;
 const gridColor = new Color(1, 0.7, 0);
 const spikeColor = new Color(.6, .6, .6);
+
+// NOTE: Not intended to change
 const tileSize = new TSM.vec3([1, 1, 0]);
-const halfTileSize = new TSM.vec3([0.5, 0.5, 0]);
+const halfTileSize = new TSM.vec3([tileSize.x / 2, tileSize.y / 2, tileSize.z / 2]);
 
 export interface IMapState {
 	gameObjects: GameObject[];
@@ -24,16 +27,16 @@ export interface IMapState {
 
 const vertexShaderSource = `
 	attribute vec4 a_position;
-	attribute vec4 a_color;
 
 	uniform mat4 u_model_view_matrix;
 	uniform mat4 u_projection_matrix;
+	uniform vec4 u_color_vector;
 
 	varying lowp vec4 v_color;
 
 	void main() {
 		gl_Position = u_projection_matrix * u_model_view_matrix * a_position;
-		v_color = a_color;
+		v_color = u_color_vector;
 	}`;
 const fragmentShaderSource = `
 	precision mediump float;
@@ -45,7 +48,7 @@ const fragmentShaderSource = `
 
 export default class Renderer {
 	private playerColors: { [id: string]: Color } = {};
-	private canvas: HTMLElement;
+	private canvas: HTMLCanvasElement;
 	private gl: WebGLRenderingContext;
 	private programInfo: ISimpleShaderProgramInfo;
 
@@ -67,7 +70,7 @@ export default class Renderer {
 
 	public constructor(canvasId: string, randomizer: Random) {
 		this.randomizer = randomizer;
-		this.canvas = document.getElementById(canvasId);
+		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 
 		const gl = initWebGL(this.canvas);
 		if (!gl) return;
@@ -92,16 +95,6 @@ export default class Renderer {
 		this.rectangleVertexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.rectangleVertexBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-		const colors = [
-			1, 1, 1, 1,
-			1, 1, 1, 1,
-			1, 1, 1, 1,
-			1, 1, 1, 1,
-		];
-		this.rectangleColorBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.rectangleColorBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 	}
 
 	public renderMap(map: Map): void {
@@ -138,7 +131,7 @@ export default class Renderer {
 	}
 
 	private pushState(group: RenderGroup, state: IMapState) {
-		group.pushGrid(new TSM.vec3([state.xSize, state.ySize, 0]), gridColor, gridThickness, 1);
+		group.pushGrid(new TSM.vec3([state.xSize, state.ySize, 0]), gridColor, gridThickness, tileSize.x, tileSize.y);
 
 		for (const entity of state.gameObjects) {
 			const isPlayer = entity.ID.startsWith('player');
@@ -158,17 +151,6 @@ export default class Renderer {
 		gl.vertexAttribPointer(info.attributeLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(info.attributeLocations.positionAttributeLocation);
 
-		const colors = [
-			object.color.r, object.color.g, object.color.b, object.color.a,
-			object.color.r, object.color.g, object.color.b, object.color.a,
-			object.color.r, object.color.g, object.color.b, object.color.a,
-			object.color.r, object.color.g, object.color.b, object.color.a,
-		];
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.rectangleColorBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-		gl.vertexAttribPointer(info.attributeLocations.colorAttributeLocation, 4, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(info.attributeLocations.colorAttributeLocation);
-
 		const offset = new TSM.vec3([halfTileSize.x - object.size.x / 2, halfTileSize.y - object.size.y / 2, 0]);
 		const modelViewMatrix = TSM.mat4.identity
 			.copy()
@@ -176,6 +158,7 @@ export default class Renderer {
 			.scale(new TSM.vec3([...object.size.xy, 1, 0]));
 
 		gl.uniformMatrix4fv(info.uniformLocations.modelViewMatrix, false, new Float32Array(modelViewMatrix.all()));
+		gl.uniform4fv(info.uniformLocations.colorVector, new Float32Array(object.color.all()));
 
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 	}
@@ -190,7 +173,7 @@ export default class Renderer {
 		// NOTE: Basic rendering setup
 		{
 			gl.clear(this.gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-			gl.viewport(0, 0, this.canvas['width'], this.canvas['height']);
+			gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 			gl.useProgram(info.program);
 
 			const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
@@ -202,7 +185,15 @@ export default class Renderer {
 				new Float32Array(orthoMatrix.all()));
 		}
 
-		group.objects.forEach((o) => {
+		// TODO: Sort objects before rendering
+		/*
+		 By:
+			- Distance?
+			- Transparency
+			- Same shader program
+		 */
+
+		for (const o of group.objects) {
 			switch ((o as IRenderObject).type) {
 				case RenderObjectTypes.Rectangle:
 					this.renderRectangle(gl, o as IRectangle);
@@ -210,7 +201,7 @@ export default class Renderer {
 				default:
 					console.log('UNKNOWN OBJECT');
 			}
-		});
+		}
 	}
 
 	private getPlayerColor(id: string): Color {

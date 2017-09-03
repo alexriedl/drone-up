@@ -2,11 +2,11 @@ export interface ISimpleShaderProgramInfo {
 	program: WebGLProgram;
 	attributeLocations: {
 		positionAttributeLocation: number,
-		colorAttributeLocation: number,
 	};
 	uniformLocations: {
 		projectionMatrix: WebGLUniformLocation,
 		modelViewMatrix: WebGLUniformLocation,
+		colorVector: WebGLUniformLocation,
 	};
 }
 
@@ -54,12 +54,12 @@ export function createShaderProgram(gl: WebGLRenderingContext, vertexShaderSourc
 		return {
 			program,
 			attributeLocations: {
-				colorAttributeLocation: gl.getAttribLocation(program, 'a_color'),
 				positionAttributeLocation: gl.getAttribLocation(program, 'a_position'),
 			},
 			uniformLocations: {
 				modelViewMatrix: gl.getUniformLocation(program, 'u_model_view_matrix'),
 				projectionMatrix: gl.getUniformLocation(program, 'u_projection_matrix'),
+				colorVector: gl.getUniformLocation(program, 'u_color_vector'),
 			},
 		};
 	}

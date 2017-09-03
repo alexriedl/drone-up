@@ -1,6 +1,10 @@
 export default class Color {
 	constructor(public r: number = 0, public g: number = 0, public b: number = 0, public a: number = 1) {
 	}
+
+	public all(): number[] {
+		return [this.r, this.g, this.b, this.a];
+	}
 }
 
 export const BLACK = new Color();
