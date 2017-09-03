@@ -1,0 +1,19 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "quotemark": [ true, "single", "avoid-escape", "avoid-template" ],
+        "indent": [ true, "tabs" ],
+        "curly": [ true, "ignore-same-line" ],
+        "one-line": [ true, "check-open-brace" ],
+        "align": [ true, "statements", "members", "elements" ],
+        "no-console": [ false ],
+        "object-literal-sort-keys": [ false ],
+        "no-bitwise": false,
+        "no-string-literal": false
+    },
+    "rulesDirectory": []
+}

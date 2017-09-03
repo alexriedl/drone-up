@@ -1,7 +1,8 @@
-import { AnimationType } from './AnimationType';
 import { ICoords, ObjectType } from '../Utils';
-import Color from '../Utils/Color';
+import { AnimationType } from './AnimationType';
+
 import RenderGroup from '../Renderer/RenderGroup';
+import Color from '../Utils/Color';
 
 export abstract class Animation {
 	public readonly objectID: string;

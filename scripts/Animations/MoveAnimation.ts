@@ -1,8 +1,9 @@
+import { ICoords, ObjectType } from '../Utils';
 import { Animation } from './Animation';
 import { AnimationType } from './AnimationType';
-import { ObjectType, ICoords } from '../Utils';
-import Color from '../Utils/Color';
+
 import RenderGroup from '../Renderer/RenderGroup';
+import Color from '../Utils/Color';
 
 export default class MoveAnimation extends Animation {
 	protected startPos: ICoords;
@@ -18,8 +19,7 @@ export default class MoveAnimation extends Animation {
 
 	public update(deltaTimeMs: number): boolean {
 		let effectiveDeltaTime = deltaTimeMs;
-		if (effectiveDeltaTime > this.durationMs)
-			effectiveDeltaTime = this.durationMs;
+		if (effectiveDeltaTime > this.durationMs) effectiveDeltaTime = this.durationMs;
 
 		this.position.x += (this.endPos.x - this.position.x) / this.durationMs * effectiveDeltaTime;
 		this.position.y += (this.endPos.y - this.position.y) / this.durationMs * effectiveDeltaTime;

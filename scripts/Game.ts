@@ -1,5 +1,6 @@
 import { Controller } from './Bots/PremadeBots';
 import { Random } from './Utils';
+
 import Drone from './GameObjects/Drone';
 import Map from './Map';
 import Runner from './Runner';
@@ -10,19 +11,22 @@ export default class Game {
 	private paused: boolean;
 	private started: boolean;
 
-	public constructor(randomizer: Random, spikePercent: number, playerControllers: Controller[], xSize: number, ySize: number) {
+	public constructor(randomizer: Random, spikePercent: number, playerControllers: Controller[],
+		xSize: number, ySize: number) {
 		this.map = new Map(xSize, ySize);
 		this.paused = false;
 		this.started = false;
 
-		let drones = [];
-		for (var i = 0, len = playerControllers.length; i < len; i++) {
-			drones.push(new Drone("player" + i, playerControllers[i]));
+		const drones = [];
+		for (let i = 0; i < playerControllers.length; i++) {
+			drones.push(new Drone('player' + i, playerControllers[i]));
 		}
 		this.map.initialize(randomizer, drones, spikePercent);
 
 		this.runner = new Runner(this.map, randomizer);
-		//if we add any game objects that move on their own we need to generate them here and supply them to the map like the drones so the runner can run them
+
+		// if we add any game objects that move on their own we need to generate them here and supply them
+		// to the map like the drones so the runner can run them
 	}
 
 	public start(): void {

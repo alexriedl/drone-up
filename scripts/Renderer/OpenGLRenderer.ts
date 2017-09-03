@@ -1,11 +1,12 @@
 import { Animation, AnimationType } from '../Animations';
 import { GameObject } from '../GameObjects';
-import { IAnimationState } from "../Runner";
-import { IRenderObject, Rectangle, RenderObjectTypes } from './RenderObjects';
+import { IAnimationState } from '../Runner';
 import { Random } from '../Utils';
-import { SimpleShaderProgramInfo, initWebGL, createShaderProgram } from './WebGL';
-import Color, { BLACK } from '../Utils/Color';
+import { IRectangle, IRenderObject, RenderObjectTypes } from './RenderObjects';
+import { createShaderProgram, initWebGL, ISimpleShaderProgramInfo } from './WebGL';
+
 import Map from '../Map';
+import Color, { BLACK } from '../Utils/Color';
 import RenderGroup from './RenderGroup';
 
 const backgroundColor = BLACK;
@@ -42,17 +43,27 @@ const fragmentShaderSource = `
 		gl_FragColor = v_color;
 	}`;
 
-
 export default class Renderer {
 	private playerColors: { [id: string]: Color } = {};
 	private canvas: HTMLElement;
 	private gl: WebGLRenderingContext;
-	private programInfo: SimpleShaderProgramInfo;
+	private programInfo: ISimpleShaderProgramInfo;
 
 	private rectangleVertexBuffer: WebGLBuffer;
 	private rectangleColorBuffer: WebGLBuffer;
 
 	private randomizer: Random;
+
+	private predefinedColors: Color[] = [
+		// new Color(0, 0, 0),
+		new Color(0, 0, 1),
+		new Color(0, 1, 0),
+		new Color(0, 1, 1),
+		new Color(1, 0, 0),
+		new Color(1, 0, 1),
+		new Color(1, 1, 0),
+		// new Color(1, 1, 1),
+	];
 
 	public constructor(canvasId: string, randomizer: Random) {
 		this.randomizer = randomizer;
@@ -72,7 +83,7 @@ export default class Renderer {
 
 		// TODO: Break this out somehow
 		// NOTE: initialize rectangle buffers
-		var positions = [
+		const positions = [
 			0, 0,
 			1, 0,
 			1, 1,
@@ -82,7 +93,7 @@ export default class Renderer {
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.rectangleVertexBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
-		var colors = [
+		const colors = [
 			1, 1, 1, 1,
 			1, 1, 1, 1,
 			1, 1, 1, 1,
@@ -97,7 +108,7 @@ export default class Renderer {
 		this.renderState({
 			gameObjects: map.getMapObjects(),
 			xSize: map.getXSize(),
-			ySize: map.getYSize()
+			ySize: map.getYSize(),
 		});
 	}
 
@@ -107,26 +118,14 @@ export default class Renderer {
 		this.renderOutput(group, state.xSize, state.ySize);
 	}
 
-	private getBonusSize(animation: Animation): number {
-		switch (animation.animationType) {
-			case AnimationType.Move: return 0.5;
-			case AnimationType.Bump: return 0.25;
-			case AnimationType.Pull:
-			case AnimationType.Push:
-				return -0.5;
-		}
-		return 0;
-	}
-
 	public renderAnimationState(state: IAnimationState): void {
 		const group = new RenderGroup();
 
 		this.pushState(group, state);
 
-		for (let i = 0; i < state.animations.length; i++) {
-			const animation = state.animations[i];
-			const isPlayer = animation.objectID.startsWith("player");
-			let color = isPlayer ? this.getPlayerColor(animation.objectID) : spikeColor;
+		for (const animation of state.animations) {
+			const isPlayer = animation.objectID.startsWith('player');
+			const color = isPlayer ? this.getPlayerColor(animation.objectID) : spikeColor;
 
 			const bonusSize = this.getBonusSize(animation);
 			const animationSize = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 0]);
@@ -141,10 +140,9 @@ export default class Renderer {
 	private pushState(group: RenderGroup, state: IMapState) {
 		group.pushGrid(new TSM.vec3([state.xSize, state.ySize, 0]), gridColor, gridThickness, 1);
 
-		for (let i = 0; i < state.gameObjects.length; i++) {
-			const entity = state.gameObjects[i];
-			const isPlayer = entity.ID.startsWith("player");
-			let color = isPlayer ? this.getPlayerColor(entity.ID) : spikeColor;
+		for (const entity of state.gameObjects) {
+			const isPlayer = entity.ID.startsWith('player');
+			const color = isPlayer ? this.getPlayerColor(entity.ID) : spikeColor;
 
 			group.pushRectangle(new TSM.vec3([entity.x, entity.y, 0]), tileSize, color);
 		}
@@ -153,14 +151,14 @@ export default class Renderer {
 	/*************************************************************************
 	*************************************************************************/
 
-	private renderRectangle(gl: WebGLRenderingContext, object: Rectangle): void {
+	private renderRectangle(gl: WebGLRenderingContext, object: IRectangle): void {
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.rectangleVertexBuffer);
 		const info = this.programInfo;
 
-		gl.vertexAttribPointer(info.attributeLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0)
+		gl.vertexAttribPointer(info.attributeLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(info.attributeLocations.positionAttributeLocation);
 
-		var colors = [
+		const colors = [
 			object.color.r, object.color.g, object.color.b, object.color.a,
 			object.color.r, object.color.g, object.color.b, object.color.a,
 			object.color.r, object.color.g, object.color.b, object.color.a,
@@ -204,32 +202,21 @@ export default class Renderer {
 				new Float32Array(orthoMatrix.all()));
 		}
 
-		group.objects.forEach(o => {
-			switch ((<IRenderObject>o).type) {
+		group.objects.forEach((o) => {
+			switch ((o as IRenderObject).type) {
 				case RenderObjectTypes.Rectangle:
-					this.renderRectangle(gl, <Rectangle>o);
+					this.renderRectangle(gl, o as IRectangle);
 					break;
 				default:
-					console.log("UNKNOWN OBJECT");
+					console.log('UNKNOWN OBJECT');
 			}
 		});
 	}
 
-	private predefinedColors: Color[] = [
-		// new Color(0, 0, 0),
-		new Color(0, 0, 1),
-		new Color(0, 1, 0),
-		new Color(0, 1, 1),
-		new Color(1, 0, 0),
-		new Color(1, 0, 1),
-		new Color(1, 1, 0),
-		// new Color(1, 1, 1),
-	];
-
 	private getPlayerColor(id: string): Color {
 		if (!this.playerColors[id]) {
 			if (this.predefinedColors && this.predefinedColors.length > 0) {
-				this.playerColors[id] = this.predefinedColors.pop()
+				this.playerColors[id] = this.predefinedColors.pop();
 			}
 			else {
 				const r = () => this.randomizer.nextRangeFloat(0.3, 1);
@@ -237,6 +224,17 @@ export default class Renderer {
 			}
 		}
 
-		return this.playerColors[id]
+		return this.playerColors[id];
+	}
+
+	private getBonusSize(animation: Animation): number {
+		switch (animation.animationType) {
+			case AnimationType.Move: return 0.5;
+			case AnimationType.Bump: return 0.25;
+			case AnimationType.Pull:
+			case AnimationType.Push:
+				return -0.5;
+		}
+		return 0;
 	}
 }

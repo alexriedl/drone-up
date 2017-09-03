@@ -1,8 +1,9 @@
+import { Animation } from './Animations';
 import { Drone, GameObject } from './GameObjects';
 import { Random } from './Utils';
+
 import Map from './Map';
 import Renderer from './Renderer/OpenGLRenderer';
-import { Animation } from './Animations';
 
 export interface IAnimationState {
 	animations: Animation[];
@@ -29,7 +30,7 @@ export default class Runner {
 		this.gameDone = false;
 		this.gamePaused = false;
 		this.map = map;
-		this.renderer = new Renderer("game-canvas", randomizer);
+		this.renderer = new Renderer('game-canvas', randomizer);
 	}
 
 	public pause(): void {
@@ -45,16 +46,12 @@ export default class Runner {
 		this.gameDone = true;
 	}
 
-	private checkGameDone(): void {
-		this.gameDone = this.gameDone || this.map.getPlayers().length <= 1;
-	}
-
 	public run() {
 		let then;
 		let animationState: IAnimationState;
-		let tickState: ITickState = {
+		const tickState: ITickState = {
 			isAnimating: false,
-			loopPosition: 0
+			loopPosition: 0,
 		};
 
 		this.frame = (now: number) => {
@@ -76,19 +73,20 @@ export default class Runner {
 			const players = this.map.getPlayers();
 
 			if (!tickState.isAnimating) {
-				tickState.loopPosition = (tickState.loopPosition + 1) % players.length;;
+				tickState.loopPosition = (tickState.loopPosition + 1) % players.length;
 				const player = players[tickState.loopPosition];
 				const action = player.controller.getAction();
 				const animations = player.perform(action, this.map);
 
 				if (action && animations && animations.length > 0) {
 					// Adjust animations' duration based on animation speed
-					if (this.animationSpeed && this.animationSpeed !== 1)
-						animations.forEach(info => info.durationMs /= this.animationSpeed);
+					if (this.animationSpeed && this.animationSpeed !== 1) {
+						animations.forEach((info) => info.durationMs /= this.animationSpeed);
+					}
 
 					animationState = {
-						animations: animations,
-						gameObjects: this.map.getMapObjects().filter(go => !animations.some(info => info.objectID === go.ID)),
+						animations,
+						gameObjects: this.map.getMapObjects().filter((go) => !animations.some((info) => info.objectID === go.ID)),
 						xSize: this.map.getXSize(),
 						ySize: this.map.getYSize(),
 					};
@@ -100,10 +98,8 @@ export default class Runner {
 			if (tickState.isAnimating) {
 				let finished = true;
 
-				for (let i = 0; i < animationState.animations.length; i++) {
-					const animation = animationState.animations[i];
-					if(!animation.update(deltaTime))
-						finished = false;
+				for (const animation of animationState.animations) {
+					if (!animation.update(deltaTime)) finished = false;
 				}
 
 				this.renderer.renderAnimationState(animationState);
@@ -122,7 +118,7 @@ export default class Runner {
 				this.checkGameDone();
 			}
 
-			if(this.gameDone || this.gamePaused) {
+			if (this.gameDone || this.gamePaused) {
 				then = undefined;
 			}
 			else {
@@ -136,4 +132,8 @@ export default class Runner {
 
 		requestAnimationFrame(this.frame);
 	}
-};
+
+	private checkGameDone(): void {
+		this.gameDone = this.gameDone || this.map.getPlayers().length <= 1;
+	}
+}

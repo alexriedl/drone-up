@@ -4,4 +4,4 @@ import GameObject from './GameObject';
 export {
 	Drone,
 	GameObject,
-}
+};

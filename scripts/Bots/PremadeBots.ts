@@ -2,8 +2,8 @@ import { GameObject } from '../GameObjects';
 import { Random } from '../Utils';
 
 export abstract class Controller {
-	protected actions: string[];
 	public scanResult: GameObject[];
+	protected actions: string[];
 
 	constructor(protected readonly randomizer: Random) { }
 	public abstract getAction(): string;
@@ -15,8 +15,8 @@ export abstract class Controller {
 
 export class LuigiBot extends Controller {
 	public getAction(): string {
-		if (this.randomizer.nextFloat() > 0.2) return "Scan";
-		return "MoveRight";
+		if (this.randomizer.nextFloat() > 0.2) return 'Scan';
+		return 'MoveRight';
 	}
 }
 
@@ -25,14 +25,14 @@ export class PushBot extends Controller {
 		var action = this.randomizer.next() % 4;
 		switch (action) {
 			case 1:
-				return "PushUp";
+				return 'PushUp';
 			case 2:
-				return "PushDown";
+				return 'PushDown';
 			case 3:
-				return "PushLeft";
+				return 'PushLeft';
 			case 4:
 			default:
-				return "PushRight";
+				return 'PushRight';
 		}
 	}
 }
@@ -42,14 +42,14 @@ export class PullBot extends Controller {
 		var action = this.randomizer.next() % 4;
 		switch (action) {
 			case 1:
-				return "PullUp";
+				return 'PullUp';
 			case 2:
-				return "PullDown";
+				return 'PullDown';
 			case 3:
-				return "PullLeft";
+				return 'PullLeft';
 			case 4:
 			default:
-				return "PullRight";
+				return 'PullRight';
 		}
 	}
 }
@@ -59,14 +59,14 @@ export class ChickenBot extends Controller {
 		var action = this.randomizer.next() % 4;
 		switch (action) {
 			case 1:
-				return "MoveUp";
+				return 'MoveUp';
 			case 2:
-				return "MoveDown";
+				return 'MoveDown';
 			case 3:
-				return "MoveLeft";
+				return 'MoveLeft';
 			case 4:
 			default:
-				return "MoveRight";
+				return 'MoveRight';
 		}
 	}
 }
@@ -78,13 +78,13 @@ export class ShoveBot extends Controller {
 		var action;
 		switch (this.nextAction) {
 			case 0:
-				action = "PushRight";
+				action = 'PushRight';
 				break;
 			case 1:
-				action = "PushUp";
+				action = 'PushUp';
 				break;
 			case 2:
-				action = "MoveRight";
+				action = 'MoveRight';
 				break;
 		}
 		this.nextAction = (this.nextAction + 1) % 3;

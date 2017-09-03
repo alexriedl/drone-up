@@ -1,33 +1,32 @@
-import { LuigiBot, PushBot, PullBot, ChickenBot, RandomBot, ShoveBot } from './Bots/PremadeBots'
+import { ChickenBot, LuigiBot, PullBot, PushBot, RandomBot, ShoveBot } from './Bots/PremadeBots';
 import { Random } from './Utils';
+
 import Game from './Game';
 
 let game: Game;
 let seed: number;
 
-const inputSeedElement = (document.getElementById("seedInput") as HTMLInputElement);
-const startStopButtonElement = (document.getElementById("startStopButton") as HTMLButtonElement);
-const pauseResumeButtonElement = (document.getElementById("pauseResumeButton") as HTMLButtonElement);
+const inputSeedElement = (document.getElementById('seedInput') as HTMLInputElement);
+const startStopButtonElement = (document.getElementById('startStopButton') as HTMLButtonElement);
+const pauseResumeButtonElement = (document.getElementById('pauseResumeButton') as HTMLButtonElement);
 
 pauseResumeButtonElement.onclick = () => pauseResumeButtonClick();
 startStopButtonElement.onclick = () => startStopButtonClick();
 
 function pauseResumeButtonClick(): void {
 	if (game && game.isStarted() && !game.isPaused()) {
-		console.log("Pausing game");
 		pauseGame();
-	} else {
-		console.log("Resuming game");
+	}
+	else {
 		resumeGame();
 	}
 }
 
 function startStopButtonClick(): void {
 	if (game && game.isStarted()) {
-		console.log("Terminating game");
 		stopGame();
-	} else {
-		console.log("Starting game");
+	}
+	else {
 		startGame();
 	}
 }
@@ -38,9 +37,9 @@ function getRandomSeed(): number {
 
 function stopGame(): void {
 	inputSeedElement.disabled = false;
-	startStopButtonElement.innerHTML = "Start Game";
+	startStopButtonElement.innerHTML = 'Start Game';
 	pauseResumeButtonElement.disabled = true;
-	pauseResumeButtonElement.innerHTML = "Pause Game";
+	pauseResumeButtonElement.innerHTML = 'Pause Game';
 
 	game.kill();
 }
@@ -48,10 +47,10 @@ function stopGame(): void {
 function startGame(): void {
 	inputSeedElement.disabled = true;
 	pauseResumeButtonElement.disabled = false;
-	pauseResumeButtonElement.innerHTML = "Pause Game";
-	startStopButtonElement.innerHTML = "End Game";
+	pauseResumeButtonElement.innerHTML = 'Pause Game';
+	startStopButtonElement.innerHTML = 'End Game';
 
-	var inputSeed = inputSeedElement.value;
+	let inputSeed = inputSeedElement.value;
 	if (!inputSeed || inputSeed.length <= 0) {
 		inputSeed = getRandomSeed().toString();
 	}
@@ -66,7 +65,7 @@ function startGame(): void {
 		new PullBot(randomizer),
 		new ChickenBot(randomizer),
 		new RandomBot(randomizer),
-		new ShoveBot(randomizer)
+		new ShoveBot(randomizer),
 	];
 
 	game = new Game(randomizer, 15, playerControllers, 20, 20);
@@ -75,12 +74,12 @@ function startGame(): void {
 }
 
 function pauseGame(): void {
-	pauseResumeButtonElement.innerHTML = "Resume Game";
+	pauseResumeButtonElement.innerHTML = 'Resume Game';
 	game.pause();
 }
 
 function resumeGame(): void {
-	pauseResumeButtonElement.innerHTML = "Pause Game";
+	pauseResumeButtonElement.innerHTML = 'Pause Game';
 	game.resume();
 }
 

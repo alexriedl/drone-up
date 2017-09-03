@@ -1,10 +1,11 @@
 import { Animation, AnimationType, MoveAnimation } from '../Animations';
 import { Controller } from '../Bots/PremadeBots';
 import { ICoords, ObjectType } from '../Utils';
+
 import Map from '../Map';
 
 export default class GameObject implements ICoords {
-	public readonly ID: string
+	public readonly ID: string;
 	public readonly type: ObjectType;
 	public readonly controller?: Controller;
 	public x: number;
@@ -18,7 +19,7 @@ export default class GameObject implements ICoords {
 
 		if (controller) {
 			this.controller = controller;
-			this.controller.setActions(["MoveUp", "MoveDown", "MoveLeft", "MoveRight"]);
+			this.controller.setActions(['MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight']);
 		}
 	}
 
@@ -40,13 +41,13 @@ export default class GameObject implements ICoords {
 
 	public perform(action: string, map: Map): Animation[] {
 		switch (action) {
-			case "MoveUp":
+			case 'MoveUp':
 				return this.moveUp(map);
-			case "MoveDown":
+			case 'MoveDown':
 				return this.moveDown(map);
-			case "MoveLeft":
+			case 'MoveLeft':
 				return this.moveLeft(map);
-			case "MoveRight":
+			case 'MoveRight':
 				return this.moveRight(map);
 		}
 
@@ -59,34 +60,6 @@ export default class GameObject implements ICoords {
 	 */
 	public move(deltaX: number, deltaY: number, map: Map, animationType?: AnimationType): Animation[] {
 		return this.internalMove(deltaX, deltaY, map, undefined, animationType);
-	}
-
-	private internalMove(deltaX: number, deltaY: number, map: Map, possibleAffected?: GameObject[], animationType?: AnimationType): Animation[] {
-		if (!possibleAffected) {
-			if (deltaX) possibleAffected = map.getAllObjectsOnSameY(this.y);
-			if (deltaY) possibleAffected = map.getAllObjectsOnSameX(this.x);
-		}
-
-		const startPos = { x: this.x, y: this.y };
-		this.x += deltaX;
-		this.y += deltaY;
-		const endPos = { x: this.x, y: this.y }
-		this.wrapCoordinates(map);
-
-		let result: Animation[] = [
-			new MoveAnimation(this.ID, this.type, startPos, endPos, animationType)
-		];
-
-		if (this.type !== ObjectType.Drone) {
-			let collisions = this.findCollided(possibleAffected);
-			for (let i = 0; i < collisions.length; i++) {
-				const go = collisions[i];
-				if (go.type === ObjectType.Drone) continue;
-				result.push.apply(result, go.internalMove(deltaX, deltaY, map, possibleAffected, AnimationType.Bump));
-			}
-		}
-
-		return result;
 	}
 
 	/**
@@ -111,10 +84,37 @@ export default class GameObject implements ICoords {
 		const result = [];
 		if (!tests) return result;
 
-		for (let i = 0; i < tests.length; i++) {
-			const t = tests[i];
-			if (this.ID !== t.ID && this.x === t.x && this.y === t.y) {
-				result.push(t);
+		for (const test of tests) {
+			if (this.ID !== test.ID && this.x === test.x && this.y === test.y) {
+				result.push(test);
+			}
+		}
+
+		return result;
+	}
+
+	private internalMove(deltaX: number, deltaY: number, map: Map, possibleAffected?: GameObject[],
+		animationType?: AnimationType): Animation[] {
+		if (!possibleAffected) {
+			if (deltaX) possibleAffected = map.getAllObjectsOnSameY(this.y);
+			if (deltaY) possibleAffected = map.getAllObjectsOnSameX(this.x);
+		}
+
+		const startPos = { x: this.x, y: this.y };
+		this.x += deltaX;
+		this.y += deltaY;
+		const endPos = { x: this.x, y: this.y };
+		this.wrapCoordinates(map);
+
+		const result: Animation[] = [
+			new MoveAnimation(this.ID, this.type, startPos, endPos, animationType),
+		];
+
+		if (this.type !== ObjectType.Drone) {
+			const collisions = this.findCollided(possibleAffected);
+			for (const go of collisions) {
+				if (go.type === ObjectType.Drone) continue;
+				result.push.apply(result, go.internalMove(deltaX, deltaY, map, possibleAffected, AnimationType.Bump));
 			}
 		}
 
