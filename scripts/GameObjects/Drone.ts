@@ -1,5 +1,6 @@
+import { Animation, AnimationType } from '../Animations';
 import { Controller } from '../Bots/PremadeBots';
-import { IMoveInfo, Animation, ObjectType } from '../Utils';
+import { ObjectType } from '../Utils';
 import GameObject from './GameObject';
 import Map from '../Map';
 
@@ -9,63 +10,53 @@ export default class Drone extends GameObject {
 		controller.setActions(["Scan", "MoveUp", "MoveDown", "MoveLeft", "MoveRight", "PullUp", "PullDown", "PullRight", "PullLeft", "PushUp", "PushDown", "PushRight", "PushLeft"]);
 	}
 
-	public scan(map: Map): IMoveInfo[] {
+	public scan(map: Map): Animation[] {
 		const scanResult = map.scanFor(this);
 		this.controller.scanResult = scanResult;
-		return [
-			{
-				ID: this.ID,
-				type: this.type,
-				durationMs: 100,
-				startPos: { x: this.x, y: this.y },
-				endPos: { x: this.x, y: this.y },
-				curPos: { x: this.x, y: this.y },
-				animation: null
-			}
-		];
+		return [];
 	}
 
-	public pullUp(map: Map): IMoveInfo[] {
+	public pullUp(map: Map): Animation[] {
 		const toPull = map.getNextObjectUpFrom(this);
-		return toPull.moveDown(map, Animation.Pull);
+		return toPull.moveDown(map, AnimationType.Pull);
 	}
 
-	public pullDown(map: Map): IMoveInfo[] {
+	public pullDown(map: Map): Animation[] {
 		var toPull = map.getNextObjectDownFrom(this);
-		return toPull.moveUp(map, Animation.Pull);
+		return toPull.moveUp(map, AnimationType.Pull);
 	}
 
-	public pullLeft(map: Map): IMoveInfo[] {
+	public pullLeft(map: Map): Animation[] {
 		var toPull = map.getNextObjectLeftFrom(this);
-		return toPull.moveRight(map, Animation.Pull);
+		return toPull.moveRight(map, AnimationType.Pull);
 	}
 
-	public pullRight(map: Map): IMoveInfo[] {
+	public pullRight(map: Map): Animation[] {
 		var toPull = map.getNextObjectRightFrom(this);
-		return toPull.moveLeft(map, Animation.Pull);
+		return toPull.moveLeft(map, AnimationType.Pull);
 	}
 
-	public pushUp(map: Map): IMoveInfo[] {
+	public pushUp(map: Map): Animation[] {
 		var toPush = map.getNextObjectUpFrom(this);
-		return toPush.moveUp(map, Animation.Push);
+		return toPush.moveUp(map, AnimationType.Push);
 	}
 
-	public pushDown(map: Map): IMoveInfo[] {
+	public pushDown(map: Map): Animation[] {
 		var toPush = map.getNextObjectDownFrom(this);
-		return toPush.moveDown(map, Animation.Push);
+		return toPush.moveDown(map, AnimationType.Push);
 	}
 
-	public pushLeft(map: Map): IMoveInfo[] {
+	public pushLeft(map: Map): Animation[] {
 		var toPush = map.getNextObjectLeftFrom(this);
-		return toPush.moveLeft(map, Animation.Push);
+		return toPush.moveLeft(map, AnimationType.Push);
 	}
 
-	public pushRight(map: Map): IMoveInfo[] {
+	public pushRight(map: Map): Animation[] {
 		var toPush = map.getNextObjectRightFrom(this);
-		return toPush.moveRight(map, Animation.Push);
+		return toPush.moveRight(map, AnimationType.Push);
 	}
 
-	public perform(action: string, map: Map): IMoveInfo[] {
+	public perform(action: string, map: Map): Animation[] {
 		switch (action) {
 			case "PullUp": return this.pullUp(map);
 			case "PullDown": return this.pullDown(map);

@@ -1,10 +1,11 @@
 import { Drone, GameObject } from './GameObjects';
-import { IMoveInfo, Random } from './Utils';
+import { Random } from './Utils';
 import Map from './Map';
 import Renderer from './Renderer/OpenGLRenderer';
+import { Animation } from './Animations';
 
 export interface IAnimationState {
-	moveInfos: IMoveInfo[];
+	animations: Animation[];
 	gameObjects: GameObject[];
 	xSize: number;
 	ySize: number;
@@ -20,7 +21,7 @@ export default class Runner {
 	private gamePaused: boolean;
 	private map: Map;
 	private renderer: Renderer;
-	private animationSpeed: number = .5;
+	private animationSpeed: number = 1;
 
 	private frame: (now: number) => void;
 
@@ -78,16 +79,16 @@ export default class Runner {
 				tickState.loopPosition = (tickState.loopPosition + 1) % players.length;;
 				const player = players[tickState.loopPosition];
 				const action = player.controller.getAction();
-				const infos = player.perform(action, this.map);
+				const animations = player.perform(action, this.map);
 
-				if (action && infos && infos.length > 0) {
+				if (action && animations && animations.length > 0) {
 					// Adjust animations' duration based on animation speed
 					if (this.animationSpeed && this.animationSpeed !== 1)
-						infos.forEach(info => info.durationMs /= this.animationSpeed);
+						animations.forEach(info => info.durationMs /= this.animationSpeed);
 
 					animationState = {
-						moveInfos: infos,
-						gameObjects: this.map.getMapObjects().filter(go => !infos.some(info => info.ID === go.ID)),
+						animations: animations,
+						gameObjects: this.map.getMapObjects().filter(go => !animations.some(info => info.objectID === go.ID)),
 						xSize: this.map.getXSize(),
 						ySize: this.map.getYSize(),
 					};
@@ -96,23 +97,12 @@ export default class Runner {
 				}
 			}
 
-			// TODO: Animation update logic should NOT be in the runner
 			if (tickState.isAnimating) {
 				let finished = true;
 
-				for (let i = 0; i < animationState.moveInfos.length; i++) {
-					const info = animationState.moveInfos[i];
-					if(info.durationMs <= 0) continue;
-
-					let effectiveDeltaTime = deltaTime;
-					if(effectiveDeltaTime > info.durationMs)
-						effectiveDeltaTime = info.durationMs;
-
-					info.curPos.x += (info.endPos.x - info.curPos.x) / info.durationMs * effectiveDeltaTime;
-					info.curPos.y += (info.endPos.y - info.curPos.y) / info.durationMs * effectiveDeltaTime;
-
-					info.durationMs -= effectiveDeltaTime;
-					if(info.durationMs > 0)
+				for (let i = 0; i < animationState.animations.length; i++) {
+					const animation = animationState.animations[i];
+					if(!animation.update(deltaTime))
 						finished = false;
 				}
 

@@ -1,9 +1,10 @@
+import { Animation, AnimationType } from '../Animations';
 import { GameObject } from '../GameObjects';
 import { IAnimationState } from "../Runner";
 import { IRenderObject, Rectangle, RenderObjectTypes } from './RenderObjects';
-import { Random, Animation, IMoveInfo } from '../Utils';
+import { Random } from '../Utils';
 import { SimpleShaderProgramInfo, initWebGL, createShaderProgram } from './WebGL';
-import Color, { BLACK } from './Color';
+import Color, { BLACK } from '../Utils/Color';
 import Map from '../Map';
 import RenderGroup from './RenderGroup';
 
@@ -106,12 +107,12 @@ export default class Renderer {
 		this.renderOutput(group, state.xSize, state.ySize);
 	}
 
-	private getBonusSize(info: IMoveInfo): number {
-		switch (info.animation) {
-			case Animation.Move: return 0.5;
-			case Animation.Bump: return 0.25;
-			case Animation.Pull:
-			case Animation.Push:
+	private getBonusSize(animation: Animation): number {
+		switch (animation.animationType) {
+			case AnimationType.Move: return 0.5;
+			case AnimationType.Bump: return 0.25;
+			case AnimationType.Pull:
+			case AnimationType.Push:
 				return -0.5;
 		}
 		return 0;
@@ -122,14 +123,16 @@ export default class Renderer {
 
 		this.pushState(group, state);
 
-		for (let i = 0; i < state.moveInfos.length; i++) {
-			const entity = state.moveInfos[i];
-			const isPlayer = entity.ID.startsWith("player");
-			let color = isPlayer ? this.getPlayerColor(entity.ID) : spikeColor;
-			const bonusSize = this.getBonusSize(entity);
+		for (let i = 0; i < state.animations.length; i++) {
+			const animation = state.animations[i];
+			const isPlayer = animation.objectID.startsWith("player");
+			let color = isPlayer ? this.getPlayerColor(animation.objectID) : spikeColor;
+
+			const bonusSize = this.getBonusSize(animation);
 			const animationSize = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 0]);
 
-			group.pushRectangle(new TSM.vec3([entity.curPos.x, entity.curPos.y, 0]), animationSize, color);
+			// TODO: The object and/or the animation needs to know how to render itself.
+			group.pushRectangle(new TSM.vec3([animation.position.x, animation.position.y, 0]), animationSize, color);
 		}
 
 		this.renderOutput(group, state.xSize, state.ySize);

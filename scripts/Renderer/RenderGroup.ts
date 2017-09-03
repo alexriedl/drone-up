@@ -1,5 +1,5 @@
 import { RenderObjectTypes } from './RenderObjects';
-import Color from './Color';
+import Color from '../Utils/Color';
 
 export default class RenderGroup {
 	public objects: Object[] = [];
