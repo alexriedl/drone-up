@@ -66,17 +66,20 @@ export default class GameObject implements ICoords {
 	 * If delta(x|y) was greater than 1, wrapCoords does not work correctly
 	 */
 	protected wrapCoordinates(map: Map): void {
-		if (this.x >= map.getXSize()) {
+		const xMax = map.getXSize() - 1;
+		const yMax = map.getYSize() - 1;
+
+		if (this.x >= xMax) {
 			this.x = 0;
 		}
 		if (this.x < 0) {
-			this.x = map.getXSize();
+			this.x = xMax;
 		}
-		if (this.y >= map.getYSize()) {
+		if (this.y >= yMax) {
 			this.y = 0;
 		}
 		if (this.y < 0) {
-			this.y = map.getYSize();
+			this.y = yMax;
 		}
 	}
 
