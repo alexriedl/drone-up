@@ -41,6 +41,19 @@
             "type": "coreclr",
             "request": "attach",
             "processId": "${command:pickProcess}"
+        },
+        {
+            "name": "Chrome Debug",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:5000",
+            "sourceMapPathOverrides": {
+                "webpack:///./scripts/*": "${workspaceRoot}/scripts/*",
+                "webpack:///*": "*",
+                "webpack:///./*": "${webRoot}/*",
+                "webpack:///src/*": "${webRoot}/*",
+                "webpack:///./~/*": "${webRoot}/node_modules/*"
+            }
         }
     ]
 }
