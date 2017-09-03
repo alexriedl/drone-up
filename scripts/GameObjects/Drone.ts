@@ -16,6 +16,7 @@ export default class Drone extends GameObject {
 			{
 				ID: this.ID,
 				type: this.type,
+				durationMs: 100,
 				startPos: { x: this.x, y: this.y },
 				endPos: { x: this.x, y: this.y },
 				curPos: { x: this.x, y: this.y },
@@ -74,9 +75,7 @@ export default class Drone extends GameObject {
 			case "PushDown": return this.pushDown(map);
 			case "PushLeft": return this.pushLeft(map);
 			case "PushRight": return this.pushRight(map);
-			case "Scan":
-				this.scan(map);
-				break;
+			case "Scan": return this.scan(map);
 			default:
 				return super.perform(action, map);
 		}

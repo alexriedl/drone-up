@@ -12,4 +12,5 @@ export interface IMoveInfo {
 	endPos: ICoords;
 	curPos: ICoords;
 	animation: Animation;
+	durationMs: number;
 }

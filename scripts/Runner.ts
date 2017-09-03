@@ -4,7 +4,6 @@ import Map from './Map';
 import Renderer from './Renderer/OpenGLRenderer';
 
 export interface IAnimationState {
-	index: number;
 	moveInfos: IMoveInfo[];
 	gameObjects: GameObject[];
 	xSize: number;
@@ -21,6 +20,7 @@ export default class Runner {
 	private gamePaused: boolean;
 	private map: Map;
 	private renderer: Renderer;
+	private animationSpeed: number = .5;
 
 	private frame: (now: number) => void;
 
@@ -37,7 +37,7 @@ export default class Runner {
 
 	public resume(): void {
 		this.gamePaused = false;
-		this.frame(Date.now());
+		requestAnimationFrame(this.frame);
 	}
 
 	public kill(): void {
@@ -49,7 +49,7 @@ export default class Runner {
 	}
 
 	public run() {
-		let then = Date.now() * 0.001;
+		let then;
 		let animationState: IAnimationState;
 		let tickState: ITickState = {
 			isAnimating: false,
@@ -57,9 +57,20 @@ export default class Runner {
 		};
 
 		this.frame = (now: number) => {
-			now *= 0.001;
 			const deltaTime = now - then;
-			then = now;
+
+			// NOTE: Ignore bad frames
+			{
+				let skipFrame = false;
+				if (!then) skipFrame = true;
+
+				then = now;
+
+				if (skipFrame) {
+					requestAnimationFrame(this.frame);
+					return;
+				}
+			}
 
 			const players = this.map.getPlayers();
 
@@ -70,8 +81,11 @@ export default class Runner {
 				const infos = player.perform(action, this.map);
 
 				if (action && infos && infos.length > 0) {
+					// Adjust animations' duration based on animation speed
+					if (this.animationSpeed && this.animationSpeed !== 1)
+						infos.forEach(info => info.durationMs /= this.animationSpeed);
+
 					animationState = {
-						index: 0,
 						moveInfos: infos,
 						gameObjects: this.map.getMapObjects().filter(go => !infos.some(info => info.ID === go.ID)),
 						xSize: this.map.getXSize(),
@@ -82,25 +96,30 @@ export default class Runner {
 				}
 			}
 
+			// TODO: Animation update logic should NOT be in the runner
 			if (tickState.isAnimating) {
-				const speed = 0.1;
-				animationState.index++;
+				let finished = true;
 
-				// Update animation state
 				for (let i = 0; i < animationState.moveInfos.length; i++) {
 					const info = animationState.moveInfos[i];
+					if(info.durationMs <= 0) continue;
 
-					// TODO: Come up with a more reliable way to know animations are finished
-					info.curPos.x += Math.sign(info.endPos.x - info.startPos.x) * speed;
-					info.curPos.y += Math.sign(info.endPos.y - info.startPos.y) * speed;
+					let effectiveDeltaTime = deltaTime;
+					if(effectiveDeltaTime > info.durationMs)
+						effectiveDeltaTime = info.durationMs;
+
+					info.curPos.x += (info.endPos.x - info.curPos.x) / info.durationMs * effectiveDeltaTime;
+					info.curPos.y += (info.endPos.y - info.curPos.y) / info.durationMs * effectiveDeltaTime;
+
+					info.durationMs -= effectiveDeltaTime;
+					if(info.durationMs > 0)
+						finished = false;
 				}
 
-				// Render animation state
 				this.renderer.renderAnimationState(animationState);
 
-				// TODO: Come up with a more reliable way to know animations are finished
-				let finished = animationState.index > 9;
 				if (finished) {
+					// TODO: Find a way to animate dead drones
 					const deadDrones = this.map.removeCrashedDrones();
 					tickState.isAnimating = false;
 				}
@@ -113,7 +132,10 @@ export default class Runner {
 				this.checkGameDone();
 			}
 
-			if (!this.gameDone && !this.gamePaused) {
+			if(this.gameDone || this.gamePaused) {
+				then = undefined;
+			}
+			else {
 				requestAnimationFrame(this.frame);
 			}
 

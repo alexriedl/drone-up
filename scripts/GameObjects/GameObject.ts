@@ -76,6 +76,7 @@ export default class GameObject implements ICoords {
 			{
 				ID: this.ID,
 				type: this.type,
+				durationMs: 250,
 				startPos: startPos,
 				endPos: endPos,
 				curPos: startPos,
