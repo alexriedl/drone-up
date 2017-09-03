@@ -2,7 +2,6 @@ import { Drone, GameObject } from './GameObjects';
 import { IMoveInfo, Random } from './Utils';
 import Map from './Map';
 import Renderer from './Renderer/OpenGLRenderer';
-//import Renderer from './Renderer/SWRenderer';
 
 export interface IAnimationState {
 	index: number;

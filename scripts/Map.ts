@@ -40,7 +40,7 @@ export default class Map {
 		return this.ySize;
 	}
 
-	public generatePlayers(randomizer: Random, players: Drone[], invalidArray: ICoords[]): void {
+	private generatePlayers(randomizer: Random, players: Drone[], invalidArray: ICoords[]): void {
 		for (let p = 0, plen = players.length; p < plen; p++) {
 			const player = players[p];
 			let attempts = 0;
@@ -74,7 +74,7 @@ export default class Map {
 		};
 	}
 
-	public generateSpikes(randomizer: Random, spikePercent: number, spikeArray: GameObject[], invalidArray: ICoords[]) {
+	private generateSpikes(randomizer: Random, spikePercent: number, spikeArray: GameObject[], invalidArray: ICoords[]) {
 		var spikesGenned = 0;
 		var spikesFailed = 0;
 		var neededSpikes = (this.xSize * this.ySize * spikePercent) / 100;
@@ -102,16 +102,14 @@ export default class Map {
 	}
 
 	public checkInvalid(x: number, y: number, invalidArray: ICoords[]) {
-		var attemptValid = true;
-
-		for (var i = 0, ilen = invalidArray.length; i < ilen && attemptValid; i++) {
-			var inv = invalidArray[i];
+		for (let i = 0; i < invalidArray.length; i++) {
+			let inv = invalidArray[i];
 			if (x === inv.x && y === inv.y) {
-				attemptValid = false;
+				return false;
 			}
 		}
 
-		return attemptValid;
+		return true;
 	}
 
 	public markInvalid(x: number, y: number, numSpread: number, invalidArray: ICoords[]): void {
@@ -165,20 +163,20 @@ export default class Map {
 
 	public scanFor(entity: GameObject): GameObject[] {
 		const scanDistance = Math.ceil(.33 * Math.min(this.xSize, this.ySize, 15));
-		var scanSquares = [];
-		var gameObjectsInRange = [];
+		let scanSquares = [];
+		let gameObjectsInRange = [];
 
 		this.markInvalid(entity.x, entity.y, scanDistance, scanSquares);
 
-		for (var j = 0, len = this.mapObjects.length; j < len; j++) {
+		for (let j = 0; j < this.mapObjects.length; j++) {
 			if (!this.checkInvalid(this.mapObjects[j].x, this.mapObjects[j].y, scanSquares)) {
 				gameObjectsInRange.push(this.mapObjects[j]);
 			}
 		}
 
-		for (var k = 0, scanLen = scanSquares.length; k < scanLen; k++) {
+		for (let k = 0; k < scanSquares.length; k++) {
 			scanSquares[k].type = "empty";
-			for (var l = 0, objInRangeLen = gameObjectsInRange.length; l < objInRangeLen && scanSquares[k].type === "empty"; l++) {
+			for (let l = 0; l < gameObjectsInRange.length && scanSquares[k].type === "empty"; l++) {
 				if (scanSquares[k].x === gameObjectsInRange[l].x && scanSquares[k].y === gameObjectsInRange[l].y) {
 					if (gameObjectsInRange[l].ID === entity.ID) {
 						scanSquares[k].type = "you";
@@ -189,8 +187,8 @@ export default class Map {
 			}
 		}
 
-		for (var m = 0, len = scanSquares.length; m < len; m++) {
-			var square = scanSquares[m];
+		for (let m = 0; m < scanSquares.length; m++) {
+			let square = scanSquares[m];
 			if (Math.abs(entity.x - scanSquares[m].x) > scanDistance) {
 				if (entity.x - scanSquares[m].x < 0) {
 					scanSquares[m].x = this.xSize + entity.x - scanSquares[m].x;
