@@ -1,22 +1,26 @@
 import { Drone, GameObject } from './GameObject';
-import { ICoords, ObjectType, Random } from './Utils';
+import { Coordinate, Enums, MarkList, Random, Interfaces } from './Utils';
 
 export default class Map {
 	private gameObjects: GameObject[];
 	private players: Drone[];
 	private spikes: GameObject[];
+	private xSize: number;
+	private ySize: number;
 
-	constructor(private xSize: number, private ySize: number) {
+	public constructor(xSize: number, ySize: number) {
+		this.xSize = xSize;
+		this.ySize = ySize;
 	}
 
 	public initialize(randomizer: Random, players: Drone[], spikePercent: number) {
-		const invalidArray: ICoords[] = [];
+		const markedList = new MarkList(this.xSize, this.ySize);
 
 		// first, generate all players and mark their "safe space" as invalid for further placements
-		this.generatePlayers(randomizer, players, invalidArray);
+		this.generatePlayers(randomizer, players, markedList);
 
 		// then, generate spikes (up to the percentage or 1000 failures, whichever happens first)
-		const spikeArray = this.generateSpikes(randomizer, spikePercent, invalidArray);
+		const spikeArray = this.generateSpikes(randomizer, spikePercent, markedList);
 
 		this.players = players;
 		this.spikes = spikeArray;
@@ -39,32 +43,6 @@ export default class Map {
 		return this.ySize;
 	}
 
-	public checkInvalid(x: number, y: number, invalidArray: ICoords[]) {
-		for (const inv of invalidArray) {
-			if (x === inv.x && y === inv.y) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	public markInvalid(x: number, y: number, numSpread: number, invalidArray: ICoords[]): void {
-		if (numSpread < 0) return;
-
-		// check if the current tile is invalid to avoid adding duplicates
-		const invalidDoesNotExist = this.checkInvalid(x, y, invalidArray);
-		if (invalidDoesNotExist) {
-			invalidArray.push({ x, y });
-		}
-
-		// recursively call out in cardinal directions
-		this.markInvalid((x + 1) % this.xSize, y, numSpread - 1, invalidArray);
-		this.markInvalid((x - 1 + this.xSize) % this.xSize, y, numSpread - 1, invalidArray);
-		this.markInvalid(x, (y + 1) % this.ySize, numSpread - 1, invalidArray);
-		this.markInvalid(x, (y - 1 + this.ySize) % this.ySize, numSpread - 1, invalidArray);
-	}
-
 	public removeCrashedDrones(): Drone[] {
 		const crashed: Drone[] = [];
 		const playerRemovalIndices = [];
@@ -75,7 +53,7 @@ export default class Map {
 				const player = this.players[i];
 				const otherObject = this.gameObjects[j];
 
-				if (player.ID !== otherObject.ID && player.x === otherObject.x && player.y === otherObject.y) {
+				if (player.ID !== otherObject.ID && player.position.equal(otherObject.position)) {
 					crashed.push(player);
 					playerRemovalIndices.push(i);
 					gameObjectRemovalIndices.push(j);
@@ -83,85 +61,45 @@ export default class Map {
 			}
 		}
 
-		for(const index of playerRemovalIndices) {
+		for (const index of playerRemovalIndices) {
 			this.players.splice(index, 1);
 		}
 
-		for(const index of gameObjectRemovalIndices) {
+		for (const index of gameObjectRemovalIndices) {
 			this.gameObjects.splice(index, 1);
 		}
 
 		return crashed;
 	}
 
-	public scanFor(entity: GameObject): GameObject[] {
+	public scanFor(entity: GameObject): Interfaces.IScanResult[] {
 		const scanDistance = Math.ceil(.33 * Math.min(this.xSize, this.ySize, 15));
-		const scanSquares = [];
-		const gameObjectsInRange = [];
+		const gameObjectsInRange: GameObject[] = [];
+		const markList = new MarkList(this.xSize, this.ySize);
 
-		this.markInvalid(entity.x, entity.y, scanDistance, scanSquares);
+		markList.mark(entity.position, scanDistance);
 
 		for (const scanned of this.gameObjects) {
-			if (!this.checkInvalid(scanned.x, scanned.y, scanSquares)) {
-				gameObjectsInRange.push({...scanned});
+			if (markList.isMarked(scanned.position)) {
+				gameObjectsInRange.push(scanned);
 			}
 		}
 
-		for (const scanned of scanSquares) {
-			scanned.type = 'empty';
-			for (const gameObject of gameObjectsInRange) {
-				if (scanned.x === gameObject.x && scanned.y === gameObject.y) {
-					if (gameObject.ID === entity.ID) {
-						scanned.type = 'you';
-						break;
-					}
-					else {
-						scanned.type = gameObject.type;
-					}
-				}
-			}
-		}
-
-		for (const square of scanSquares) {
-			if (Math.abs(entity.x - square.x) > scanDistance) {
-				if (entity.x - square.x < 0) {
-					square.x = this.xSize + entity.x - square.x;
-				} else if (entity.x + square.x > this.xSize) {
-					// 0 - entity.x + square.x;
-				}
-			} else {
-				if (entity.x > square.x) {
-					square.x = entity.x - square.x;
-				} else {
-					square.x = square.x - entity.x;
-				}
-			}
-
-			if (Math.abs(entity.y - square.y) > scanDistance) {
-				if (entity.y - square.y < 0) {
-					square.y = this.xSize + entity.y - square.y;
-				} else if (entity.y + square.y > this.ySize) {
-					// 0 - entity.y + square.y;
-				}
-			} else {
-				if (entity.y > square.y) {
-					square.y = entity.y - square.y;
-				} else {
-					square.y = square.y - entity.y;
-				}
-			}
-		}
-
-		return scanSquares;
+		return gameObjectsInRange.map(gameObject => {
+			const type = gameObject.ID === entity.ID ? 'you' : gameObject.type.toString();
+			let x = gameObject.position.x - entity.position.x;
+			let y = gameObject.position.y - entity.position.y;
+			return { type, x, y };
+		});
 	}
 
 	// GetNextObjectUpFrom(this.Id) returns an ID of the next object up from the object with the given ID
 	public getNextObjectUpFrom(entity: GameObject): GameObject {
-		const lineObjects = this.getAllObjectsOnSameX(entity.x);
+		const lineObjects = this.getAllObjectsOnSameX(entity.position.x);
 
 		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort((a, b) => {
-			return b.y - a.y;
+			return b.position.y - a.position.y;
 		});
 
 		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
@@ -172,11 +110,11 @@ export default class Map {
 	}
 
 	public getNextObjectDownFrom(entity: GameObject): GameObject {
-		const lineObjects = this.getAllObjectsOnSameX(entity.x);
+		const lineObjects = this.getAllObjectsOnSameX(entity.position.x);
 
 		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort((a, b) => {
-			return a.y - b.y;
+			return a.position.y - b.position.y;
 		});
 
 		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
@@ -187,11 +125,11 @@ export default class Map {
 	}
 
 	public getNextObjectLeftFrom(entity: GameObject): GameObject {
-		const lineObjects = this.getAllObjectsOnSameY(entity.y);
+		const lineObjects = this.getAllObjectsOnSameY(entity.position.y);
 
 		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort((a, b) => {
-			return b.x - a.x;
+			return b.position.x - a.position.x;
 		});
 
 		for (let k = 0; k < sortedObjects.length; k++) {
@@ -202,11 +140,11 @@ export default class Map {
 	}
 
 	public getNextObjectRightFrom(entity: GameObject): GameObject {
-		const lineObjects = this.getAllObjectsOnSameY(entity.y);
+		const lineObjects = this.getAllObjectsOnSameY(entity.position.y);
 
 		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort((a, b) => {
-			return a.x - b.x;
+			return a.position.x - b.position.x;
 		});
 
 		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
@@ -219,7 +157,7 @@ export default class Map {
 	public getAllObjectsOnSameY(y: number): GameObject[] {
 		const sameYList = [];
 		for (const mo of this.gameObjects) {
-			if (mo.y === y) sameYList.push(mo);
+			if (mo.position.y === y) sameYList.push(mo);
 		}
 		return sameYList;
 	}
@@ -227,12 +165,12 @@ export default class Map {
 	public getAllObjectsOnSameX(x: number): GameObject[] {
 		const sameXList = [];
 		for (const mo of this.gameObjects) {
-			if (mo.x === x) sameXList.push(mo);
+			if (mo.position.x === x) sameXList.push(mo);
 		}
 		return sameXList;
 	}
 
-	private generatePlayers(randomizer: Random, players: Drone[], invalidArray: ICoords[]): void {
+	private generatePlayers(randomizer: Random, players: Drone[], markedList: MarkList): void {
 		for (const player of players) {
 			let attempts = 0;
 			let validSpot = false;
@@ -244,19 +182,15 @@ export default class Map {
 					return null;
 				}
 
-				const x = randomizer.nextRangeInt(0, this.xSize);
-				const y = randomizer.nextRangeInt(0, this.ySize);
+				const position = Coordinate.random(randomizer, this.xSize, this.ySize);
+				const invalidPosition = markedList.isMarked(position);
 
-				// doublecheck all invalid spaces
-				const attemptValid = this.checkInvalid(x, y, invalidArray);
-
-				if (attemptValid) {
-					player.x = x;
-					player.y = y;
+				if (!invalidPosition) {
+					player.position = position;
 					validSpot = true;
 
 					// add the player's "safe space" (anything a distance of <= 3 tiles away)
-					this.markInvalid(x, y, 3, invalidArray);
+					markedList.mark(position, 3);
 				}
 
 				if (!validSpot) {
@@ -266,31 +200,31 @@ export default class Map {
 		}
 	}
 
-	private generateSpikes(randomizer: Random, spikePercent: number, invalidArray: ICoords[]): GameObject[] {
+	private generateSpikes(randomizer: Random, spikePercent: number, markedList: MarkList): GameObject[] {
 		const spikeArray: GameObject[] = [];
 		let spikesGenned = 0;
 		let spikesFailed = 0;
 		const neededSpikes = (this.xSize * this.ySize * spikePercent) / 100;
 
 		while (spikesGenned < neededSpikes && spikesFailed < 1000) {
-			const x = randomizer.nextRangeInt(0, this.xSize);
-			const y = randomizer.nextRangeInt(0, this.ySize);
+			const position = Coordinate.random(randomizer, this.xSize, this.ySize);
+			const invalidPosition = markedList.isMarked(position);
 
-			const attemptValid = this.checkInvalid(x, y, invalidArray);
-
-			if (attemptValid) {
+			if (!invalidPosition) {
 				const ID = `__reservedSpikeNumber${spikesGenned + 1}__`;
 				const model = undefined;
-				spikeArray.push(new GameObject(ID, ObjectType.Spike, model, undefined, x, y));
+				const controller = undefined;
+				spikeArray.push(new GameObject(ID, Enums.ObjectType.Spike, model, controller, position));
 
 				// spikes only invalidate their tile, they get no "safe space"
-				this.markInvalid(x, y, 0, invalidArray);
+				markedList.mark(position, 0);
 			}
 
-			if (attemptValid) {
-				spikesGenned++;
-			} else {
+			if (invalidPosition) {
 				spikesFailed++;
+			}
+			else {
+				spikesGenned++;
 			}
 		}
 

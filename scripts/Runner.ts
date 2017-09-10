@@ -1,6 +1,6 @@
-import { Random } from './Utils';
+import { Color, Random } from './Utils';
+import { Renderer, RenderGroup } from './Renderer';
 import Map from './Map';
-import Renderer from './Renderer/Renderer';
 import TickState from './TickState';
 
 export default class Runner {
@@ -8,15 +8,16 @@ export default class Runner {
 	private gamePaused: boolean;
 	private map: Map;
 	private renderer: Renderer;
-	private animationSpeed: number = 1;
+	private animationSpeed: number;
 
 	private frame: (now: number) => void;
 
-	public constructor(map: Map, randomizer: Random) {
+	public constructor(map: Map, randomizer: Random, animationSpeed: number = 1) {
 		this.gameDone = false;
 		this.gamePaused = false;
 		this.map = map;
 		this.renderer = new Renderer('game-canvas', randomizer);
+		this.animationSpeed = animationSpeed;
 	}
 
 	public pause(): void {
@@ -52,7 +53,7 @@ export default class Runner {
 
 			const effectiveDeltaTime = deltaTime * this.animationSpeed;
 			tickState.update(effectiveDeltaTime, this.map);
-			this.renderer.renderMap(this.map);
+			this.renderGame();
 
 			if (!tickState.isAnimating()) {
 				this.checkGameDone();
@@ -71,5 +72,21 @@ export default class Runner {
 
 	private checkGameDone(): void {
 		this.gameDone = this.gameDone || this.map.getPlayers().length <= 1;
+	}
+
+	private renderGame(): void {
+		const group = new RenderGroup();
+		const renderer = this.renderer;
+		const map = this.map;
+
+		const gridThickness = 0.05;
+		const gridColor = new Color(1, 0.7, 0);
+		group.pushGrid(new TSM.vec3([map.getXSize(), map.getYSize(), 0]), gridColor, gridThickness);
+
+		for (const go of map.getGameObjects()) {
+			go.render(group);
+		}
+
+		renderer.renderGroup(group, map.getXSize(), map.getYSize());
 	}
 }

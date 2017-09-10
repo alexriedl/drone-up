@@ -1,13 +1,13 @@
 import { AnimationType } from '../Animations';
 import { Controller } from '../Bots/PremadeBots';
+import { Enums } from '../Utils';
 import { Model } from '../Model';
-import { ObjectType } from '../Utils';
 import GameObject from './GameObject';
 import Map from '../Map';
 
 export default class Drone extends GameObject {
 	public constructor(ID: string, model: Model,  controller: Controller) {
-		super(ID, ObjectType.Drone, model, controller);
+		super(ID, Enums.ObjectType.Drone, model, controller);
 		controller.setActions([
 			'Scan',
 			'MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight',

@@ -1,8 +1,8 @@
 import { GameObject } from '../GameObject';
-import { Random } from '../Utils';
+import { Random, Interfaces } from '../Utils';
 
 export abstract class Controller {
-	public scanResult: GameObject[];
+	public scanResult: Interfaces.IScanResult[];
 	protected actions: string[];
 
 	constructor(protected readonly randomizer: Random) { }

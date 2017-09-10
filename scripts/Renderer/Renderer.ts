@@ -1,7 +1,6 @@
 import { Animation, AnimationType } from '../Animations';
 import { createShaderProgram, initWebGL, ISimpleShaderProgramInfo } from './WebGL';
 import { GameObject } from '../GameObject';
-import { IAnimationState } from '../Runner';
 import { IRectangle, IRenderObject, RenderObjectTypes } from './RenderObjects';
 import { Random } from '../Utils';
 import Color, { BLACK } from '../Utils/Color';
@@ -46,7 +45,6 @@ const fragmentShaderSource = `
 	}`;
 
 export default class Renderer {
-	private playerColors: { [id: string]: Color } = {};
 	private canvas: HTMLCanvasElement;
 	private gl: WebGLRenderingContext;
 	private programInfo: ISimpleShaderProgramInfo;
@@ -55,17 +53,6 @@ export default class Renderer {
 	private rectangleColorBuffer: WebGLBuffer;
 
 	private randomizer: Random;
-
-	private predefinedColors: Color[] = [
-		// new Color(0, 0, 0),
-		new Color(0, 0, 1),
-		new Color(0, 1, 0),
-		new Color(0, 1, 1),
-		new Color(1, 0, 0),
-		new Color(1, 0, 1),
-		new Color(1, 1, 0),
-		// new Color(1, 1, 1),
-	];
 
 	public constructor(canvasId: string, randomizer: Random) {
 		this.randomizer = randomizer;
@@ -96,50 +83,6 @@ export default class Renderer {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 	}
 
-	public renderMap(map: Map): void {
-		this.renderState({
-			gameObjects: map.getGameObjects(),
-			xSize: map.getXSize(),
-			ySize: map.getYSize(),
-		});
-	}
-
-	public renderState(state: IMapState): void {
-		const group = new RenderGroup();
-		this.pushState(group, state);
-		this.renderOutput(group, state.xSize, state.ySize);
-	}
-
-	public renderAnimationState(state: IAnimationState): void {
-		const group = new RenderGroup();
-
-		this.pushState(group, state);
-
-		for (const animation of state.animations) {
-			const isPlayer = animation.objectID.startsWith('player');
-			const color = isPlayer ? this.getPlayerColor(animation.objectID) : spikeColor;
-
-			const bonusSize = this.getBonusSize(animation);
-			const animationSize = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 0]);
-
-			// TODO: The object and/or the animation needs to know how to render itself.
-			group.pushRectangle(new TSM.vec3([animation.position.x, animation.position.y, 0]), animationSize, color);
-		}
-
-		this.renderOutput(group, state.xSize, state.ySize);
-	}
-
-	private pushState(group: RenderGroup, state: IMapState) {
-		group.pushGrid(new TSM.vec3([state.xSize, state.ySize, 0]), gridColor, gridThickness, tileSize.x, tileSize.y);
-
-		for (const entity of state.gameObjects) {
-			const isPlayer = entity.ID.startsWith('player');
-			const color = isPlayer ? this.getPlayerColor(entity.ID) : spikeColor;
-
-			group.pushRectangle(new TSM.vec3([entity.x, entity.y, 0]), tileSize, color);
-		}
-	}
-
 	/*************************************************************************
 	*************************************************************************/
 
@@ -165,7 +108,7 @@ export default class Renderer {
 	/*************************************************************************
 	*************************************************************************/
 
-	private renderOutput(group: RenderGroup, mapWidth: number, mapHeight): void {
+	public renderGroup(group: RenderGroup, mapWidth: number, mapHeight): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const info = this.programInfo;
 
@@ -201,20 +144,6 @@ export default class Renderer {
 					console.log('UNKNOWN OBJECT');
 			}
 		}
-	}
-
-	private getPlayerColor(id: string): Color {
-		if (!this.playerColors[id]) {
-			if (this.predefinedColors && this.predefinedColors.length > 0) {
-				this.playerColors[id] = this.predefinedColors.pop();
-			}
-			else {
-				const r = () => this.randomizer.nextRangeFloat(0.3, 1);
-				this.playerColors[id] = new Color(r(), r(), r());
-			}
-		}
-
-		return this.playerColors[id];
 	}
 
 	private getBonusSize(animation: Animation): number {

@@ -1,7 +1,7 @@
 import { Controller } from './Bots/PremadeBots';
-import { Random } from './Utils';
-
-import Drone from './GameObjects/Drone';
+import { Drone } from './GameObject';
+import { Random, Color } from './Utils';
+import { SimpleDroneModel } from './Model';
 import Map from './Map';
 import Runner from './Runner';
 
@@ -19,7 +19,10 @@ export default class Game {
 
 		const drones = [];
 		for (let i = 0; i < playerControllers.length; i++) {
-			drones.push(new Drone('player' + i, playerControllers[i]));
+			const controller = playerControllers[i];
+			const model = new SimpleDroneModel(this.getNextPlayerColor(randomizer));
+			const ID = `player${i}`;
+			drones.push(new Drone(ID, model, controller));
 		}
 		this.map.initialize(randomizer, drones, spikePercent);
 
@@ -56,4 +59,26 @@ export default class Game {
 	public isPaused(): boolean {
 		return this.paused;
 	}
+
+	private predefinedColors: Color[] = [
+		// new Color(0, 0, 0),
+		new Color(0, 0, 1),
+		new Color(0, 1, 0),
+		new Color(0, 1, 1),
+		new Color(1, 0, 0),
+		new Color(1, 0, 1),
+		new Color(1, 1, 0),
+		// new Color(1, 1, 1),
+	];
+
+	private getNextPlayerColor(randomizer: Random): Color {
+		if (this.predefinedColors && this.predefinedColors.length > 0) {
+			return this.predefinedColors.pop();
+		}
+		else {
+			const r = () => randomizer.nextRangeFloat(0.3, 1);
+			return new Color(r(), r(), r());
+		}
+	}
+
 }

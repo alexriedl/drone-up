@@ -25,8 +25,8 @@ export default class TickState {
 
 			for (let i = 0; i < this.animatingObjects.length; i++) {
 				const ao = this.animatingObjects[i];
-				ao.updateAnimation(deltaTime);
-				animationRemovalIndices.push(i);
+				const finished = ao.updateAnimation(deltaTime);
+				if (finished) animationRemovalIndices.push(i);
 			}
 
 			for (const index of animationRemovalIndices) {

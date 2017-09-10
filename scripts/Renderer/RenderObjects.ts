@@ -1,4 +1,4 @@
-import Color from '../Utils/Color';
+import { Color } from '../Utils';
 
 export enum RenderObjectTypes {
 	Rectangle,

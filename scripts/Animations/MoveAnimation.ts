@@ -1,14 +1,12 @@
 import { Animation } from './Animation';
 import { AnimationType } from './AnimationType';
-import { ICoords, ObjectType } from '../Utils';
-import Color from '../Utils/Color';
-import RenderGroup from '../Renderer/RenderGroup';
+import { Coordinate } from '../Utils';
 
 export default class MoveAnimation extends Animation {
-	protected startPos: ICoords;
-	protected endPos: ICoords;
+	protected startPos: Coordinate;
+	protected endPos: Coordinate;
 
-	public constructor(startPos: ICoords, endPos: ICoords, animationType: AnimationType) {
+	public constructor(startPos: Coordinate, endPos: Coordinate, animationType: AnimationType) {
 		super(startPos, animationType, 250);
 
 		this.startPos = startPos;
