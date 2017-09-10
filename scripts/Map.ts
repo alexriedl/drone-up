@@ -47,17 +47,14 @@ export default class Map {
 	public removeCrashedDrones(): Drone[] {
 		const crashed: Drone[] = [];
 		const playerRemovalIndices = [];
-		const gameObjectRemovalIndices = [];
 
 		for (let i = 0, playerCount = this.players.length; i < playerCount; i++) {
-			for (let j = 0, mapObjectCount = this.gameObjects.length; j < mapObjectCount; j++) {
+			for (const otherObject of this.gameObjects) {
 				const player = this.players[i];
-				const otherObject = this.gameObjects[j];
 
 				if (player.ID !== otherObject.ID && player.position.equal(otherObject.position)) {
 					crashed.push(player);
 					playerRemovalIndices.push(i);
-					gameObjectRemovalIndices.push(j);
 				}
 			}
 		}
@@ -66,8 +63,12 @@ export default class Map {
 			this.players.splice(index, 1);
 		}
 
-		for (const index of gameObjectRemovalIndices) {
-			this.gameObjects.splice(index, 1);
+		for (let i = 0; i < crashed.length; i++) {
+			const dead = crashed[i];
+			const index = this.gameObjects.indexOf(dead);
+			if(index > -1) {
+				this.gameObjects.splice(index, 1);
+			}
 		}
 
 		return crashed;

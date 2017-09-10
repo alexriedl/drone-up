@@ -15,11 +15,11 @@ export default class SimpleDroneModel extends Model {
 		let bonusSize = 0;
 		if(animation) {
 			switch (animation.animationType) {
-				case AnimationType.Move: bonusSize = 0.5;
-				case AnimationType.Bump: bonusSize = 0.25;
+				case AnimationType.Move: bonusSize = 0.5; break;
+				case AnimationType.Bump: bonusSize = 0.25; break;
 				case AnimationType.Pull:
 				case AnimationType.Push:
-					bonusSize = -0.5;
+					bonusSize = -0.5; break;
 			}
 		}
 		const animationSize = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 0]);
