@@ -1,4 +1,4 @@
-import { Color, Random } from './Utils';
+import { Color } from './Utils';
 import { Renderer, RenderGroup } from './Renderer';
 import Map from './Map';
 import TickState from './TickState';
@@ -12,11 +12,11 @@ export default class Runner {
 
 	private frame: (now: number) => void;
 
-	public constructor(map: Map, randomizer: Random, animationSpeed: number = 1) {
+	public constructor(map: Map, animationSpeed: number = 1) {
 		this.gameDone = false;
 		this.gamePaused = false;
 		this.map = map;
-		this.renderer = new Renderer('game-canvas', randomizer);
+		this.renderer = new Renderer('game-canvas');
 		this.animationSpeed = animationSpeed;
 	}
 

@@ -1,5 +1,6 @@
 import { Drone, GameObject } from './GameObject';
 import { Coordinate, Enums, MarkList, Random, Interfaces } from './Utils';
+import { SimpleSpikeModel } from './Model';
 
 export default class Map {
 	private gameObjects: GameObject[];
@@ -212,7 +213,7 @@ export default class Map {
 
 			if (!invalidPosition) {
 				const ID = `__reservedSpikeNumber${spikesGenned + 1}__`;
-				const model = undefined;
+				const model = new SimpleSpikeModel();
 				const controller = undefined;
 				spikeArray.push(new GameObject(ID, Enums.ObjectType.Spike, model, controller, position));
 

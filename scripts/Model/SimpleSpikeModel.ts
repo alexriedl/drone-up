@@ -3,14 +3,9 @@ import { Coordinate, Color } from '../Utils';
 import { RenderGroup } from '../Renderer';
 import Model from './Model';
 
-export default class SimpleDroneModel extends Model {
-	protected color: Color;
+const spikeColor = new Color(.6, .6, .6);
 
-	public constructor(color: Color) {
-		super();
-		this.color = color;
-	}
-
+export default class SimpleSpikeModel extends Model {
 	protected renderModel(group: RenderGroup, position: Coordinate, animation?: Animation): void {
 		let bonusSize = 0;
 		if(animation) {
@@ -23,6 +18,6 @@ export default class SimpleDroneModel extends Model {
 			}
 		}
 		const animationSize = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 0]);
-		group.pushRectangle(new TSM.vec3([position.x, position.y, 0]), animationSize, this.color);
+		group.pushRectangle(new TSM.vec3([position.x, position.y, 0]), animationSize, spikeColor);
 	}
 }

@@ -26,7 +26,7 @@ export default class Game {
 		}
 		this.map.initialize(randomizer, drones, spikePercent);
 
-		this.runner = new Runner(this.map, randomizer);
+		this.runner = new Runner(this.map);
 
 		// if we add any game objects that move on their own we need to generate them here and supply them
 		// to the map like the drones so the runner can run them

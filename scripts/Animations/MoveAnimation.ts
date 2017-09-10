@@ -15,11 +15,11 @@ export default class MoveAnimation extends Animation {
 
 	public update(deltaTimeMs: number): boolean {
 		let effectiveDeltaTime = deltaTimeMs;
-		if (effectiveDeltaTime > this.durationMs) effectiveDeltaTime = this.durationMs;
+		if (effectiveDeltaTime > this.remainingDurationMs) effectiveDeltaTime = this.remainingDurationMs;
 
-		this.position.x += (this.endPos.x - this.position.x) / this.durationMs * effectiveDeltaTime;
-		this.position.y += (this.endPos.y - this.position.y) / this.durationMs * effectiveDeltaTime;
-		this.durationMs -= effectiveDeltaTime;
+		this.position.x += (this.endPos.x - this.position.x) / this.remainingDurationMs * effectiveDeltaTime;
+		this.position.y += (this.endPos.y - this.position.y) / this.remainingDurationMs * effectiveDeltaTime;
+		this.remainingDurationMs -= effectiveDeltaTime;
 
 		return this.isFinished();
 	}

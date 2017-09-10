@@ -1,27 +1,11 @@
 import { Animation, AnimationType } from '../Animations';
+import { Color } from '../Utils';
 import { createShaderProgram, initWebGL, ISimpleShaderProgramInfo } from './WebGL';
 import { GameObject } from '../GameObject';
 import { IRectangle, IRenderObject, RenderObjectTypes } from './RenderObjects';
 import { Random } from '../Utils';
-import Color, { BLACK } from '../Utils/Color';
 import Map from '../Map';
 import RenderGroup from './RenderGroup';
-
-// NOTE: Configurable options
-const backgroundColor = BLACK;
-const gridThickness = 0.05;
-const gridColor = new Color(1, 0.7, 0);
-const spikeColor = new Color(.6, .6, .6);
-
-// NOTE: Not intended to change
-const tileSize = new TSM.vec3([1, 1, 0]);
-const halfTileSize = new TSM.vec3([tileSize.x / 2, tileSize.y / 2, tileSize.z / 2]);
-
-export interface IMapState {
-	gameObjects: GameObject[];
-	xSize: number;
-	ySize: number;
-}
 
 const vertexShaderSource = `
 	attribute vec4 a_position;
@@ -47,15 +31,12 @@ const fragmentShaderSource = `
 export default class Renderer {
 	private canvas: HTMLCanvasElement;
 	private gl: WebGLRenderingContext;
-	private programInfo: ISimpleShaderProgramInfo;
 
+	private programInfo: ISimpleShaderProgramInfo;
 	private rectangleVertexBuffer: WebGLBuffer;
 	private rectangleColorBuffer: WebGLBuffer;
 
-	private randomizer: Random;
-
-	public constructor(canvasId: string, randomizer: Random) {
-		this.randomizer = randomizer;
+	public constructor(canvasId: string) {
 		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 
 		const gl = initWebGL(this.canvas);
@@ -63,10 +44,10 @@ export default class Renderer {
 
 		this.gl = gl;
 
-		gl.clearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1.0);
+		this.setBackgroundColor(Color.BLACK);
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthFunc(gl.LEQUAL);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		this.clearScreen();
 
 		this.programInfo = createShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
 
@@ -83,6 +64,14 @@ export default class Renderer {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 	}
 
+	public setBackgroundColor(color: Color): void {
+		this.gl.clearColor(color.r, color.g, color.b, 1.0);
+	}
+
+	public clearScreen(): void {
+		this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+	}
+
 	/*************************************************************************
 	*************************************************************************/
 
@@ -93,7 +82,7 @@ export default class Renderer {
 		gl.vertexAttribPointer(info.attributeLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(info.attributeLocations.positionAttributeLocation);
 
-		const offset = new TSM.vec3([halfTileSize.x - object.size.x / 2, halfTileSize.y - object.size.y / 2, 0]);
+		const offset = new TSM.vec3([0.5 - object.size.x / 2, 0.5 - object.size.y / 2, 0]);
 		const modelViewMatrix = TSM.mat4.identity
 			.copy()
 			.translate(object.origin.add(offset))
@@ -114,7 +103,7 @@ export default class Renderer {
 
 		// NOTE: Basic rendering setup
 		{
-			gl.clear(this.gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			this.clearScreen();
 			gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 			gl.useProgram(info.program);
 
