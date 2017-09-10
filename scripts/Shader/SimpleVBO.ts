@@ -28,7 +28,7 @@ export default class SimpleVBO extends Shader {
 	public readonly uniformProjectionMatrixLocation: WebGLUniformLocation;
 	public readonly uniformColorLocation: WebGLUniformLocation;
 
-	public constructor(gl: WebGLRenderingContext) {
+	protected constructor(gl: WebGLRenderingContext) {
 		super(gl);
 
 		this.attributePositionLocation = this.getAttributeLocation('a_position');
@@ -43,5 +43,17 @@ export default class SimpleVBO extends Shader {
 
 	protected getFragmentSource(): string {
 		return fragmentShaderSource;
+	}
+
+	private static staticShader: SimpleVBO;
+	public static create(gl?: WebGLRenderingContext): SimpleVBO {
+		if (SimpleVBO.staticShader) return SimpleVBO.staticShader;
+		if (!gl) {
+			console.error("No gl context to initialize shader with");
+			return null;
+		}
+
+		SimpleVBO.staticShader = new SimpleVBO(gl);
+		return SimpleVBO.staticShader;
 	}
 }

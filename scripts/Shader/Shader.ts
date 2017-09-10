@@ -14,7 +14,7 @@ abstract class Shader {
 	protected readonly gl: WebGLRenderingContext;
 	protected readonly program: WebGLProgram;
 
-	public constructor(gl: WebGLRenderingContext) {
+	protected constructor(gl: WebGLRenderingContext) {
 		this.gl = gl;
 
 		const vertexShader = createShader(gl, gl.VERTEX_SHADER, this.getVertexSource());

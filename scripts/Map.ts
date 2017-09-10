@@ -1,6 +1,6 @@
-import { Drone, GameObject } from './GameObject';
 import { Coordinate, Enums, MarkList, Random, Interfaces } from './Utils';
-import { SimpleSpikeModel } from './Model';
+import { Drone, Spike, GameObject } from './GameObject';
+import { Model } from './Model';
 
 export default class Map {
 	private gameObjects: GameObject[];
@@ -14,14 +14,14 @@ export default class Map {
 		this.ySize = ySize;
 	}
 
-	public initialize(randomizer: Random, players: Drone[], spikePercent: number) {
+	public initialize(randomizer: Random, players: Drone[], spikePercent: number, createSpikeModel: (id: string) => Model) {
 		const markedList = new MarkList(this.xSize, this.ySize);
 
 		// first, generate all players and mark their "safe space" as invalid for further placements
 		this.generatePlayers(randomizer, players, markedList);
 
 		// then, generate spikes (up to the percentage or 1000 failures, whichever happens first)
-		const spikeArray = this.generateSpikes(randomizer, spikePercent, markedList);
+		const spikeArray = this.generateSpikes(randomizer, spikePercent, markedList, createSpikeModel);
 
 		this.players = players;
 		this.spikes = spikeArray;
@@ -66,7 +66,7 @@ export default class Map {
 		for (let i = 0; i < crashed.length; i++) {
 			const dead = crashed[i];
 			const index = this.gameObjects.indexOf(dead);
-			if(index > -1) {
+			if (index > -1) {
 				this.gameObjects.splice(index, 1);
 			}
 		}
@@ -202,8 +202,9 @@ export default class Map {
 		}
 	}
 
-	private generateSpikes(randomizer: Random, spikePercent: number, markedList: MarkList): GameObject[] {
-		const spikeArray: GameObject[] = [];
+	private generateSpikes(randomizer: Random, spikePercent: number, markedList: MarkList,
+		createSpikeModel: (id: string) => Model): Spike[] {
+		const spikeArray: Spike[] = [];
 		let spikesGenned = 0;
 		let spikesFailed = 0;
 		const neededSpikes = (this.xSize * this.ySize * spikePercent) / 100;
@@ -214,9 +215,8 @@ export default class Map {
 
 			if (!invalidPosition) {
 				const ID = `__reservedSpikeNumber${spikesGenned + 1}__`;
-				const model = new SimpleSpikeModel();
-				const controller = undefined;
-				spikeArray.push(new GameObject(ID, Enums.ObjectType.Spike, model, controller, position));
+				const model = createSpikeModel(ID);
+				spikeArray.push(new Spike(ID, model, position));
 
 				// spikes only invalidate their tile, they get no "safe space"
 				markedList.mark(position, 0);

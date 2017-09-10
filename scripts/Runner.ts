@@ -1,23 +1,24 @@
 import { Color } from './Utils';
-import { Renderer, RenderGroup } from './Renderer';
+import { GameObject } from './GameObject';
 import Map from './Map';
+import Renderer from './Renderer';
 import TickState from './TickState';
 
 export default class Runner {
 	private gameDone: boolean;
 	private gamePaused: boolean;
 	private map: Map;
-	private renderer: Renderer;
 	private animationSpeed: number;
 
 	private frame: (now: number) => void;
+	private renderGame: () => void;
 
-	public constructor(map: Map, animationSpeed: number = 1) {
+	public constructor(map: Map, animationSpeed: number, renderGame: () => void) {
 		this.gameDone = false;
 		this.gamePaused = false;
 		this.map = map;
-		this.renderer = new Renderer('game-canvas');
 		this.animationSpeed = animationSpeed;
+		this.renderGame = renderGame;
 	}
 
 	public pause(): void {
@@ -72,21 +73,5 @@ export default class Runner {
 
 	private checkGameDone(): void {
 		this.gameDone = this.gameDone || this.map.getPlayers().length <= 1;
-	}
-
-	private renderGame(): void {
-		const group = new RenderGroup();
-		const renderer = this.renderer;
-		const map = this.map;
-
-		const gridThickness = 0.05;
-		const gridColor = new Color(1, 0.7, 0);
-		group.pushGrid(new TSM.vec3([map.getXSize(), map.getYSize(), 0]), gridColor, gridThickness);
-
-		for (const go of map.getGameObjects()) {
-			go.render(group);
-		}
-
-		renderer.renderGroup(group, map.getXSize(), map.getYSize());
 	}
 }

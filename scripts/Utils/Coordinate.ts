@@ -17,6 +17,10 @@ export default class Coordinate {
 		return Coordinate.copy(this);
 	}
 
+	public vec3(): TSM.vec3 {
+		return new TSM.vec3([this.x, this.y, 0]);
+	}
+
 	public static random(randomizer: Random, xMax: number, yMax: number): Coordinate {
 		const x = randomizer.nextRangeInt(0, xMax);
 		const y = randomizer.nextRangeInt(0, yMax);

@@ -2,10 +2,10 @@ import { Animation, AnimationType, MoveAnimation } from '../Animations';
 import { Controller } from '../Bots/PremadeBots';
 import { Coordinate, Enums } from '../Utils';
 import { Model } from '../Model';
-import { RenderGroup } from '../Renderer';
 import Map from '../Map';
+import Renderer from '../Renderer';
 
-export default class GameObject {
+abstract class GameObject {
 	public readonly ID: string;
 	public readonly type: Enums.ObjectType;
 	public readonly model: Model;
@@ -25,10 +25,14 @@ export default class GameObject {
 		}
 	}
 
-	public render(group: RenderGroup): void {
+	public canRender(): boolean {
+		return !!this.model;
+	}
+
+	public render(renderer: Renderer): void {
 		if (!this.model) return;
-		if (this.animation) this.model.renderAnimation(group, this.animation);
-		else this.model.render(group, this.position);
+		if (this.animation) this.model.renderAnimation(renderer, this.animation);
+		else this.model.render(renderer, this.position);
 	}
 
 	public updateAnimation(deltaTime: number): boolean {
@@ -141,3 +145,5 @@ export default class GameObject {
 		return result;
 	}
 }
+
+export default GameObject;
