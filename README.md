@@ -11,7 +11,7 @@ This is the game DroneUp.
 7. Visit `localhost:5000`
 
 ## Known Issues
-* Player collisions (Example seed: 1504476721327)
+* Player collisions
 
 ## Road Map
 * Upload custom scripts to control drones

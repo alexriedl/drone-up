@@ -1,17 +1,13 @@
-import { ICoords, ObjectType } from '../Utils';
 import { Animation } from './Animation';
 import { AnimationType } from './AnimationType';
-
-import RenderGroup from '../Renderer/RenderGroup';
-import Color from '../Utils/Color';
+import { Coordinate } from '../Utils';
 
 export default class MoveAnimation extends Animation {
-	protected startPos: ICoords;
-	protected endPos: ICoords;
+	protected startPos: Coordinate;
+	protected endPos: Coordinate;
 
-	public constructor(objectID: string, objectType: ObjectType, startPos: ICoords, endPos: ICoords,
-		animationType: AnimationType = AnimationType.Move) {
-		super(objectID, objectType, startPos, animationType, 250);
+	public constructor(startPos: Coordinate, endPos: Coordinate, animationType: AnimationType) {
+		super(startPos, animationType, 250);
 
 		this.startPos = startPos;
 		this.endPos = endPos;
@@ -19,11 +15,11 @@ export default class MoveAnimation extends Animation {
 
 	public update(deltaTimeMs: number): boolean {
 		let effectiveDeltaTime = deltaTimeMs;
-		if (effectiveDeltaTime > this.durationMs) effectiveDeltaTime = this.durationMs;
+		if (effectiveDeltaTime > this.remainingDurationMs) effectiveDeltaTime = this.remainingDurationMs;
 
-		this.position.x += (this.endPos.x - this.position.x) / this.durationMs * effectiveDeltaTime;
-		this.position.y += (this.endPos.y - this.position.y) / this.durationMs * effectiveDeltaTime;
-		this.durationMs -= effectiveDeltaTime;
+		this.position.x += (this.endPos.x - this.position.x) / this.remainingDurationMs * effectiveDeltaTime;
+		this.position.y += (this.endPos.y - this.position.y) / this.remainingDurationMs * effectiveDeltaTime;
+		this.remainingDurationMs -= effectiveDeltaTime;
 
 		return this.isFinished();
 	}
