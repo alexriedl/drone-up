@@ -60,7 +60,7 @@ export default class Renderer {
 		 */
 
 		// NOTE: Here temporarily until background objects are implemented
-		const grid = new Grid(this, new Color(0.6, 0.6, 0), map.xSize, map.ySize);
+		const grid = new Grid(this, new Color(1, 0.6, 0), map.xSize, map.ySize);
 		grid.useShader();
 		gl.uniformMatrix4fv(grid.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
 		grid.render(this, null);
