@@ -1,20 +1,7 @@
-import { Animation } from './Animations';
-import { Drone, GameObject } from './GameObject';
 import { Random } from './Utils';
 import Map from './Map';
 import Renderer from './Renderer/Renderer';
-
-export interface IAnimationState {
-	animations: Animation[];
-	gameObjects: GameObject[];
-	xSize: number;
-	ySize: number;
-}
-
-export interface ITickState {
-	isAnimating: boolean;
-	loopPosition: number;
-}
+import TickState from './TickState';
 
 export default class Runner {
 	private gameDone: boolean;
@@ -47,11 +34,7 @@ export default class Runner {
 
 	public run() {
 		let then;
-		let animationState: IAnimationState;
-		const tickState: ITickState = {
-			isAnimating: false,
-			loopPosition: 0,
-		};
+		const tickState = new TickState();
 
 		this.frame = (now: number) => {
 			const deltaTime = now - then;
@@ -67,51 +50,11 @@ export default class Runner {
 				}
 			}
 
-			const players = this.map.getPlayers();
+			const effectiveDeltaTime = deltaTime * this.animationSpeed;
+			tickState.update(effectiveDeltaTime, this.map);
+			this.renderer.renderMap(this.map);
 
-			if (!tickState.isAnimating) {
-				tickState.loopPosition = (tickState.loopPosition + 1) % players.length;
-				const player = players[tickState.loopPosition];
-				const action = player.controller.getAction();
-				const animations = player.perform(action, this.map);
-
-				if (action && animations && animations.length > 0) {
-					// Adjust animations' duration based on animation speed
-					if (this.animationSpeed && this.animationSpeed !== 1) {
-						animations.forEach((info) => info.durationMs /= this.animationSpeed);
-					}
-
-					animationState = {
-						animations,
-						gameObjects: this.map.getGameObjects().filter((go) => !animations.some((info) => info.objectID === go.ID)),
-						xSize: this.map.getXSize(),
-						ySize: this.map.getYSize(),
-					};
-
-					tickState.isAnimating = true;
-				}
-			}
-
-			if (tickState.isAnimating) {
-				let finished = true;
-
-				for (const animation of animationState.animations) {
-					if (!animation.update(deltaTime)) finished = false;
-				}
-
-				this.renderer.renderAnimationState(animationState);
-
-				if (finished) {
-					// TODO: Find a way to animate dead drones
-					const deadDrones = this.map.removeCrashedDrones();
-					tickState.isAnimating = false;
-				}
-			}
-			else {
-				this.renderer.renderMap(this.map);
-			}
-
-			if (!tickState.isAnimating) {
+			if (!tickState.isAnimating()) {
 				this.checkGameDone();
 			}
 
@@ -120,10 +63,6 @@ export default class Runner {
 			}
 			else {
 				requestAnimationFrame(this.frame);
-			}
-
-			if (this.gameDone) {
-				this.renderer.renderMap(this.map);
 			}
 		};
 

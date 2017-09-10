@@ -1,17 +1,15 @@
-import { ICoords, ObjectType } from '../Utils';
 import { Animation } from './Animation';
 import { AnimationType } from './AnimationType';
-
-import RenderGroup from '../Renderer/RenderGroup';
+import { ICoords, ObjectType } from '../Utils';
 import Color from '../Utils/Color';
+import RenderGroup from '../Renderer/RenderGroup';
 
 export default class MoveAnimation extends Animation {
 	protected startPos: ICoords;
 	protected endPos: ICoords;
 
-	public constructor(objectID: string, objectType: ObjectType, startPos: ICoords, endPos: ICoords,
-		animationType: AnimationType = AnimationType.Move) {
-		super(objectID, objectType, startPos, animationType, 250);
+	public constructor(startPos: ICoords, endPos: ICoords, animationType: AnimationType) {
+		super(startPos, animationType, 250);
 
 		this.startPos = startPos;
 		this.endPos = endPos;

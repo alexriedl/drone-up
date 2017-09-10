@@ -11,6 +11,7 @@ export default class GameObject implements ICoords {
 	public readonly controller?: Controller;
 	public x: number;
 	public y: number;
+	private animation?: Animation;
 
 	public constructor(ID: string, type: ObjectType, model: Model, controller?: Controller, x?: number, y?: number) {
 		this.ID = ID;
@@ -25,25 +26,36 @@ export default class GameObject implements ICoords {
 	}
 
 	public render(): void {
+		if(this.animation) this.model.renderAnimation(this.animation);
+		else this.model.render();
 	}
 
-	public moveUp(map: Map, animationType?: AnimationType): Animation[] {
+	public updateAnimation(deltaTime: number): boolean {
+		if(!this.animation) return true;
+
+		const finished = this.animation.update(deltaTime);
+		if(finished) this.animation = undefined;
+
+		return finished;
+	}
+
+	public moveUp(map: Map, animationType?: AnimationType): GameObject[] {
 		return this.move(0, -1, map, animationType);
 	}
 
-	public moveDown(map: Map, animationType?: AnimationType): Animation[] {
+	public moveDown(map: Map, animationType?: AnimationType): GameObject[] {
 		return this.move(0, 1, map, animationType);
 	}
 
-	public moveLeft(map: Map, animationType?: AnimationType): Animation[] {
+	public moveLeft(map: Map, animationType?: AnimationType): GameObject[] {
 		return this.move(-1, 0, map, animationType);
 	}
 
-	public moveRight(map: Map, animationType?: AnimationType): Animation[] {
+	public moveRight(map: Map, animationType?: AnimationType): GameObject[] {
 		return this.move(1, 0, map, animationType);
 	}
 
-	public perform(action: string, map: Map): Animation[] {
+	public perform(action: string, map: Map): GameObject[] {
 		switch (action) {
 			case 'MoveUp':
 				return this.moveUp(map);
@@ -55,15 +67,15 @@ export default class GameObject implements ICoords {
 				return this.moveRight(map);
 		}
 
-		return null;
+		return [];
 	}
 
 	/**
 	 * Returns an array of affected objects. Assumes a change in either x or y direction, but not both.
 	 * Also assumes either delta is -1, 0, or 1
 	 */
-	public move(deltaX: number, deltaY: number, map: Map, animationType?: AnimationType): Animation[] {
-		return this.internalMove(deltaX, deltaY, map, undefined, animationType);
+	public move(deltaX: number, deltaY: number, map: Map, animationType: AnimationType = AnimationType.Move): GameObject[] {
+		return this.internalMove(deltaX, deltaY, map, animationType);
 	}
 
 	/**
@@ -100,8 +112,8 @@ export default class GameObject implements ICoords {
 		return result;
 	}
 
-	private internalMove(deltaX: number, deltaY: number, map: Map, possibleAffected?: GameObject[],
-		animationType?: AnimationType): Animation[] {
+	private internalMove(deltaX: number, deltaY: number, map: Map, animationType: AnimationType,
+		possibleAffected?: GameObject[]): GameObject[] {
 		if (!possibleAffected) {
 			if (deltaX) possibleAffected = map.getAllObjectsOnSameY(this.y);
 			if (deltaY) possibleAffected = map.getAllObjectsOnSameX(this.x);
@@ -113,15 +125,15 @@ export default class GameObject implements ICoords {
 		const endPos = { x: this.x, y: this.y };
 		this.wrapCoordinates(map);
 
-		const result: Animation[] = [
-			new MoveAnimation(this.ID, this.type, startPos, endPos, animationType),
-		];
+		this.animation = new MoveAnimation(startPos, endPos, animationType);
+		const result: GameObject[] = [this];
 
 		if (this.type !== ObjectType.Drone) {
 			const collisions = this.findCollided(possibleAffected);
 			for (const go of collisions) {
+				// TODO: This needs to be smarter. Perhaps query that object the response of being bumped into.
 				if (go.type === ObjectType.Drone) continue;
-				result.push.apply(result, go.internalMove(deltaX, deltaY, map, possibleAffected, AnimationType.Bump));
+				result.push.apply(result, go.internalMove(deltaX, deltaY, map, AnimationType.Bump, possibleAffected));
 			}
 		}
 
