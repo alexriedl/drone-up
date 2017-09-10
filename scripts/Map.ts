@@ -1,8 +1,8 @@
-import { Drone, GameObject } from './GameObjects';
+import { Drone, GameObject } from './GameObject';
 import { ICoords, ObjectType, Random } from './Utils';
 
 export default class Map {
-	private mapObjects: GameObject[];
+	private gameObjects: GameObject[];
 	private players: Drone[];
 	private spikes: GameObject[];
 
@@ -10,22 +10,21 @@ export default class Map {
 	}
 
 	public initialize(randomizer: Random, players: Drone[], spikePercent: number) {
-		const spikeArray: GameObject[] = [];
 		const invalidArray: ICoords[] = [];
 
 		// first, generate all players and mark their "safe space" as invalid for further placements
 		this.generatePlayers(randomizer, players, invalidArray);
 
 		// then, generate spikes (up to the percentage or 1000 failures, whichever happens first)
-		this.generateSpikes(randomizer, spikePercent, spikeArray, invalidArray);
+		const spikeArray = this.generateSpikes(randomizer, spikePercent, invalidArray);
 
 		this.players = players;
 		this.spikes = spikeArray;
-		this.mapObjects = spikeArray.concat(players);
+		this.gameObjects = spikeArray.concat(players);
 	}
 
-	public getMapObjects(): GameObject[] {
-		return this.mapObjects;
+	public getGameObjects(): GameObject[] {
+		return this.gameObjects;
 	}
 
 	public getPlayers(): Drone[] {
@@ -72,26 +71,24 @@ export default class Map {
 		const gameObjectRemovalIndices = [];
 
 		for (let i = 0, playerCount = this.players.length; i < playerCount; i++) {
-			for (let j = 0, mapObjectCount = this.mapObjects.length; j < mapObjectCount; j++) {
+			for (let j = 0, mapObjectCount = this.gameObjects.length; j < mapObjectCount; j++) {
 				const player = this.players[i];
-				const otherObject = this.mapObjects[j];
+				const otherObject = this.gameObjects[j];
 
 				if (player.ID !== otherObject.ID && player.x === otherObject.x && player.y === otherObject.y) {
 					crashed.push(player);
 					playerRemovalIndices.push(i);
+					gameObjectRemovalIndices.push(j);
 				}
 			}
 		}
 
-		for (let j = 0, len = playerRemovalIndices.length; j < len; j++) {
-			this.players.splice(playerRemovalIndices[j], 1);
+		for(const index of playerRemovalIndices) {
+			this.players.splice(index, 1);
 		}
 
-		for (const c of crashed) {
-			const index = this.mapObjects.indexOf(c);
-			if (index > -1) {
-				this.mapObjects.splice(index, 1);
-			}
+		for(const index of gameObjectRemovalIndices) {
+			this.gameObjects.splice(index, 1);
 		}
 
 		return crashed;
@@ -104,7 +101,7 @@ export default class Map {
 
 		this.markInvalid(entity.x, entity.y, scanDistance, scanSquares);
 
-		for (const scanned of this.mapObjects) {
+		for (const scanned of this.gameObjects) {
 			if (!this.checkInvalid(scanned.x, scanned.y, scanSquares)) {
 				gameObjectsInRange.push({...scanned});
 			}
@@ -221,7 +218,7 @@ export default class Map {
 
 	public getAllObjectsOnSameY(y: number): GameObject[] {
 		const sameYList = [];
-		for (const mo of this.mapObjects) {
+		for (const mo of this.gameObjects) {
 			if (mo.y === y) sameYList.push(mo);
 		}
 		return sameYList;
@@ -229,17 +226,17 @@ export default class Map {
 
 	public getAllObjectsOnSameX(x: number): GameObject[] {
 		const sameXList = [];
-		for (const mo of this.mapObjects) {
+		for (const mo of this.gameObjects) {
 			if (mo.x === x) sameXList.push(mo);
 		}
 		return sameXList;
 	}
 
 	private generatePlayers(randomizer: Random, players: Drone[], invalidArray: ICoords[]): void {
-		for (let p = 0, plen = players.length; p < plen; p++) {
-			const player = players[p];
+		for (const player of players) {
 			let attempts = 0;
 			let validSpot = false;
+
 			while (!validSpot) {
 				// only attempt up to 1000 times to prevent an infinite loop; if we can't place a player, bail out
 				if (attempts > 1000) {
@@ -247,8 +244,8 @@ export default class Map {
 					return null;
 				}
 
-				const x = randomizer.next() % this.xSize;
-				const y = randomizer.next() % this.ySize;
+				const x = randomizer.nextRangeInt(0, this.xSize);
+				const y = randomizer.nextRangeInt(0, this.ySize);
 
 				// doublecheck all invalid spaces
 				const attemptValid = this.checkInvalid(x, y, invalidArray);
@@ -269,20 +266,22 @@ export default class Map {
 		}
 	}
 
-	private generateSpikes(randomizer: Random, spikePercent: number, spikeArray: GameObject[], invalidArray: ICoords[]) {
+	private generateSpikes(randomizer: Random, spikePercent: number, invalidArray: ICoords[]): GameObject[] {
+		const spikeArray: GameObject[] = [];
 		let spikesGenned = 0;
 		let spikesFailed = 0;
 		const neededSpikes = (this.xSize * this.ySize * spikePercent) / 100;
-		while (spikesGenned < neededSpikes && spikesFailed < 1000) {
-			const spikeId = '__reservedSpikeNumber' + (spikesGenned + 1) + '__';
 
-			const x = randomizer.next() % this.xSize;
-			const y = randomizer.next() % this.ySize;
+		while (spikesGenned < neededSpikes && spikesFailed < 1000) {
+			const x = randomizer.nextRangeInt(0, this.xSize);
+			const y = randomizer.nextRangeInt(0, this.ySize);
 
 			const attemptValid = this.checkInvalid(x, y, invalidArray);
 
 			if (attemptValid) {
-				spikeArray.push(new GameObject(spikeId, ObjectType.Spike, undefined, x, y));
+				const ID = `__reservedSpikeNumber${spikesGenned + 1}__`;
+				const model = undefined;
+				spikeArray.push(new GameObject(ID, ObjectType.Spike, model, undefined, x, y));
 
 				// spikes only invalidate their tile, they get no "safe space"
 				this.markInvalid(x, y, 0, invalidArray);
@@ -294,5 +293,7 @@ export default class Map {
 				spikesFailed++;
 			}
 		}
+
+		return spikeArray;
 	}
 }

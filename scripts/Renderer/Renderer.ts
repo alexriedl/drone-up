@@ -1,12 +1,11 @@
 import { Animation, AnimationType } from '../Animations';
-import { GameObject } from '../GameObjects';
-import { IAnimationState } from '../Runner';
-import { Random } from '../Utils';
-import { IRectangle, IRenderObject, RenderObjectTypes } from './RenderObjects';
 import { createShaderProgram, initWebGL, ISimpleShaderProgramInfo } from './WebGL';
-
-import Map from '../Map';
+import { GameObject } from '../GameObject';
+import { IAnimationState } from '../Runner';
+import { IRectangle, IRenderObject, RenderObjectTypes } from './RenderObjects';
+import { Random } from '../Utils';
 import Color, { BLACK } from '../Utils/Color';
+import Map from '../Map';
 import RenderGroup from './RenderGroup';
 
 // NOTE: Configurable options
@@ -99,7 +98,7 @@ export default class Renderer {
 
 	public renderMap(map: Map): void {
 		this.renderState({
-			gameObjects: map.getMapObjects(),
+			gameObjects: map.getGameObjects(),
 			xSize: map.getXSize(),
 			ySize: map.getYSize(),
 		});

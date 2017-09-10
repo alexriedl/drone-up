@@ -1,17 +1,18 @@
 import { Animation, AnimationType, MoveAnimation } from '../Animations';
 import { Controller } from '../Bots/PremadeBots';
 import { ICoords, ObjectType } from '../Utils';
-
+import { Model } from '../Model';
 import Map from '../Map';
 
 export default class GameObject implements ICoords {
 	public readonly ID: string;
 	public readonly type: ObjectType;
+	public readonly model: Model;
 	public readonly controller?: Controller;
 	public x: number;
 	public y: number;
 
-	public constructor(ID: string, type: ObjectType, controller?: Controller, x?: number, y?: number) {
+	public constructor(ID: string, type: ObjectType, model: Model, controller?: Controller, x?: number, y?: number) {
 		this.ID = ID;
 		this.type = type;
 		this.x = x || 0;
@@ -21,6 +22,9 @@ export default class GameObject implements ICoords {
 			this.controller = controller;
 			this.controller.setActions(['MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight']);
 		}
+	}
+
+	public render(): void {
 	}
 
 	public moveUp(map: Map, animationType?: AnimationType): Animation[] {

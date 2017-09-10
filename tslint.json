@@ -12,7 +12,8 @@
         "align": [ true, "statements", "members", "elements" ],
         "no-console": [ false ],
         "object-literal-sort-keys": [ false ],
-        "no-bitwise": false
+        "no-bitwise": false,
+        "ordered-imports": false
     },
     "rulesDirectory": []
 }

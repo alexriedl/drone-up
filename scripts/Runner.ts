@@ -1,9 +1,8 @@
 import { Animation } from './Animations';
-import { Drone, GameObject } from './GameObjects';
+import { Drone, GameObject } from './GameObject';
 import { Random } from './Utils';
-
 import Map from './Map';
-import Renderer from './Renderer/OpenGLRenderer';
+import Renderer from './Renderer/Renderer';
 
 export interface IAnimationState {
 	animations: Animation[];
@@ -57,11 +56,9 @@ export default class Runner {
 		this.frame = (now: number) => {
 			const deltaTime = now - then;
 
-			// NOTE: Ignore bad frames
+			// NOTE: Skip bad frames. This should only happen on startup and after pausing.
 			{
-				let skipFrame = false;
-				if (!then) skipFrame = true;
-
+				const skipFrame = !then;
 				then = now;
 
 				if (skipFrame) {
@@ -86,7 +83,7 @@ export default class Runner {
 
 					animationState = {
 						animations,
-						gameObjects: this.map.getMapObjects().filter((go) => !animations.some((info) => info.objectID === go.ID)),
+						gameObjects: this.map.getGameObjects().filter((go) => !animations.some((info) => info.objectID === go.ID)),
 						xSize: this.map.getXSize(),
 						ySize: this.map.getYSize(),
 					};

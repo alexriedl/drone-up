@@ -1,4 +1,4 @@
-import { GameObject } from '../GameObjects';
+import { GameObject } from '../GameObject';
 import { Random } from '../Utils';
 
 export abstract class Controller {
