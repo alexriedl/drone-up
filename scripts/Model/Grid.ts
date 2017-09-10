@@ -1,16 +1,18 @@
-import { Animation, AnimationType } from '../Animations';
 import { Coordinate, Color } from '../Utils';
 import { SimpleVBO } from '../Shader';
 import Model from './Model';
 import Renderer from '../Renderer';
 
-function initializeVertexBuffer(gl: WebGLRenderingContext): WebGLBuffer  {
-	const positions = [
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1,
-	];
+function initializeVertexBuffer(gl: WebGLRenderingContext, xSize: number, ySize: number): WebGLBuffer  {
+	const positions: number[] = [];
+
+	for(let x = 0; x <= xSize; x++) {
+		positions.push(x, 0, x, ySize);
+	}
+
+	for(let y = 0; y <= ySize; y++) {
+		positions.push(0, y, xSize, y);
+	}
 
 	const vertexBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -19,21 +21,29 @@ function initializeVertexBuffer(gl: WebGLRenderingContext): WebGLBuffer  {
 	return vertexBuffer;
 }
 
-abstract class SimpleRectangle extends Model {
+export default class Grid extends Model {
 	private static vertexBuffer: WebGLBuffer;
 	protected shader: SimpleVBO;
 	protected color: Color;
 
-	public constructor(renderer: Renderer, color: Color) {
+	private readonly xSize: number;
+	private readonly ySize: number;
+	private readonly total: number;
+
+	public constructor(renderer: Renderer, color: Color, xSize: number, ySize: number) {
 		super();
 		this.color = color;
+
+		this.xSize = xSize;
+		this.ySize = ySize;
+		this.total = (this.xSize * 2 + 2) + (this.ySize * 2 + 2);
 
 		// TODO: Move gl specific work outside of the constructor to be initialized in a static manor
 		const gl = renderer.getGlContext();
 		SimpleVBO.create(gl); // NOTE: Used to initialize the shader in a static context - only 1 ever gets created
 
-		if (!SimpleRectangle.vertexBuffer) {
-			SimpleRectangle.vertexBuffer = initializeVertexBuffer(gl);
+		if (!Grid.vertexBuffer) {
+			Grid.vertexBuffer = initializeVertexBuffer(gl, xSize, ySize);
 		}
 
 		this.shader = SimpleVBO.create();
@@ -43,41 +53,21 @@ abstract class SimpleRectangle extends Model {
 		return this.shader.uniformProjectionMatrixLocation;
 	}
 
-	protected renderModel(renderer: Renderer, position: Coordinate, animation?: Animation): void {
-		let bonusSize = animation && this.getAnimationBonusSize(animation) || 0;
-		const size = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 1]);
-
+	protected renderModel(renderer: Renderer): void {
 		const gl = renderer.getGlContext();
 		const shader = this.shader;
-		const vertexBuffer = SimpleRectangle.vertexBuffer;
+		const vertexBuffer = Grid.vertexBuffer;
+		gl.lineWidth(2);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
 		gl.vertexAttribPointer(shader.attributePositionLocation, 2, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(shader.attributePositionLocation);
 
-		const offset = new TSM.vec3([0.5 - size.x / 2, 0.5 - size.y / 2, 0]);
 		const modelViewMatrix = TSM.mat4.identity
-			.copy()
-			.translate(position.vec3().add(offset))
-			.scale(size);
-
 		gl.uniformMatrix4fv(shader.uniformModelViewMatrixLocation, false, new Float32Array(modelViewMatrix.all()));
 		gl.uniform4fv(shader.uniformColorLocation, new Float32Array(this.color.all()));
 
-		gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+		gl.drawArrays(gl.LINES, 0, this.total);
 	}
-
-	private getAnimationBonusSize(animation: Animation): number {
-		switch (animation.animationType) {
-			case AnimationType.Move: return 0.5;
-			case AnimationType.Bump: return 0.25;
-			case AnimationType.Pull:
-			case AnimationType.Push:
-				return -0.5;
-		}
-	}
-
 }
-
-export default SimpleRectangle;

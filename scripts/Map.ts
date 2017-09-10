@@ -1,13 +1,12 @@
-import { Coordinate, Enums, MarkList, Random, Interfaces } from './Utils';
+import { Coordinate, MarkList, Random, Interfaces } from './Utils';
 import { Drone, Spike, GameObject } from './GameObject';
 import { Model } from './Model';
 
 export default class Map {
 	private gameObjects: GameObject[];
 	private players: Drone[];
-	private spikes: GameObject[];
-	private xSize: number;
-	private ySize: number;
+	public readonly xSize: number;
+	public readonly ySize: number;
 
 	public constructor(xSize: number, ySize: number) {
 		this.xSize = xSize;
@@ -24,7 +23,6 @@ export default class Map {
 		const spikeArray = this.generateSpikes(randomizer, spikePercent, markedList, createSpikeModel);
 
 		this.players = players;
-		this.spikes = spikeArray;
 		this.gameObjects = spikeArray.concat(players);
 	}
 
@@ -34,14 +32,6 @@ export default class Map {
 
 	public getPlayers(): Drone[] {
 		return this.players;
-	}
-
-	public getXSize(): number {
-		return this.xSize;
-	}
-
-	public getYSize(): number {
-		return this.ySize;
 	}
 
 	public removeCrashedDrones(): Drone[] {

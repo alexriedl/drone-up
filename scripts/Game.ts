@@ -31,7 +31,7 @@ export default class Game {
 		this.map.initialize(randomizer, drones, spikePercent, createSpikeModel);
 
 		const renderGame = (): void => {
-			renderer.renderGroup(this.map.getGameObjects(), this.map.getXSize(), this.map.getYSize());
+			renderer.renderMap(this.map);
 		}
 		const animationSpeed = 1;
 		this.runner = new Runner(this.map, animationSpeed, renderGame);

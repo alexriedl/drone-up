@@ -1,7 +1,4 @@
-import { Color } from './Utils';
-import { GameObject } from './GameObject';
 import Map from './Map';
-import Renderer from './Renderer';
 import TickState from './TickState';
 
 export default class Runner {

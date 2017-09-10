@@ -87,8 +87,8 @@ abstract class GameObject {
 	 * If delta(x|y) was greater than 1, wrapCoords does not work correctly
 	 */
 	protected wrapCoordinates(map: Map): void {
-		const xMax = map.getXSize() - 1;
-		const yMax = map.getYSize() - 1;
+		const xMax = map.xSize - 1;
+		const yMax = map.ySize - 1;
 
 		if (this.position.x > xMax) {
 			this.position.x = 0;

@@ -1,5 +1,9 @@
 import { Color } from './Utils';
 import { GameObject } from './GameObject';
+import Map from './Map';
+
+import { Coordinate } from './Utils';
+import { Grid } from './Model';
 
 export default class Renderer {
 	private gl: WebGLRenderingContext;
@@ -35,7 +39,7 @@ export default class Renderer {
 	/*************************************************************************
 	*************************************************************************/
 
-	public renderGroup(objects: GameObject[], mapWidth: number, mapHeight): void {
+	public renderMap(map: Map): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const width = gl.canvas.clientWidth;
 		const height = gl.canvas.clientHeight;
@@ -45,7 +49,7 @@ export default class Renderer {
 		gl.viewport(0, 0, width, height);
 
 		const aspect = width / height
-		const orthoMatrix = TSM.mat4.orthographic(0, mapWidth, mapHeight / aspect, 0, -1, 1);
+		const orthoMatrix = TSM.mat4.orthographic(0, map.xSize, map.ySize, 0, -1, 1);
 
 		// TODO: Sort objects before rendering
 		/*
@@ -55,8 +59,16 @@ export default class Renderer {
 			- Same shader program
 		 */
 
-		for (const go of objects) {
+		// NOTE: Here temporarily until background objects are implemented
+		const grid = new Grid(this, new Color(0.6, 0.6, 0), map.xSize, map.ySize);
+		grid.useShader();
+		gl.uniformMatrix4fv(grid.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
+		grid.render(this, null);
+
+		for (const go of map.getGameObjects()) {
 			if (!go.canRender()) continue;
+
+			// TODO: Only bind a shader if it is not currently in use
 			go.model.useShader();
 			gl.uniformMatrix4fv(go.model.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
 			go.render(this);
