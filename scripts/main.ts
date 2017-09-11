@@ -2,7 +2,6 @@ import { Game, Bot } from './Game';
 import { Random } from './Utils';
 
 let game: Game;
-let seed: number;
 
 const inputSeedElement = (document.getElementById('seedInput') as HTMLInputElement);
 const startStopButtonElement = (document.getElementById('startStopButton') as HTMLButtonElement);
@@ -53,17 +52,17 @@ function startGame(): void {
 		inputSeed = getRandomSeed().toString();
 	}
 
-	seed = +inputSeed > 0 ? +inputSeed : getRandomSeed();
+	const seed = +inputSeed > 0 ? +inputSeed : getRandomSeed();
 	inputSeedElement.value = seed.toString();
 
 	const randomizer = new Random(seed);
 	const playerControllers = [
-		new Bot.LuigiBot(randomizer),
-		new Bot.PushBot(randomizer),
-		new Bot.PullBot(randomizer),
-		new Bot.ChickenBot(randomizer),
-		new Bot.RandomBot(randomizer),
-		new Bot.ShoveBot(randomizer),
+		new Bot.Luigi(randomizer),
+		new Bot.Push(randomizer),
+		new Bot.Pull(randomizer),
+		new Bot.Chicken(randomizer),
+		new Bot.Random(randomizer),
+		new Bot.Shove(randomizer),
 	];
 
 	game = new Game(randomizer, 15, playerControllers, 20, 20);

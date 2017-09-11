@@ -1,6 +1,6 @@
 import Controller from './Controller';
 
-export default class ShoveBot extends Controller {
+export default class Shove extends Controller {
 	nextAction = 0;
 
 	getAction() {

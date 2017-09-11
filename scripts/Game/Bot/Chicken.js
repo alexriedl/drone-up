@@ -1,6 +1,6 @@
 import Controller from './Controller';
 
-export default class ChickenBot extends Controller {
+export default class Chicken extends Controller {
 	getAction() {
 		var action = this.randomizer.next() % 4;
 		switch (action) {

@@ -1,17 +1,17 @@
-import ChickenBot from './ChickenBot';
+import Chicken from './Chicken';
 import Controller from './Controller';
-import LuigiBot from './LuigiBot';
-import PullBot from './PullBot';
-import PushBot from './PushBot';
-import RandomBot from './RandomBot';
-import ShoveBot from './ShoveBot';
+import Luigi from './Luigi';
+import Pull from './Pull';
+import Push from './Push';
+import Random from './Random';
+import Shove from './Shove';
 
 export {
-	ChickenBot,
+	Chicken,
 	Controller,
-	LuigiBot,
-	PullBot,
-	PushBot,
-	RandomBot,
-	ShoveBot,
+	Luigi,
+	Pull,
+	Push,
+	Random,
+	Shove,
 };

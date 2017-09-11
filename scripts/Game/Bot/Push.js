@@ -1,18 +1,18 @@
 import Controller from './Controller';
 
-export default class PullBot extends Controller {
+export default class Push extends Controller {
 	getAction() {
 		var action = this.randomizer.next() % 4;
 		switch (action) {
 			case 1:
-				return 'PullUp';
+				return 'PushUp';
 			case 2:
-				return 'PullDown';
+				return 'PushDown';
 			case 3:
-				return 'PullLeft';
+				return 'PushLeft';
 			case 4:
 			default:
-				return 'PullRight';
+				return 'PushRight';
 		}
 	}
 }
