@@ -1,7 +1,7 @@
-import { Controller } from './Bots';
+import { Controller } from '../Bots';
 import { Drone } from './GameObject';
-import { Random, Color } from './Utils';
-import { SimpleDrone, SimpleSpike } from './Model';
+import { Random, Color } from '../Utils';
+import { SimpleDrone, SimpleSpike } from '../Model';
 import Map from './Map';
 import Runner from './Runner';
 

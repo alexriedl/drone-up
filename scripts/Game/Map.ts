@@ -1,6 +1,6 @@
-import { Coordinate, MarkList, Random, Interfaces } from './Utils';
+import { Coordinate, MarkList, Random, Interfaces } from '../Utils';
 import { Drone, Spike, GameObject } from './GameObject';
-import { Model } from './Model';
+import { Model } from '../Model';
 
 export default class Map {
 	public readonly xSize: number;

@@ -1,5 +1,5 @@
-import { Coordinate, Enums } from '../Utils';
-import { Model } from '../Model';
+import { Coordinate, Enums } from '../../Utils';
+import { Model } from '../../Model';
 import GameObject from './GameObject';
 
 export default class Spike extends GameObject {

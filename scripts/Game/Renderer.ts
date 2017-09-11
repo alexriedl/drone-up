@@ -1,9 +1,8 @@
-import { Color } from './Utils';
+import { Color } from '../Utils';
 import { GameObject } from './GameObject';
 
-import { Coordinate } from './Utils';
-import { Grid } from './Model';
-import { Register } from './Utils';
+import { Coordinate, Register } from '../Utils';
+import { Grid } from '../Model';
 
 export default class Renderer {
 	private gl: WebGLRenderingContext;

@@ -1,7 +1,6 @@
 import { ChickenBot, LuigiBot, PullBot, PushBot, RandomBot, ShoveBot } from './Bots';
+import { Game } from './Game';
 import { Random } from './Utils';
-
-import Game from './Game';
 
 let game: Game;
 let seed: number;

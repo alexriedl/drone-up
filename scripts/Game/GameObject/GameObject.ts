@@ -1,7 +1,7 @@
-import { Animation, AnimationType, MoveAnimation } from '../Animations';
-import { Controller } from '../Bots';
-import { Coordinate, Enums } from '../Utils';
-import { Model } from '../Model';
+import { Animation, AnimationType, MoveAnimation } from '../../Animations';
+import { Controller } from '../../Bots';
+import { Coordinate, Enums } from '../../Utils';
+import { Model } from '../../Model';
 import Map from '../Map';
 
 abstract class GameObject {
