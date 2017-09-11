@@ -31,8 +31,7 @@ bool onGrid(float pos) {
 void main() {
 	bool onXGrid = onGrid(v_uv.x * u_x_count);
 	bool onYGrid = onGrid(v_uv.y * u_y_count);
-	bool drawGrid = any(bvec2(onXGrid, onYGrid));
-	gl_FragColor = drawGrid ? u_grid_color : vec4(0.0, 0.0, 0.0, 0.0);
+	gl_FragColor = onXGrid || onYGrid ? u_grid_color : vec4(0.0, 0.0, 0.0, 0.0);
 }`;
 
 export default class GridShader extends Shader {

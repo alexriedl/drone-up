@@ -20,11 +20,11 @@ export default class Renderer {
 
 		this.gl = gl;
 
-		gl.enable(gl.DEPTH_TEST);
-		gl.depthFunc(gl.LEQUAL);
+		// gl.enable(gl.DEPTH_TEST);
+		// gl.depthFunc(gl.LEQUAL);
 
 		gl.enable(gl.BLEND);
-		gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
 		this.setBackgroundColor(Color.BLACK);
 		this.clearScreen();
