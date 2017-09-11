@@ -10,7 +10,7 @@ abstract class Model {
 		this.renderModel(gl, animation.position, animation);
 	}
 
-	public render(gl: WebGLRenderingContext, position: Coordinate): void {
+	public render(gl: WebGLRenderingContext, position: Coordinate = new Coordinate(0, 0)): void {
 		this.renderModel(gl, position);
 	}
 

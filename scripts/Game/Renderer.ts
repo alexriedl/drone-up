@@ -2,11 +2,11 @@ import { Color } from '../Utils';
 import { GameObject } from './GameObject';
 
 import { Coordinate, Register } from '../Utils';
-import { Grid } from '../Model';
+import { Grid, ShaderedGrid } from '../Model';
 
 export default class Renderer {
 	private gl: WebGLRenderingContext;
-	private grid: Grid;
+	private grid: ShaderedGrid;
 	private xSize: number;
 	private ySize: number;
 
@@ -20,15 +20,19 @@ export default class Renderer {
 
 		this.gl = gl;
 
-		this.setBackgroundColor(Color.BLACK);
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthFunc(gl.LEQUAL);
+
+		gl.enable(gl.BLEND);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+
+		this.setBackgroundColor(Color.BLACK);
 		this.clearScreen();
 
 		this.xSize = xSize;
 		this.ySize = ySize;
 
-		this.grid = new Grid(new Color(1, 0.6, 0), xSize, ySize);
+		this.grid = new ShaderedGrid(new Color(1, 0.6, 0), 1, xSize, ySize);
 	}
 
 	public setBackgroundColor(color: Color): void {
@@ -66,19 +70,26 @@ export default class Renderer {
 			- Same shader program
 		 */
 
+		// NOTE: Here to initialize any resources that are registered after startup
 		Register.initializeRegistered(gl);
 
-		// NOTE: Here temporarily until background objects are implemented
-		this.grid.useShader(gl);
-		gl.uniformMatrix4fv(this.grid.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
-		this.grid.render(gl, new Coordinate(0, 0));
+		{
+			// TODO: Here temporarily until background objects are implemented
+			const grid = this.grid;
+			grid.useShader(gl);
+			gl.uniformMatrix4fv(grid.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
+			grid.render(gl);
+		}
 
 		for (const go of gameObjects) {
 			if (!go.canRender()) continue;
 
-			// TODO: Only bind a shader if it is not currently in use
-			go.model.useShader(gl);
-			gl.uniformMatrix4fv(go.model.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
+			{
+				// TODO: Only bind a shader if it is not currently in use
+				go.model.useShader(gl);
+				gl.uniformMatrix4fv(go.model.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
+			}
+
 			go.render(gl);
 		}
 	}
