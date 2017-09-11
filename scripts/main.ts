@@ -1,4 +1,4 @@
-import { ChickenBot, LuigiBot, PullBot, PushBot, RandomBot, ShoveBot } from './Bots/PremadeBots';
+import { ChickenBot, LuigiBot, PullBot, PushBot, RandomBot, ShoveBot } from './Bots';
 import { Random } from './Utils';
 
 import Game from './Game';
