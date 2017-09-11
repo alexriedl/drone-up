@@ -16,12 +16,6 @@
       "command": "dotnet",
       "problemMatcher": [],
       "args": [ "build", "--no-incremental" ]
-    },
-    {
-      "taskName": "restore",
-      "command": "dotnet",
-      "args": [ "restore" ],
-      "problemMatcher": []
     }
   ]
 }
