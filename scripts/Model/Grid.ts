@@ -18,7 +18,7 @@ export default class Grid extends Model {
 		this.total = (xSize * 2 + 2) + (ySize * 2 + 2);
 
 		this.shader = SimpleShader.createShader();
-		this.buffer = GridBuffer.createGrid(xSize, ySize);
+		this.buffer = GridBuffer.createBuffer(xSize, ySize);
 	}
 
 	public getModelViewMatrixUniformLocation(): WebGLUniformLocation {

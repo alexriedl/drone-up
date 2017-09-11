@@ -27,7 +27,7 @@ export default class GridBuffer extends Buffer {
 		return vertexBuffer;
 	}
 
-	public static createGrid(xSize: number, ySize: number): GridBuffer {
+	public static createBuffer(xSize: number, ySize: number): GridBuffer {
 		const key = `${xSize}x${ySize}`;
 		const grid = Buffer.create<GridBuffer>(GridBuffer, key);
 		grid.setup(xSize, ySize);
