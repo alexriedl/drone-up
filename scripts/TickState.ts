@@ -2,11 +2,11 @@ import { GameObject } from './GameObject';
 import Map from './Map';
 
 export default class TickState {
-	loopPosition: number = 0;
-	animatingObjects: GameObject[] = [];
+	public loopPosition: number = 0;
+	public animatingObjects: GameObject[] = [];
 
 	public isAnimating(): boolean {
-		return this.animatingObjects && this.animatingObjects.length > 0
+		return this.animatingObjects && this.animatingObjects.length > 0;
 	}
 
 	public update(deltaTime: number, map: Map) {

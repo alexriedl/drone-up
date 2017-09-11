@@ -56,7 +56,7 @@ export default class Renderer {
 		this.clearScreen();
 		gl.viewport(0, 0, width, height);
 
-		const aspect = width / height
+		const aspect = width / height;
 		const orthoMatrix = TSM.mat4.orthographic(0, this.xSize, this.ySize, 0, -1, 1);
 
 		// TODO: Sort objects before rendering

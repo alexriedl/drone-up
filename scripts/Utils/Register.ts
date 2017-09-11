@@ -11,7 +11,7 @@ export function register(thing: IRegisterObject) {
 export function initializeRegistered(gl: WebGLRenderingContext) {
 	const things = pendingThings;
 	pendingThings = [];
-	for(const thing of things) {
+	for (const thing of things) {
 		thing.initialize(gl);
 	}
 }

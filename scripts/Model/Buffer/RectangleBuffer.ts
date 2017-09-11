@@ -16,7 +16,7 @@ export default class RectangleBuffer extends Buffer {
 		return vertexBuffer;
 	}
 
-	public static create(): RectangleBuffer {
+	public static createBuffer(): RectangleBuffer {
 		return Buffer.create<RectangleBuffer>(RectangleBuffer);
 	}
 }

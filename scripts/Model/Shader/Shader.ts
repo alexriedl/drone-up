@@ -43,7 +43,7 @@ abstract class Shader {
 		gl.linkProgram(this.program);
 
 		const success = gl.getProgramParameter(this.program, gl.LINK_STATUS);
-		if(!success) {
+		if (!success) {
 			console.log(gl.getProgramInfoLog(this.program));
 			gl.deleteProgram(this.program);
 			this.program = undefined;
@@ -62,7 +62,7 @@ abstract class Shader {
 	}
 
 	private static instances = {};
-	protected static create<T extends Shader>(type: { new (): T }, modifier?: string): T {
+	protected static create<T extends Shader>(type: { new(): T }, modifier?: string): T {
 		const key = modifier ? `${type.name}-${modifier}` : type.name;
 		if (Shader.instances[key]) return Shader.instances[key];
 		Shader.instances[key] = new type();

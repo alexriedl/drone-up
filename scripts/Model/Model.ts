@@ -6,9 +6,6 @@ import { Shader } from './Shader';
 abstract class Model {
 	protected shader: Shader;
 
-	public constructor() {
-	}
-
 	public renderAnimation(gl: WebGLRenderingContext, animation: Animation): void {
 		this.renderModel(gl, animation.position, animation);
 	}

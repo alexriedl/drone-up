@@ -35,10 +35,10 @@ abstract class GameObject {
 	}
 
 	public updateAnimation(deltaTime: number): boolean {
-		if(!this.animation) return true;
+		if (!this.animation) return true;
 
 		const finished = this.animation.update(deltaTime);
-		if(finished) this.animation = undefined;
+		if (finished) this.animation = undefined;
 
 		return finished;
 	}
@@ -78,7 +78,8 @@ abstract class GameObject {
 	 * Returns an array of affected objects. Assumes a change in either x or y direction, but not both.
 	 * Also assumes either delta is -1, 0, or 1
 	 */
-	public move(deltaX: number, deltaY: number, map: Map, animationType: AnimationType = AnimationType.Move): GameObject[] {
+	public move(deltaX: number, deltaY: number, map: Map,
+		animationType: AnimationType = AnimationType.Move): GameObject[] {
 		return this.internalMove(deltaX, deltaY, map, animationType);
 	}
 

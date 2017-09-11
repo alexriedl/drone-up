@@ -3,17 +3,18 @@ import { Drone, Spike, GameObject } from './GameObject';
 import { Model } from './Model';
 
 export default class Map {
-	private gameObjects: GameObject[];
-	private players: Drone[];
 	public readonly xSize: number;
 	public readonly ySize: number;
+	private gameObjects: GameObject[];
+	private players: Drone[];
 
 	public constructor(xSize: number, ySize: number) {
 		this.xSize = xSize;
 		this.ySize = ySize;
 	}
 
-	public initialize(randomizer: Random, players: Drone[], spikePercent: number, createSpikeModel: (id: string) => Model) {
+	public initialize(randomizer: Random, players: Drone[], spikePercent: number,
+		createSpikeModel: (id: string) => Model) {
 		const markedList = new MarkList(this.xSize, this.ySize);
 
 		// first, generate all players and mark their "safe space" as invalid for further placements
@@ -53,8 +54,7 @@ export default class Map {
 			this.players.splice(index, 1);
 		}
 
-		for (let i = 0; i < crashed.length; i++) {
-			const dead = crashed[i];
+		for (const dead of crashed) {
 			const index = this.gameObjects.indexOf(dead);
 			if (index > -1) {
 				this.gameObjects.splice(index, 1);
@@ -77,10 +77,10 @@ export default class Map {
 			}
 		}
 
-		return gameObjectsInRange.map(gameObject => {
+		return gameObjectsInRange.map((gameObject) => {
 			const type = gameObject.ID === entity.ID ? 'you' : gameObject.type.toString();
-			let x = gameObject.position.x - entity.position.x;
-			let y = gameObject.position.y - entity.position.y;
+			const x = gameObject.position.x - entity.position.x;
+			const y = gameObject.position.y - entity.position.y;
 			return { type, x, y };
 		});
 	}

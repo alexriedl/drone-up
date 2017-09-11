@@ -17,7 +17,7 @@ export default class Grid extends Model {
 		this.color = color;
 		this.total = (xSize * 2 + 2) + (ySize * 2 + 2);
 
-		this.shader = SimpleShader.create();
+		this.shader = SimpleShader.createShader();
 		this.buffer = GridBuffer.createGrid(xSize, ySize);
 	}
 
@@ -35,7 +35,7 @@ export default class Grid extends Model {
 		gl.vertexAttribPointer(shader.attributePositionLocation, 2, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(shader.attributePositionLocation);
 
-		const modelViewMatrix = TSM.mat4.identity
+		const modelViewMatrix = TSM.mat4.identity;
 		gl.uniformMatrix4fv(shader.uniformModelViewMatrixLocation, false, new Float32Array(modelViewMatrix.all()));
 		gl.uniform4fv(shader.uniformColorLocation, new Float32Array(this.color.all()));
 

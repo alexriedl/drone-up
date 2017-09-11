@@ -13,8 +13,8 @@ abstract class SimpleRectangle extends Model {
 		super();
 		this.color = color;
 
-		this.shader = SimpleShader.create();
-		this.buffer = RectangleBuffer.create();
+		this.shader = SimpleShader.createShader();
+		this.buffer = RectangleBuffer.createBuffer();
 	}
 
 	public getModelViewMatrixUniformLocation(): WebGLUniformLocation {
@@ -22,7 +22,7 @@ abstract class SimpleRectangle extends Model {
 	}
 
 	protected renderModel(gl: WebGLRenderingContext, position: Coordinate, animation?: Animation): void {
-		let bonusSize = animation && this.getAnimationBonusSize(animation) || 0;
+		const bonusSize = animation && this.getAnimationBonusSize(animation) || 0;
 		const size = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 1]);
 
 		const shader = this.shader;

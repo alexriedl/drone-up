@@ -4,4 +4,4 @@ import SimpleShader from './SimpleShader';
 export {
 	Shader,
 	SimpleShader,
-}
+};

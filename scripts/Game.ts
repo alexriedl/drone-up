@@ -11,6 +11,17 @@ export default class Game {
 	private runner: Runner;
 	private started: boolean;
 
+	private predefinedColors: Color[] = [
+		// new Color(0, 0, 0),
+		new Color(0, 0, 1),
+		new Color(0, 1, 0),
+		new Color(0, 1, 1),
+		new Color(1, 0, 0),
+		new Color(1, 0, 1),
+		new Color(1, 1, 0),
+		// new Color(1, 1, 1),
+	];
+
 	public constructor(randomizer: Random, spikePercent: number, playerControllers: Controller[],
 		xSize: number, ySize: number) {
 		this.map = new Map(xSize, ySize);
@@ -62,17 +73,6 @@ export default class Game {
 	public isPaused(): boolean {
 		return this.paused;
 	}
-
-	private predefinedColors: Color[] = [
-		// new Color(0, 0, 0),
-		new Color(0, 0, 1),
-		new Color(0, 1, 0),
-		new Color(0, 1, 1),
-		new Color(1, 0, 0),
-		new Color(1, 0, 1),
-		new Color(1, 1, 0),
-		// new Color(1, 1, 1),
-	];
 
 	private getNextPlayerColor(randomizer: Random): Color {
 		if (this.predefinedColors && this.predefinedColors.length > 0) {
