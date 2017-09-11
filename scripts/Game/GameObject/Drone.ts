@@ -1,5 +1,5 @@
 import { AnimationType } from '../../Animations';
-import { Controller } from '../../Bots';
+import { Controller } from '../Bot';
 import { Enums } from '../../Utils';
 import { Model } from '../../Model';
 import GameObject from './GameObject';

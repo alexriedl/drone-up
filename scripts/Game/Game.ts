@@ -1,4 +1,4 @@
-import { Controller } from '../Bots';
+import { Controller } from './Bot';
 import { Drone } from './GameObject';
 import { Random, Color } from '../Utils';
 import { SimpleDrone, SimpleSpike } from '../Model';

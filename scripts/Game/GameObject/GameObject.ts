@@ -1,5 +1,5 @@
 import { Animation, AnimationType, MoveAnimation } from '../../Animations';
-import { Controller } from '../../Bots';
+import { Controller } from '../Bot';
 import { Coordinate, Enums } from '../../Utils';
 import { Model } from '../../Model';
 import Map from '../Map';

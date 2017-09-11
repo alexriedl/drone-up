@@ -1,4 +1,4 @@
-import { Random, Interfaces } from '../Utils';
+import { Random, Interfaces } from '../../Utils';
 
 abstract class Controller {
 	public scanResult: Interfaces.IScanResult[];

@@ -1,5 +1,4 @@
-import { ChickenBot, LuigiBot, PullBot, PushBot, RandomBot, ShoveBot } from './Bots';
-import { Game } from './Game';
+import { Game, Bot } from './Game';
 import { Random } from './Utils';
 
 let game: Game;
@@ -59,12 +58,12 @@ function startGame(): void {
 
 	const randomizer = new Random(seed);
 	const playerControllers = [
-		new LuigiBot(randomizer),
-		new PushBot(randomizer),
-		new PullBot(randomizer),
-		new ChickenBot(randomizer),
-		new RandomBot(randomizer),
-		new ShoveBot(randomizer),
+		new Bot.LuigiBot(randomizer),
+		new Bot.PushBot(randomizer),
+		new Bot.PullBot(randomizer),
+		new Bot.ChickenBot(randomizer),
+		new Bot.RandomBot(randomizer),
+		new Bot.ShoveBot(randomizer),
 	];
 
 	game = new Game(randomizer, 15, playerControllers, 20, 20);
