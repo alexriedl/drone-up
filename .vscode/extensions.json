@@ -1,9 +1,10 @@
 {
-	"recommendations": [
-		"EditorConfig.EditorConfig",
-		"ms-vscode.csharp",
-		"msjsdiag.debugger-for-chrome",
-		"tintoy.msbuild-project-tools",
-		"wayou.vscode-todo-highlight"
-	]
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "eg2.tslint",
+    "ms-vscode.csharp",
+    "msjsdiag.debugger-for-chrome",
+    "tintoy.msbuild-project-tools",
+    "wayou.vscode-todo-highlight"
+  ]
 }
