@@ -1,63 +1,34 @@
 import { Coordinate, Color } from '../Utils';
-import { SimpleVBO } from '../Shader';
+import { GridBuffer } from './Buffer';
+import { Register } from '../Utils';
+import { SimpleShader } from './Shader';
 import Model from './Model';
-import Renderer from '../Renderer';
-
-function initializeVertexBuffer(gl: WebGLRenderingContext, xSize: number, ySize: number): WebGLBuffer  {
-	const positions: number[] = [];
-
-	for(let x = 0; x <= xSize; x++) {
-		positions.push(x, 0, x, ySize);
-	}
-
-	for(let y = 0; y <= ySize; y++) {
-		positions.push(0, y, xSize, y);
-	}
-
-	const vertexBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-	return vertexBuffer;
-}
 
 export default class Grid extends Model {
-	private static vertexBuffer: WebGLBuffer;
-	protected shader: SimpleVBO;
+	protected buffer: GridBuffer;
+	protected shader: SimpleShader;
 	protected color: Color;
 
-	private readonly xSize: number;
-	private readonly ySize: number;
 	private readonly total: number;
 
-	public constructor(renderer: Renderer, color: Color, xSize: number, ySize: number) {
+	public constructor(color: Color, xSize: number, ySize: number) {
 		super();
+
 		this.color = color;
+		this.total = (xSize * 2 + 2) + (ySize * 2 + 2);
 
-		this.xSize = xSize;
-		this.ySize = ySize;
-		this.total = (this.xSize * 2 + 2) + (this.ySize * 2 + 2);
-
-		// TODO: Move gl specific work outside of the constructor to be initialized in a static manor
-		const gl = renderer.getGlContext();
-		SimpleVBO.create(gl); // NOTE: Used to initialize the shader in a static context - only 1 ever gets created
-
-		if (!Grid.vertexBuffer) {
-			Grid.vertexBuffer = initializeVertexBuffer(gl, xSize, ySize);
-		}
-
-		this.shader = SimpleVBO.create();
+		this.shader = SimpleShader.create();
+		this.buffer = GridBuffer.createGrid(xSize, ySize);
 	}
 
 	public getModelViewMatrixUniformLocation(): WebGLUniformLocation {
 		return this.shader.uniformProjectionMatrixLocation;
 	}
 
-	protected renderModel(renderer: Renderer): void {
-		const gl = renderer.getGlContext();
+	protected renderModel(gl: WebGLRenderingContext): void {
 		const shader = this.shader;
-		const vertexBuffer = Grid.vertexBuffer;
-		gl.lineWidth(2);
+		const vertexBuffer = this.buffer.getBuffer();
+		gl.lineWidth(1);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 

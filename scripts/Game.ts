@@ -3,7 +3,6 @@ import { Drone } from './GameObject';
 import { Random, Color } from './Utils';
 import { SimpleDrone, SimpleSpike } from './Model';
 import Map from './Map';
-import Renderer from './Renderer';
 import Runner from './Runner';
 
 export default class Game {
@@ -18,9 +17,8 @@ export default class Game {
 		this.paused = false;
 		this.started = false;
 
-		const renderer = new Renderer('game-canvas');
-		const createDroneModel = (id: string) => new SimpleDrone(renderer, this.getNextPlayerColor(randomizer));
-		const createSpikeModel = (id: string) => new SimpleSpike(renderer);
+		const createDroneModel = (id: string) => new SimpleDrone(this.getNextPlayerColor(randomizer));
+		const createSpikeModel = (id: string) => new SimpleSpike();
 
 		const drones = [];
 		for (let i = 0; i < playerControllers.length; i++) {
@@ -30,11 +28,8 @@ export default class Game {
 		}
 		this.map.initialize(randomizer, drones, spikePercent, createSpikeModel);
 
-		const renderGame = (): void => {
-			renderer.renderMap(this.map);
-		}
 		const animationSpeed = 1;
-		this.runner = new Runner(this.map, animationSpeed, renderGame);
+		this.runner = new Runner(this.map, animationSpeed);
 
 		// if we add any game objects that move on their own we need to generate them here and supply them
 		// to the map like the drones so the runner can run them
@@ -88,5 +83,4 @@ export default class Game {
 			return new Color(r(), r(), r());
 		}
 	}
-
 }

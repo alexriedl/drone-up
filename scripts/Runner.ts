@@ -1,4 +1,5 @@
 import Map from './Map';
+import Renderer from './Renderer';
 import TickState from './TickState';
 
 export default class Runner {
@@ -6,16 +7,16 @@ export default class Runner {
 	private gamePaused: boolean;
 	private map: Map;
 	private animationSpeed: number;
+	private renderer: Renderer;
 
 	private frame: (now: number) => void;
-	private renderGame: () => void;
 
-	public constructor(map: Map, animationSpeed: number, renderGame: () => void) {
+	public constructor(map: Map, animationSpeed: number) {
+		this.renderer = new Renderer('game-canvas', map.xSize, map.ySize);
 		this.gameDone = false;
 		this.gamePaused = false;
 		this.map = map;
 		this.animationSpeed = animationSpeed;
-		this.renderGame = renderGame;
 	}
 
 	public pause(): void {
@@ -51,7 +52,7 @@ export default class Runner {
 
 			const effectiveDeltaTime = deltaTime * this.animationSpeed;
 			tickState.update(effectiveDeltaTime, this.map);
-			this.renderGame();
+			this.renderer.renderMap(this.map.getGameObjects());
 
 			if (!tickState.isAnimating()) {
 				this.checkGameDone();

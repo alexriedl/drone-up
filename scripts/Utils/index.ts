@@ -4,6 +4,7 @@ import Color from './Color';
 import Coordinate from './Coordinate';
 import MarkList from './MarkList';
 import Random from './Random';
+import * as Register from './Register';
 
 export {
 	Color,
@@ -12,4 +13,5 @@ export {
 	Interfaces,
 	MarkList,
 	Random,
+	Register,
 };

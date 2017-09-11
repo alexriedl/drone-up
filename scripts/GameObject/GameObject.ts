@@ -3,7 +3,6 @@ import { Controller } from '../Bots/PremadeBots';
 import { Coordinate, Enums } from '../Utils';
 import { Model } from '../Model';
 import Map from '../Map';
-import Renderer from '../Renderer';
 
 abstract class GameObject {
 	public readonly ID: string;
@@ -29,10 +28,10 @@ abstract class GameObject {
 		return !!this.model;
 	}
 
-	public render(renderer: Renderer): void {
+	public render(gl: WebGLRenderingContext): void {
 		if (!this.model) return;
-		if (this.animation) this.model.renderAnimation(renderer, this.animation);
-		else this.model.render(renderer, this.position);
+		if (this.animation) this.model.renderAnimation(gl, this.animation);
+		else this.model.render(gl, this.position);
 	}
 
 	public updateAnimation(deltaTime: number): boolean {

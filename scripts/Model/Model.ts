@@ -1,7 +1,7 @@
 import { Animation } from '../Animations';
 import { Coordinate } from '../Utils';
-import { Shader } from '../Shader';
-import Renderer from '../Renderer';
+import { Register } from '../Utils';
+import { Shader } from './Shader';
 
 abstract class Model {
 	protected shader: Shader;
@@ -9,20 +9,20 @@ abstract class Model {
 	public constructor() {
 	}
 
-	public renderAnimation(renderer: Renderer, animation: Animation): void {
-		this.renderModel(renderer, animation.position, animation);
+	public renderAnimation(gl: WebGLRenderingContext, animation: Animation): void {
+		this.renderModel(gl, animation.position, animation);
 	}
 
-	public render(renderer: Renderer, position: Coordinate): void {
-		this.renderModel(renderer, position);
+	public render(gl: WebGLRenderingContext, position: Coordinate): void {
+		this.renderModel(gl, position);
 	}
 
-	public useShader(): void {
-		this.shader.use();
+	public useShader(gl: WebGLRenderingContext): void {
+		this.shader.use(gl);
 	}
 
 	public abstract getModelViewMatrixUniformLocation(): WebGLUniformLocation;
-	protected abstract renderModel(renderer: Renderer, position: Coordinate, animation?: Animation): void;
+	protected abstract renderModel(gl: WebGLRenderingContext, position: Coordinate, animation?: Animation): void;
 }
 
 export default Model;

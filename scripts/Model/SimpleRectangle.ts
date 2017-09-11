@@ -1,55 +1,32 @@
 import { Animation, AnimationType } from '../Animations';
 import { Coordinate, Color } from '../Utils';
-import { SimpleVBO } from '../Shader';
+import { RectangleBuffer } from './Buffer';
+import { SimpleShader } from './Shader';
 import Model from './Model';
-import Renderer from '../Renderer';
-
-function initializeVertexBuffer(gl: WebGLRenderingContext): WebGLBuffer  {
-	const positions = [
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1,
-	];
-
-	const vertexBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-	return vertexBuffer;
-}
 
 abstract class SimpleRectangle extends Model {
-	private static vertexBuffer: WebGLBuffer;
-	protected shader: SimpleVBO;
+	protected buffer: RectangleBuffer;
+	protected shader: SimpleShader;
 	protected color: Color;
 
-	public constructor(renderer: Renderer, color: Color) {
+	public constructor(color: Color) {
 		super();
 		this.color = color;
 
-		// TODO: Move gl specific work outside of the constructor to be initialized in a static manor
-		const gl = renderer.getGlContext();
-		SimpleVBO.create(gl); // NOTE: Used to initialize the shader in a static context - only 1 ever gets created
-
-		if (!SimpleRectangle.vertexBuffer) {
-			SimpleRectangle.vertexBuffer = initializeVertexBuffer(gl);
-		}
-
-		this.shader = SimpleVBO.create();
+		this.shader = SimpleShader.create();
+		this.buffer = RectangleBuffer.create();
 	}
 
 	public getModelViewMatrixUniformLocation(): WebGLUniformLocation {
 		return this.shader.uniformProjectionMatrixLocation;
 	}
 
-	protected renderModel(renderer: Renderer, position: Coordinate, animation?: Animation): void {
+	protected renderModel(gl: WebGLRenderingContext, position: Coordinate, animation?: Animation): void {
 		let bonusSize = animation && this.getAnimationBonusSize(animation) || 0;
 		const size = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 1]);
 
-		const gl = renderer.getGlContext();
 		const shader = this.shader;
-		const vertexBuffer = SimpleRectangle.vertexBuffer;
+		const vertexBuffer = this.buffer.getBuffer();
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
@@ -77,7 +54,6 @@ abstract class SimpleRectangle extends Model {
 				return -0.5;
 		}
 	}
-
 }
 
 export default SimpleRectangle;
