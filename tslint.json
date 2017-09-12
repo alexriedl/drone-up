@@ -13,15 +13,7 @@
         "no-console": [ false ],
         "object-literal-sort-keys": [ false ],
         "no-bitwise": false,
-        "ordered-imports": false,
-        "no-unused-variable": true,
-        "member-ordering": [ true, {
-          "order": [
-            "instance-field",
-            "constructor",
-            "instance-method"
-          ]
-        }]
+        "ordered-imports": false
     },
     "rulesDirectory": []
 }
