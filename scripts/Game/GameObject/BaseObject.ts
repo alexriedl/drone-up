@@ -18,8 +18,7 @@ abstract class BaseObject {
 
 	public render(gl: WebGLRenderingContext): void {
 		if (!this.model) return;
-		if (this.animation) this.model.renderAnimation(gl, this.animation);
-		else this.model.render(gl, this.position);
+		else this.model.render(gl, this.position, this.animation);
 	}
 
 	public updateAnimation(deltaTime: number): boolean {

@@ -1,7 +1,7 @@
 import { Coordinate, Color } from '../Utils';
+import { GridShader } from './Shader';
 import { RectangleBuffer } from './Buffer';
 import { Register } from '../Utils';
-import { GridShader } from './Shader';
 import Model from './Model';
 
 export default class Grid extends Model {
@@ -28,7 +28,7 @@ export default class Grid extends Model {
 		return this.shader.uniformProjectionMatrixLocation;
 	}
 
-	protected renderModel(gl: WebGLRenderingContext, position: Coordinate): void {
+	public render(gl: WebGLRenderingContext, position: Coordinate = new Coordinate(0, 0)): void {
 		const shader = this.shader;
 		const vertexBuffer = this.buffer.getBuffer();
 		const size = new TSM.vec3([this.xSize, this.ySize, 1]);

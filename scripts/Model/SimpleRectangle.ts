@@ -1,4 +1,4 @@
-import { Animation, AnimationType } from '../Animations';
+import { MoveAnimation, Animation, AnimationType } from '../Animations';
 import { Coordinate, Color } from '../Utils';
 import { RectangleBuffer } from './Buffer';
 import { SimpleShader } from './Shader';
@@ -21,8 +21,15 @@ abstract class SimpleRectangle extends Model {
 		return this.shader.uniformProjectionMatrixLocation;
 	}
 
-	protected renderModel(gl: WebGLRenderingContext, position: Coordinate, animation?: Animation): void {
-		const bonusSize = animation && this.getAnimationBonusSize(animation) || 0;
+	public render(gl: WebGLRenderingContext, position: Coordinate, animation?: Animation): void {
+		let bonusSize = 0;
+
+		if (animation) {
+			if (animation instanceof MoveAnimation) {
+				bonusSize = this.getAnimationBonusSize(animation);
+				position = animation.position;
+			}
+		}
 		const size = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 1]);
 
 		const shader = this.shader;
