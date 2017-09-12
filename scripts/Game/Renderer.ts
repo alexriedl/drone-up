@@ -2,7 +2,7 @@ import { Color } from '../Utils';
 import { GameObject } from './GameObject';
 
 import { Coordinate, Register } from '../Utils';
-import { Grid, ShaderedGrid } from '../Model';
+import { ShaderedGrid } from '../Model';
 
 export default class Renderer {
 	private gl: WebGLRenderingContext;
@@ -32,7 +32,7 @@ export default class Renderer {
 		this.xSize = xSize;
 		this.ySize = ySize;
 
-		this.grid = new ShaderedGrid(new Color(1, 0.6, 0), 1, xSize, ySize);
+		this.grid = new ShaderedGrid(new Color(1, 0.6, 0), 2/100, xSize, ySize);
 	}
 
 	public setBackgroundColor(color: Color): void {

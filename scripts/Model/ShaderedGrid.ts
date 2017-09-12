@@ -16,7 +16,7 @@ export default class ShaderedGrid extends Model {
 		super();
 
 		this.gridColor = gridColor;
-		this.gridThickness = gridThickness / 50;
+		this.gridThickness = gridThickness;
 		this.xSize = xSize;
 		this.ySize = ySize;
 
