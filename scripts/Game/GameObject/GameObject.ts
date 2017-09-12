@@ -1,22 +1,20 @@
-import { Animation, AnimationType, MoveAnimation } from '../../Animations';
+import { AnimationType, MoveAnimation } from '../../Animations';
 import { Controller } from '../Bot';
 import { Coordinate, Enums } from '../../Utils';
 import { Model } from '../../Model';
+import BaseObject from './BaseObject';
 import Map from '../Map';
 
-abstract class GameObject {
+abstract class GameObject extends BaseObject {
 	public readonly ID: string;
 	public readonly type: Enums.ObjectType;
-	public readonly model: Model;
 	public readonly controller?: Controller;
-	public position: Coordinate;
-	private animation?: Animation;
 
 	public constructor(ID: string, type: Enums.ObjectType, model: Model, controller?: Controller, position?: Coordinate) {
+		super(position, model);
+
 		this.ID = ID;
 		this.type = type;
-		this.position = position;
-		this.model = model;
 
 		if (controller) {
 			this.controller = controller;
@@ -24,42 +22,23 @@ abstract class GameObject {
 		}
 	}
 
-	public canRender(): boolean {
-		return !!this.model;
-	}
-
-	public render(gl: WebGLRenderingContext): void {
-		if (!this.model) return;
-		if (this.animation) this.model.renderAnimation(gl, this.animation);
-		else this.model.render(gl, this.position);
-	}
-
-	public updateAnimation(deltaTime: number): boolean {
-		if (!this.animation) return true;
-
-		const finished = this.animation.update(deltaTime);
-		if (finished) this.animation = undefined;
-
-		return finished;
-	}
-
-	public moveUp(map: Map, animationType?: AnimationType): GameObject[] {
+	public moveUp(map: Map, animationType?: AnimationType): BaseObject[] {
 		return this.move(0, -1, map, animationType);
 	}
 
-	public moveDown(map: Map, animationType?: AnimationType): GameObject[] {
+	public moveDown(map: Map, animationType?: AnimationType): BaseObject[] {
 		return this.move(0, 1, map, animationType);
 	}
 
-	public moveLeft(map: Map, animationType?: AnimationType): GameObject[] {
+	public moveLeft(map: Map, animationType?: AnimationType): BaseObject[] {
 		return this.move(-1, 0, map, animationType);
 	}
 
-	public moveRight(map: Map, animationType?: AnimationType): GameObject[] {
+	public moveRight(map: Map, animationType?: AnimationType): BaseObject[] {
 		return this.move(1, 0, map, animationType);
 	}
 
-	public perform(action: string, map: Map): GameObject[] {
+	public perform(action: string, map: Map): BaseObject[] {
 		switch (action) {
 			case 'MoveUp':
 				return this.moveUp(map);
@@ -79,7 +58,7 @@ abstract class GameObject {
 	 * Also assumes either delta is -1, 0, or 1
 	 */
 	public move(deltaX: number, deltaY: number, map: Map,
-		animationType: AnimationType = AnimationType.Move): GameObject[] {
+		animationType: AnimationType = AnimationType.Move): BaseObject[] {
 		return this.internalMove(deltaX, deltaY, map, animationType);
 	}
 
@@ -118,7 +97,7 @@ abstract class GameObject {
 	}
 
 	private internalMove(deltaX: number, deltaY: number, map: Map, animationType: AnimationType,
-		possibleAffected?: GameObject[]): GameObject[] {
+		possibleAffected?: GameObject[]): BaseObject[] {
 		if (!possibleAffected) {
 			if (deltaX) possibleAffected = map.getAllObjectsOnSameY(this.position.y);
 			if (deltaY) possibleAffected = map.getAllObjectsOnSameX(this.position.x);
@@ -130,8 +109,8 @@ abstract class GameObject {
 		const endPos = this.position.copy();
 		this.wrapCoordinates(map);
 
-		this.animation = new MoveAnimation(startPos, endPos, animationType);
-		const result: GameObject[] = [this];
+		this.setAnimation(new MoveAnimation(startPos, endPos, animationType));
+		const result: BaseObject[] = [];
 
 		if (this.type !== Enums.ObjectType.Drone) {
 			const collisions = this.findCollided(possibleAffected);

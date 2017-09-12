@@ -3,14 +3,12 @@ import { Coordinate } from '../Utils';
 
 export abstract class Animation {
 	public readonly animationType: AnimationType;
-	public readonly position: Coordinate;
 	public remainingDurationMs: number;
 	private readonly originalDurationMs: number;
 
-	public constructor(position: Coordinate, animationType: AnimationType, durationMs: number) {
+	public constructor(animationType: AnimationType, durationMs: number) {
 		this.animationType = animationType;
 		this.originalDurationMs = this.remainingDurationMs = durationMs;
-		this.position = position;
 	}
 
 	public abstract update(deltaTimeMs: number): boolean;

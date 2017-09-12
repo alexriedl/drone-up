@@ -2,6 +2,7 @@ import { AnimationType } from '../../Animations';
 import { Controller } from '../Bot';
 import { Enums } from '../../Utils';
 import { Model } from '../../Model';
+import BaseObject from './BaseObject';
 import GameObject from './GameObject';
 import Map from '../Map';
 
@@ -16,53 +17,53 @@ export default class Drone extends GameObject {
 		]);
 	}
 
-	public scan(map: Map): GameObject[] {
+	public scan(map: Map): BaseObject[] {
 		const scanResult = map.scanFor(this);
 		this.controller.scanResult = scanResult;
 		return [];
 	}
 
-	public pullUp(map: Map): GameObject[] {
+	public pullUp(map: Map): BaseObject[] {
 		const toPull = map.getNextObjectUpFrom(this);
 		return toPull.moveDown(map, AnimationType.Pull);
 	}
 
-	public pullDown(map: Map): GameObject[] {
+	public pullDown(map: Map): BaseObject[] {
 		const toPull = map.getNextObjectDownFrom(this);
 		return toPull.moveUp(map, AnimationType.Pull);
 	}
 
-	public pullLeft(map: Map): GameObject[] {
+	public pullLeft(map: Map): BaseObject[] {
 		const toPull = map.getNextObjectLeftFrom(this);
 		return toPull.moveRight(map, AnimationType.Pull);
 	}
 
-	public pullRight(map: Map): GameObject[] {
+	public pullRight(map: Map): BaseObject[] {
 		const toPull = map.getNextObjectRightFrom(this);
 		return toPull.moveLeft(map, AnimationType.Pull);
 	}
 
-	public pushUp(map: Map): GameObject[] {
+	public pushUp(map: Map): BaseObject[] {
 		const toPush = map.getNextObjectUpFrom(this);
 		return toPush.moveUp(map, AnimationType.Push);
 	}
 
-	public pushDown(map: Map): GameObject[] {
+	public pushDown(map: Map): BaseObject[] {
 		const toPush = map.getNextObjectDownFrom(this);
 		return toPush.moveDown(map, AnimationType.Push);
 	}
 
-	public pushLeft(map: Map): GameObject[] {
+	public pushLeft(map: Map): BaseObject[] {
 		const toPush = map.getNextObjectLeftFrom(this);
 		return toPush.moveLeft(map, AnimationType.Push);
 	}
 
-	public pushRight(map: Map): GameObject[] {
+	public pushRight(map: Map): BaseObject[] {
 		const toPush = map.getNextObjectRightFrom(this);
 		return toPush.moveRight(map, AnimationType.Push);
 	}
 
-	public perform(action: string, map: Map): GameObject[] {
+	public perform(action: string, map: Map): BaseObject[] {
 		switch (action) {
 			case 'PullUp': return this.pullUp(map);
 			case 'PullDown': return this.pullDown(map);

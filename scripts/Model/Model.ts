@@ -6,12 +6,8 @@ import { Shader } from './Shader';
 abstract class Model {
 	protected shader: Shader;
 
-	public renderAnimation(gl: WebGLRenderingContext, animation: Animation): void {
-		this.renderModel(gl, animation.position, animation);
-	}
-
-	public render(gl: WebGLRenderingContext, position: Coordinate = new Coordinate(0, 0)): void {
-		this.renderModel(gl, position);
+	public render(gl: WebGLRenderingContext, position: Coordinate = new Coordinate(0, 0), animation?: Animation): void {
+		this.renderModel(gl, position, animation);
 	}
 
 	public useShader(gl: WebGLRenderingContext): void {
