@@ -1,4 +1,4 @@
-import { MoveAnimation, Animation, AnimationType } from '../Animations';
+import { ResizeAnimation, MoveAnimation, Animation, AnimationType } from '../Animations';
 import { Coordinate, Color } from '../Utils';
 import { RectangleBuffer } from './Buffer';
 import { SimpleShader } from './Shader';
@@ -28,6 +28,9 @@ abstract class SimpleRectangle extends Model {
 			if (animation instanceof MoveAnimation) {
 				bonusSize = this.getAnimationBonusSize(animation);
 				position = animation.position;
+			}
+			else if (animation instanceof ResizeAnimation) {
+				bonusSize = animation.size;
 			}
 		}
 		const size = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 1]);

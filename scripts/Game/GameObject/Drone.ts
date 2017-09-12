@@ -1,4 +1,4 @@
-import { AnimationType } from '../../Animations';
+import { ResizeAnimation, AnimationType } from '../../Animations';
 import { Controller } from '../Bot';
 import { Enums } from '../../Utils';
 import { Model } from '../../Model';
@@ -20,7 +20,8 @@ export default class Drone extends GameObject {
 	public scan(map: Map): BaseObject[] {
 		const scanResult = map.scanFor(this);
 		this.controller.scanResult = scanResult;
-		return [];
+		this.setAnimation(new ResizeAnimation(7, 0, 1000));
+		return [this];
 	}
 
 	public pullUp(map: Map): BaseObject[] {
