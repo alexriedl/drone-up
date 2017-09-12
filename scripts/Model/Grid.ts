@@ -1,7 +1,6 @@
 import { Coordinate, Color } from '../Utils';
 import { GridShader } from './Shader';
 import { RectangleBuffer } from './Buffer';
-import { Register } from '../Utils';
 import Model from './Model';
 
 export default class Grid extends Model {

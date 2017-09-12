@@ -1,4 +1,4 @@
-import { Animation, AnimationType, MoveAnimation } from '../../Animations';
+import { Animation } from '../../Animations';
 import { Coordinate } from '../../Utils';
 import { Model } from '../../Model';
 

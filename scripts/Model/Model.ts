@@ -1,6 +1,5 @@
 import { Animation } from '../Animations';
 import { Coordinate } from '../Utils';
-import { Register } from '../Utils';
 import { Shader } from './Shader';
 
 abstract class Model {

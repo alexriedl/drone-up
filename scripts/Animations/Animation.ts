@@ -1,5 +1,4 @@
-import { AnimationType } from './AnimationType';
-import { Coordinate } from '../Utils';
+import AnimationType from './AnimationType';
 
 abstract class Animation {
 	public readonly animationType: AnimationType;
