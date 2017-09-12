@@ -3,56 +3,48 @@ import Map from './Map';
 
 export default class TickState {
 	protected loopPosition: number = 0;
-	protected transientObjects: BaseObject[] = [];
-	protected animating: boolean;
+	protected animatingObjects: BaseObject[] = [];
 
 	public isAnimating(): boolean {
-		return this.animating;
+		return this.animatingObjects && this.animatingObjects.length > 0;
 	}
 
-	public update(deltaTime: number, map: Map) {
+	public update(deltaTime: number, map: Map): BaseObject[] {
 		const players = map.getPlayers();
 
 		if (!this.isAnimating()) {
 			this.loopPosition = (this.loopPosition + 1) % players.length;
 			const player = players[this.loopPosition];
 			const action = player.controller.getAction();
-			this.transientObjects = player.perform(action, map);
-			this.animating = true;
+			this.animatingObjects = player.perform(action, map);
 		}
 
 		// NOTE: Do not change this to an else. The first if statement may make this become true
-		if (this.animating) {
+		if (this.isAnimating()) {
 			const animationRemovalIndices = [];
-			let stillAnimating = false;
 
-			for (const go of map.getGameObjects()) {
-				const finished = go.updateAnimation(deltaTime);
-				if (!finished) stillAnimating = true;
-			}
-
-			for (let i = 0; i < this.transientObjects.length; i++) {
-				const ao = this.transientObjects[i];
+			for (let i = 0; i < this.animatingObjects.length; i++) {
+				const ao = this.animatingObjects[i];
 				const finished = ao.updateAnimation(deltaTime);
 				if (finished) animationRemovalIndices.push(i);
 			}
 
 			for (const index of animationRemovalIndices) {
-				this.transientObjects.splice(index, 1);
+				this.animatingObjects.splice(index, 1);
 			}
 
-			this.animating = (this.transientObjects && this.transientObjects.length > 0) || stillAnimating;
-
-			if (!this.animating) {
+			if (!this.isAnimating()) {
 				// TODO: Find a way to animate dead drones
 				const deadDrones = map.removeCrashedDrones();
 				if (deadDrones && deadDrones.length > 0) {
 					deadDrones.forEach((drone) => {
 						drone.setAnimation(null);
 					});
-					this.transientObjects = deadDrones;
+					this.animatingObjects = deadDrones;
 				}
 			}
+
+			return this.animatingObjects;
 		}
 	}
 }

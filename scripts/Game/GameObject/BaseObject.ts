@@ -3,11 +3,13 @@ import { Coordinate } from '../../Utils';
 import { Model } from '../../Model';
 
 abstract class BaseObject {
+	public readonly ID: string;
 	public readonly model: Model;
 	public position: Coordinate;
 	private animation?: Animation;
 
-	public constructor(position: Coordinate, model: Model) {
+	public constructor(ID: string, position: Coordinate, model: Model) {
+		this.ID = ID;
 		this.position = position;
 		this.model = model;
 	}

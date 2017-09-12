@@ -1,5 +1,5 @@
 import { Color } from '../Utils';
-import { GameObject } from './GameObject';
+import { BaseObject } from './GameObject';
 
 import { Register } from '../Utils';
 import { Grid } from '../Model';
@@ -50,7 +50,7 @@ export default class Renderer {
 	/*************************************************************************
 	*************************************************************************/
 
-	public renderMap(gameObjects: GameObject[]): void {
+	public renderMap(objects: BaseObject[]): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const width = gl.canvas.clientWidth;
 		const height = gl.canvas.clientHeight;
@@ -80,16 +80,16 @@ export default class Renderer {
 			grid.render(gl);
 		}
 
-		for (const go of gameObjects) {
-			if (!go.canRender()) continue;
+		for (const o of objects) {
+			if (!o.canRender()) continue;
 
 			{
 				// TODO: Only bind a shader if it is not currently in use
-				go.model.useShader(gl);
-				gl.uniformMatrix4fv(go.model.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
+				o.model.useShader(gl);
+				gl.uniformMatrix4fv(o.model.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
 			}
 
-			go.render(gl);
+			o.render(gl);
 		}
 	}
 }
