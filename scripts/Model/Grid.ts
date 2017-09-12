@@ -4,7 +4,7 @@ import { Register } from '../Utils';
 import { GridShader } from './Shader';
 import Model from './Model';
 
-export default class ShaderedGrid extends Model {
+export default class Grid extends Model {
 	protected buffer: RectangleBuffer;
 	protected shader: GridShader;
 	protected gridColor: Color;

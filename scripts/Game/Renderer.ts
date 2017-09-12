@@ -2,11 +2,11 @@ import { Color } from '../Utils';
 import { GameObject } from './GameObject';
 
 import { Coordinate, Register } from '../Utils';
-import { ShaderedGrid } from '../Model';
+import { Grid } from '../Model';
 
 export default class Renderer {
 	private gl: WebGLRenderingContext;
-	private grid: ShaderedGrid;
+	private grid: Grid;
 	private xSize: number;
 	private ySize: number;
 
@@ -26,13 +26,13 @@ export default class Renderer {
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-		this.setBackgroundColor(Color.BLACK);
+		this.setBackgroundColor(Color.BLACK.lighten(.15));
 		this.clearScreen();
 
 		this.xSize = xSize;
 		this.ySize = ySize;
 
-		this.grid = new ShaderedGrid(new Color(1, 0.6, 0), 2/100, xSize, ySize);
+		this.grid = new Grid(new Color(1, 0.6, 0), 2 / 100, xSize, ySize);
 	}
 
 	public setBackgroundColor(color: Color): void {

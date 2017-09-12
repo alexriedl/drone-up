@@ -17,7 +17,21 @@ export default class Color {
 		this.a = a;
 	}
 
+	/**
+	 * Return the value of this color as an array
+	 */
 	public all(): number[] {
 		return [this.r, this.g, this.b, this.a];
+	}
+
+	/**
+	 * Create a new color a percentage lighter than this color.
+	 * Parameter is a value between 0 and 1.
+	 */
+	public lighten(percent: number): Color {
+		const r = Math.min(1, this.r + 1 * percent);
+		const g = Math.min(1, this.g + 1 * percent);
+		const b = Math.min(1, this.b + 1 * percent);
+		return new Color(r, g, b, this.a);
 	}
 }
