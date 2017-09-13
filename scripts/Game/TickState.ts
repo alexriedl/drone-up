@@ -21,20 +21,22 @@ export default class TickState {
 
 		// NOTE: Do not change this to an else. The first if statement may make this become true
 		if (this.isAnimating()) {
-			const animationRemovalIndices = [];
+			const removes = [];
 
-			for (let i = 0; i < this.animatingObjects.length; i++) {
-				const ao = this.animatingObjects[i];
+			for (const ao of this.animatingObjects) {
 				const finished = ao.updateAnimation(deltaTime);
-				if (finished) animationRemovalIndices.push(i);
+				if (finished) removes.push(ao);
 			}
 
-			for (const index of animationRemovalIndices) {
-				this.animatingObjects.splice(index, 1);
+			for (const remove of removes) {
+				const index = this.animatingObjects.indexOf(remove);
+				if (index > -1) {
+					this.animatingObjects.splice(index, 1);
+				}
 			}
 
 			if (!this.isAnimating()) {
-				// TODO: Find a way to animate dead drones
+				// TODO: Add crash animation
 				const deadDrones = map.removeCrashedDrones();
 				if (deadDrones && deadDrones.length > 0) {
 					deadDrones.forEach((drone) => {
