@@ -1,11 +1,9 @@
 import { Animation } from '../Animations';
 import { Coordinate, Color } from '../Utils';
 import { GridShader } from './Shader';
-import { RectangleBuffer } from './Buffer';
 import SimpleRectangle, { IRenderState } from './SimpleRectangle';
 
 export default class Grid extends SimpleRectangle {
-	protected buffer: RectangleBuffer;
 	protected shader: GridShader;
 	protected gridThickness: number;
 	protected xSize: number;
@@ -21,10 +19,6 @@ export default class Grid extends SimpleRectangle {
 
 	protected createShader(): GridShader {
 		return GridShader.createShader();
-	}
-
-	public getModelViewMatrixUniformLocation(): WebGLUniformLocation {
-		return this.shader.uniformProjectionMatrixLocation;
 	}
 
 	protected setupRenderState(position?: Coordinate, animation?: Animation): IRenderState {

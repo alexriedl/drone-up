@@ -1,9 +1,11 @@
+import GridShader from './GridShader';
+import ScanShader from './ScanShader';
 import Shader from './Shader';
 import SimpleShader from './SimpleShader';
-import GridShader from './GridShader';
 
 export {
+	GridShader,
+	ScanShader,
 	Shader,
 	SimpleShader,
-	GridShader,
 };

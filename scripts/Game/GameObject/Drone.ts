@@ -6,6 +6,10 @@ import BaseObject from './BaseObject';
 import GameObject from './GameObject';
 import Map from '../Map';
 
+import { Color } from '../../Utils';
+import { Scan } from '../../Model';
+import { ResizeAnimation } from '../../Animations';
+
 export default class Drone extends GameObject {
 	public constructor(ID: string, model: Model,  controller: Controller) {
 		super(ID, Enums.ObjectType.Drone, model, controller);
@@ -23,7 +27,17 @@ export default class Drone extends GameObject {
 	public scan(map: Map): BaseObject[] {
 		const scanResult = map.scanFor(this);
 		this.controller.scanResult = scanResult;
-		return [];
+
+		let scanObject;
+		// TODO: Move this into a gameObject
+		{
+			const scanModel = new Scan(new Color(0.58, 0, 0.827));
+			scanObject = new Drone('scan_drone', scanModel, null);
+			scanObject.setAnimation(new ResizeAnimation(5, 1, 350));
+			scanObject.position = this.position.copy();
+		}
+
+		return [scanObject];
 	}
 
 	public pullUp(map: Map): BaseObject[] {

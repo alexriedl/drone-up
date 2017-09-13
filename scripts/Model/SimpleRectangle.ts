@@ -79,7 +79,7 @@ abstract class SimpleRectangle extends Model {
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 	}
 
-	private getAnimationBonusSize(animation: Animation): number {
+	protected getAnimationBonusSize(animation: Animation): number {
 		switch (animation.animationType) {
 			case AnimationType.Move: return 0.5;
 			case AnimationType.Bump: return 0.25;
