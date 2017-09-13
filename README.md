@@ -10,9 +10,6 @@ This is the game DroneUp.
 6. Start the site: `dotnet run`
 7. Visit `localhost:5000`
 
-## Known Issues
-* Player collisions
-
 ## Road Map
 * Upload custom scripts to control drones
 * Score board

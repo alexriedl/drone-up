@@ -37,7 +37,6 @@ export default class Map {
 
 	public removeCrashedDrones(): Drone[] {
 		const crashed: Drone[] = [];
-		const playerRemovalIndices = [];
 
 		for (let i = 0, playerCount = this.players.length; i < playerCount; i++) {
 			for (const otherObject of this.gameObjects) {
@@ -45,19 +44,19 @@ export default class Map {
 
 				if (player.ID !== otherObject.ID && player.position.equal(otherObject.position)) {
 					crashed.push(player);
-					playerRemovalIndices.push(i);
 				}
 			}
 		}
 
-		for (const index of playerRemovalIndices) {
-			this.players.splice(index, 1);
-		}
-
 		for (const dead of crashed) {
-			const index = this.gameObjects.indexOf(dead);
-			if (index > -1) {
-				this.gameObjects.splice(index, 1);
+			const gameObjectsIndex = this.gameObjects.indexOf(dead);
+			if (gameObjectsIndex > -1) {
+				this.gameObjects.splice(gameObjectsIndex, 1);
+			}
+
+			const playerIndex = this.players.indexOf(dead);
+			if (playerIndex > -1) {
+				this.players.splice(playerIndex, 1);
 			}
 		}
 
