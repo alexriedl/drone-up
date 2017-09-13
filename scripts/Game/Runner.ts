@@ -54,7 +54,10 @@ export default class Runner {
 			const effectiveDeltaTime = deltaTime * this.animationSpeed;
 			const transientObjects = tickState.update(effectiveDeltaTime, this.map);
 			const gameObjects = this.map.getGameObjects();
-			this.renderer.renderMap(this.combineLists(gameObjects, transientObjects));
+
+			const renderObjects = this.combineLists(gameObjects, transientObjects);
+			// this.renderer.renderMap(renderObjects);
+			this.renderer.renderSection(renderObjects);
 
 			if (!tickState.isAnimating()) {
 				this.checkGameDone();

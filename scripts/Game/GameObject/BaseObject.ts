@@ -15,6 +15,7 @@ abstract class BaseObject {
 	}
 
 	public canRender(): boolean {
+		// TODO: Improve this to ensure buffer and shader is also loaded
 		return !!this.model;
 	}
 
