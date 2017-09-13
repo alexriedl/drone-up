@@ -1,3 +1,4 @@
+import { GameObject, BaseObject } from './GameObject';
 import Map from './Map';
 import Renderer from './Renderer';
 import TickState from './TickState';
@@ -51,8 +52,9 @@ export default class Runner {
 			}
 
 			const effectiveDeltaTime = deltaTime * this.animationSpeed;
-			tickState.update(effectiveDeltaTime, this.map);
-			this.renderer.renderMap(this.map.getGameObjects());
+			const transientObjects = tickState.update(effectiveDeltaTime, this.map);
+			const gameObjects = this.map.getGameObjects();
+			this.renderer.renderMap(this.combineLists(gameObjects, transientObjects));
 
 			if (!tickState.isAnimating()) {
 				this.checkGameDone();
@@ -67,6 +69,16 @@ export default class Runner {
 		};
 
 		requestAnimationFrame(this.frame);
+	}
+
+	private combineLists(gameObjects: GameObject[], transientObjects: BaseObject[]): BaseObject[] {
+		if (!transientObjects) return [...gameObjects];
+		if (!gameObjects) return [...transientObjects];
+
+		const removed: BaseObject[] = gameObjects.
+			filter((go) => transientObjects.find((to) => go.ID === to.ID) === undefined);
+
+		return removed.concat(transientObjects);
 	}
 
 	private checkGameDone(): void {

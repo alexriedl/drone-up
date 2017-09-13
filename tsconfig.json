@@ -7,6 +7,7 @@
     "skipDefaultLibCheck": true,
     "allowJs": true,
     "outDir": "tsout",
+    "noUnusedLocals": true,
     "types": [
       "@diamondlovesyou/tsm"
     ]

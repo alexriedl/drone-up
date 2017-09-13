@@ -1,11 +1,13 @@
-import Grid from './Grid';
+import GridModel from './GridModel';
 import Model from './Model';
-import SimpleDrone from './SimpleDrone';
-import SimpleSpike from './SimpleSpike';
+import ScanModel from './ScanModel';
+import DroneModel from './DroneModel';
+import SpikeModel from './SpikeModel';
 
 export {
-	Grid,
+	GridModel,
 	Model,
-	SimpleDrone,
-	SimpleSpike,
+	ScanModel,
+	DroneModel,
+	SpikeModel,
 };

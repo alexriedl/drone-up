@@ -6,14 +6,12 @@ import BaseObject from './BaseObject';
 import Map from '../Map';
 
 abstract class GameObject extends BaseObject {
-	public readonly ID: string;
 	public readonly type: Enums.ObjectType;
 	public readonly controller?: Controller;
 
 	public constructor(ID: string, type: Enums.ObjectType, model: Model, controller?: Controller, position?: Coordinate) {
-		super(position, model);
+		super(ID, position, model);
 
-		this.ID = ID;
 		this.type = type;
 
 		if (controller) {
@@ -110,7 +108,7 @@ abstract class GameObject extends BaseObject {
 		this.wrapCoordinates(map);
 
 		this.setAnimation(new MoveAnimation(startPos, endPos, animationType));
-		const result: BaseObject[] = [];
+		const result: BaseObject[] = [this];
 
 		if (this.type !== Enums.ObjectType.Drone) {
 			const collisions = this.findCollided(possibleAffected);

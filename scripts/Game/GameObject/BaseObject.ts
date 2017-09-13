@@ -1,13 +1,15 @@
-import { Animation, AnimationType, MoveAnimation } from '../../Animations';
+import { Animation } from '../../Animations';
 import { Coordinate } from '../../Utils';
 import { Model } from '../../Model';
 
 abstract class BaseObject {
+	public readonly ID: string;
 	public readonly model: Model;
 	public position: Coordinate;
 	private animation?: Animation;
 
-	public constructor(position: Coordinate, model: Model) {
+	public constructor(ID: string, position: Coordinate, model: Model) {
+		this.ID = ID;
 		this.position = position;
 		this.model = model;
 	}
@@ -18,8 +20,7 @@ abstract class BaseObject {
 
 	public render(gl: WebGLRenderingContext): void {
 		if (!this.model) return;
-		if (this.animation) this.model.renderAnimation(gl, this.animation);
-		else this.model.render(gl, this.position);
+		else this.model.render(gl, this.position, this.animation);
 	}
 
 	public updateAnimation(deltaTime: number): boolean {

@@ -4,23 +4,29 @@ import { Enums } from '../../Utils';
 import { Model } from '../../Model';
 import BaseObject from './BaseObject';
 import GameObject from './GameObject';
+import ScanObject from './ScanObject';
 import Map from '../Map';
 
 export default class Drone extends GameObject {
 	public constructor(ID: string, model: Model,  controller: Controller) {
 		super(ID, Enums.ObjectType.Drone, model, controller);
-		controller.setActions([
-			'Scan',
-			'MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight',
-			'PullUp', 'PullDown', 'PullLeft', 'PullRight',
-			'PushUp', 'PushDown', 'PushLeft', 'PushRight',
-		]);
+
+		if (controller) {
+			controller.setActions([
+				'Scan',
+				'MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight',
+				'PullUp', 'PullDown', 'PullLeft', 'PullRight',
+				'PushUp', 'PushDown', 'PushLeft', 'PushRight',
+			]);
+		}
 	}
 
 	public scan(map: Map): BaseObject[] {
 		const scanResult = map.scanFor(this);
 		this.controller.scanResult = scanResult;
-		return [];
+
+		const scan = new ScanObject(`${this.ID}-scan`, this.position.copy());
+		return [scan];
 	}
 
 	public pullUp(map: Map): BaseObject[] {

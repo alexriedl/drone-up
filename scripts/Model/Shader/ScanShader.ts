@@ -15,33 +15,26 @@ void main() {
 
 const fragmentShaderSource = `
 precision mediump float;
-
-uniform float u_x_count;
-uniform float u_y_count;
-uniform float u_grid_thickness;
-uniform vec4 u_grid_color;
+uniform vec4 u_color;
+const float u_wave_count = 3.0;
 
 varying lowp vec2 v_uv;
 
-bool onGrid(float pos) {
-	float f = fract(pos);
-	return f < u_grid_thickness || f > 1.0 - u_grid_thickness;
-}
+const float THICKNESS = 0.07;
 
 void main() {
-	bool onXGrid = onGrid(v_uv.x * u_x_count);
-	bool onYGrid = onGrid(v_uv.y * u_y_count);
-	gl_FragColor = onXGrid || onYGrid ? u_grid_color : vec4(0.0, 0.0, 0.0, 0.0);
+	vec2 pos = vec2(0.5) - v_uv;
+	float d = distance(pos, vec2(0.0));
+
+	float f = fract(d * 2.0 * u_wave_count);
+	gl_FragColor = d < 0.5 && d > 0.1 && (f < THICKNESS || f > 1.0 - THICKNESS) ? u_color : vec4(0.0);
 }`;
 
-export default class GridShader extends Shader {
+export default class ScanShader extends Shader {
 	public attributePositionLocation: number;
 	public uniformModelViewMatrixLocation: WebGLUniformLocation;
 	public uniformProjectionMatrixLocation: WebGLUniformLocation;
 	public uniformColorLocation: WebGLUniformLocation;
-	public uniformGridThicknessLocation: WebGLUniformLocation;
-	public uniformXCountLocation: WebGLUniformLocation;
-	public uniformYCountLocation: WebGLUniformLocation;
 
 	public initialize(gl: WebGLRenderingContext) {
 		super.initialize(gl);
@@ -49,10 +42,7 @@ export default class GridShader extends Shader {
 		this.attributePositionLocation = this.getAttributeLocation(gl, 'a_position');
 		this.uniformModelViewMatrixLocation = this.getUniformLocation(gl, 'u_model_view');
 		this.uniformProjectionMatrixLocation = this.getUniformLocation(gl, 'u_projection');
-		this.uniformColorLocation = this.getUniformLocation(gl, 'u_grid_color');
-		this.uniformGridThicknessLocation = this.getUniformLocation(gl, 'u_grid_thickness');
-		this.uniformXCountLocation = this.getUniformLocation(gl, 'u_x_count');
-		this.uniformYCountLocation = this.getUniformLocation(gl, 'u_y_count');
+		this.uniformColorLocation = this.getUniformLocation(gl, 'u_color');
 	}
 
 	public getVertexSource(): string {
@@ -63,7 +53,7 @@ export default class GridShader extends Shader {
 		return fragmentShaderSource;
 	}
 
-	public static createShader(): GridShader {
-		return Shader.create<GridShader>(GridShader);
+	public static createShader(): ScanShader {
+		return Shader.create<ScanShader>(ScanShader);
 	}
 }

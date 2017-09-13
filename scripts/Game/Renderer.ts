@@ -1,12 +1,12 @@
 import { Color } from '../Utils';
-import { GameObject } from './GameObject';
+import { BaseObject } from './GameObject';
 
-import { Coordinate, Register } from '../Utils';
-import { Grid } from '../Model';
+import { Register } from '../Utils';
+import { GridModel } from '../Model';
 
 export default class Renderer {
 	private gl: WebGLRenderingContext;
-	private grid: Grid;
+	private grid: GridModel;
 	private xSize: number;
 	private ySize: number;
 
@@ -32,7 +32,7 @@ export default class Renderer {
 		this.xSize = xSize;
 		this.ySize = ySize;
 
-		this.grid = new Grid(new Color(1, 0.6, 0), 2 / 100, xSize, ySize);
+		this.grid = new GridModel(new Color(1, 0.6, 0), 2 / 100, xSize, ySize);
 	}
 
 	public setBackgroundColor(color: Color): void {
@@ -50,7 +50,7 @@ export default class Renderer {
 	/*************************************************************************
 	*************************************************************************/
 
-	public renderMap(gameObjects: GameObject[]): void {
+	public renderMap(objects: BaseObject[]): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const width = gl.canvas.clientWidth;
 		const height = gl.canvas.clientHeight;
@@ -59,7 +59,6 @@ export default class Renderer {
 		this.clearScreen();
 		gl.viewport(0, 0, width, height);
 
-		const aspect = width / height;
 		const orthoMatrix = TSM.mat4.orthographic(0, this.xSize, this.ySize, 0, -1, 1);
 
 		// TODO: Sort objects before rendering
@@ -81,16 +80,16 @@ export default class Renderer {
 			grid.render(gl);
 		}
 
-		for (const go of gameObjects) {
-			if (!go.canRender()) continue;
+		for (const o of objects) {
+			if (!o.canRender()) continue;
 
 			{
 				// TODO: Only bind a shader if it is not currently in use
-				go.model.useShader(gl);
-				gl.uniformMatrix4fv(go.model.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
+				o.model.useShader(gl);
+				gl.uniformMatrix4fv(o.model.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
 			}
 
-			go.render(gl);
+			o.render(gl);
 		}
 	}
 }

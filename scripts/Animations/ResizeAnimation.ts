@@ -1,6 +1,5 @@
-import { Animation } from './Animation';
-import { AnimationType } from './AnimationType';
-import { Coordinate } from '../Utils';
+import Animation from './Animation';
+import AnimationType from './AnimationType';
 
 export default class ResizeAnimation extends Animation {
 	public size: number;

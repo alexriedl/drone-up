@@ -1,7 +1,6 @@
-import { AnimationType } from './AnimationType';
-import { Coordinate } from '../Utils';
+import AnimationType from './AnimationType';
 
-export abstract class Animation {
+abstract class Animation {
 	public readonly animationType: AnimationType;
 	public remainingDurationMs: number;
 	private readonly originalDurationMs: number;
@@ -22,3 +21,5 @@ export abstract class Animation {
 		return this.remainingDurationMs <= 0;
 	}
 }
+
+export default Animation;
