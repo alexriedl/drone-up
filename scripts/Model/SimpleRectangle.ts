@@ -82,7 +82,7 @@ abstract class SimpleRectangle extends Model {
 	protected getAnimationBonusSize(animation: Animation): number {
 		switch (animation.animationType) {
 			case AnimationType.Move: return 0.5;
-			case AnimationType.Bump: return 0.25;
+			case AnimationType.Bump: return 0;
 			case AnimationType.Pull:
 			case AnimationType.Push:
 				return -0.5;

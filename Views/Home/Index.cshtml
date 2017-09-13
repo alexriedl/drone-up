@@ -1,14 +1,8 @@
-﻿@section metadata {
-	<meta name="Environment" content="@ViewBag.Environment" />
-	<meta name="Version" content="@ViewBag.Version" />
-}
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Hello Bulma!</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.1/css/bulma.min.css">
 </head>
@@ -16,30 +10,10 @@
 	<nav class="navbar" style="background-color: lightslategrey">
 		<div class="navbar-brand">
 			<h2 class="navbar-item"><strong style="color: white">DroneUp</strong></h2>
-			<div class="navbar-burger">
-				<span></span>
-				<span></span>
-				<span></span>
-			</div>
 		</div>
 	</nav>
 	<div class="container">
 		<div class="columns" style="margin-top: 20px; margin-bottom: 20px;">
-			<div class="column">
-				<table class="table is-striped">
-					<thead>
-						<th>
-							Bot Name
-						</th>
-						<th>
-							Status
-						</th>
-					</thead>
-				</table>
-			</div>
-			<div class="column">
-				<canvas id="game-canvas" width="800" height="800"></canvas>
-			</div>
 			<div class="column">
 				<div>
 					<button type="button" id="startStopButton">Start Game</button>
@@ -57,6 +31,9 @@
 					<textarea disabled cols="50" id="droneNameList"></textarea>
 				</div>
 			</div>
+			<div class="column">
+				<canvas id="game-canvas" width="1000" height="800" style="background: #4D4D4D;"></canvas>
+			</div>
 		</div>
 	</div>
 </body>
@@ -67,7 +44,7 @@
 				<strong>DroneUp 2017</strong>
 			</p>
 			<p>
-				<a class="icon" href="http://gitlab.directs.com/jonmetzler-sandbox/Hackaton-DroneUp">
+				<a class="icon" href="https://github.com/alexriedl/drone-up">
 					<i class="fa fa-github"></i>
 				</a>
 			</p>

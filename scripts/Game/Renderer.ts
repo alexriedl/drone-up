@@ -10,6 +10,9 @@ export default class Renderer {
 	private xSize: number;
 	private ySize: number;
 
+	private overflowXTiles: number = 0;
+	private overflowYTiles: number = 0;
+
 	public constructor(canvasId: string, xSize: number, ySize: number) {
 		const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 		const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext;
@@ -32,19 +35,33 @@ export default class Renderer {
 		this.xSize = xSize;
 		this.ySize = ySize;
 
-		this.grid = new GridModel(new Color(1, 0.6, 0), 2 / 100, xSize, ySize);
+		// NOTE: Setup viewport into canvas, and how much extra space is available around map
+		{
+			const width = gl.canvas.clientWidth;
+			const height = gl.canvas.clientHeight;
+			gl.viewport(0, 0, width, height);
+
+			if (height < width) {
+				const size = height / this.ySize;
+				const overflowPixels = width - this.xSize * size;
+				this.overflowXTiles = overflowPixels / size;
+			}
+			else if (width > height) {
+				const size = width / this.xSize;
+				const overflowPixels = height - this.ySize * size;
+				this.overflowYTiles = overflowPixels / size;
+			}
+		}
+
+		this.grid = new GridModel(new Color(1, 0.6, 0), xSize / 1000, xSize, ySize);
 	}
 
 	public setBackgroundColor(color: Color): void {
 		this.gl.clearColor(color.r, color.g, color.b, 1.0);
 	}
 
-	public clearScreen(): void {
+	protected clearScreen(): void {
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-	}
-
-	public getGlContext(): WebGLRenderingContext {
-		return this.gl;
 	}
 
 	/*************************************************************************
@@ -52,14 +69,13 @@ export default class Renderer {
 
 	public renderMap(objects: BaseObject[]): void {
 		const gl: WebGLRenderingContext = this.gl;
-		const width = gl.canvas.clientWidth;
-		const height = gl.canvas.clientHeight;
 
-		// NOTE: Basic rendering setup
 		this.clearScreen();
-		gl.viewport(0, 0, width, height);
 
-		const orthoMatrix = TSM.mat4.orthographic(0, this.xSize, this.ySize, 0, -1, 1);
+		const orthoMatrix = TSM.mat4.orthographic(
+			-this.overflowXTiles / 2, this.xSize + this.overflowXTiles / 2,
+			this.ySize + this.overflowYTiles / 2, -this.overflowYTiles / 2,
+			-1, 1);
 
 		// TODO: Sort objects before rendering
 		/*
