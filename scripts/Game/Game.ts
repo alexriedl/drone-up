@@ -1,7 +1,7 @@
 import { Controller } from './Bot';
 import { Drone } from './GameObject';
 import { Random, Color } from '../Utils';
-import { SimpleDrone, SimpleSpike } from '../Model';
+import { DroneModel, SpikeModel } from '../Model';
 import Map from './Map';
 import Runner from './Runner';
 
@@ -28,8 +28,8 @@ export default class Game {
 		this.paused = false;
 		this.started = false;
 
-		const createDroneModel = (id: string) => new SimpleDrone(this.getNextPlayerColor(randomizer));
-		const createSpikeModel = (id: string) => new SimpleSpike();
+		const createDroneModel = (id: string) => new DroneModel(this.getNextPlayerColor(randomizer));
+		const createSpikeModel = (id: string) => new SpikeModel();
 
 		const drones = [];
 		for (let i = 0; i < playerControllers.length; i++) {

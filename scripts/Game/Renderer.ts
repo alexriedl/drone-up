@@ -2,11 +2,11 @@ import { Color } from '../Utils';
 import { BaseObject } from './GameObject';
 
 import { Register } from '../Utils';
-import { Grid } from '../Model';
+import { GridModel } from '../Model';
 
 export default class Renderer {
 	private gl: WebGLRenderingContext;
-	private grid: Grid;
+	private grid: GridModel;
 	private xSize: number;
 	private ySize: number;
 
@@ -32,7 +32,7 @@ export default class Renderer {
 		this.xSize = xSize;
 		this.ySize = ySize;
 
-		this.grid = new Grid(new Color(1, 0.6, 0), 2 / 100, xSize, ySize);
+		this.grid = new GridModel(new Color(1, 0.6, 0), 2 / 100, xSize, ySize);
 	}
 
 	public setBackgroundColor(color: Color): void {

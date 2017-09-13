@@ -3,7 +3,7 @@ import { Coordinate, Color } from '../Utils';
 import { GridShader } from './Shader';
 import SimpleRectangle, { IRenderState } from './SimpleRectangle';
 
-export default class Grid extends SimpleRectangle {
+export default class GridModel extends SimpleRectangle {
 	protected shader: GridShader;
 	protected gridThickness: number;
 	protected xSize: number;

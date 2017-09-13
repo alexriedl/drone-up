@@ -1,7 +1,7 @@
 import { ScanShader } from './Shader';
 import SimpleRectangle, { IRenderState } from './SimpleRectangle';
 
-export default class Scan extends SimpleRectangle {
+export default class ScanModel extends SimpleRectangle {
 	protected shader: ScanShader;
 
 	protected createShader(): ScanShader {
