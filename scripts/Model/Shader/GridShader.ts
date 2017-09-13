@@ -38,8 +38,7 @@ export default class GridShader extends Shader {
 	public attributePositionLocation: number;
 	public uniformModelViewMatrixLocation: WebGLUniformLocation;
 	public uniformProjectionMatrixLocation: WebGLUniformLocation;
-	public uniformGridColorLocation: WebGLUniformLocation;
-	public uniformBackgroundColorLocation: WebGLUniformLocation;
+	public uniformColorLocation: WebGLUniformLocation;
 	public uniformGridThicknessLocation: WebGLUniformLocation;
 	public uniformXCountLocation: WebGLUniformLocation;
 	public uniformYCountLocation: WebGLUniformLocation;
@@ -50,18 +49,17 @@ export default class GridShader extends Shader {
 		this.attributePositionLocation = this.getAttributeLocation(gl, 'a_position');
 		this.uniformModelViewMatrixLocation = this.getUniformLocation(gl, 'u_model_view');
 		this.uniformProjectionMatrixLocation = this.getUniformLocation(gl, 'u_projection');
-		this.uniformGridColorLocation = this.getUniformLocation(gl, 'u_grid_color');
-		this.uniformBackgroundColorLocation = this.getUniformLocation(gl, 'u_background_color');
+		this.uniformColorLocation = this.getUniformLocation(gl, 'u_grid_color');
 		this.uniformGridThicknessLocation = this.getUniformLocation(gl, 'u_grid_thickness');
 		this.uniformXCountLocation = this.getUniformLocation(gl, 'u_x_count');
 		this.uniformYCountLocation = this.getUniformLocation(gl, 'u_y_count');
 	}
 
-	protected getVertexSource(): string {
+	public getVertexSource(): string {
 		return vertexShaderSource;
 	}
 
-	protected getFragmentSource(): string {
+	public getFragmentSource(): string {
 		return fragmentShaderSource;
 	}
 

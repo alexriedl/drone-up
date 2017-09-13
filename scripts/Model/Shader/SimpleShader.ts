@@ -33,11 +33,11 @@ export default class SimpleShader extends Shader {
 		this.uniformColorLocation = this.getUniformLocation(gl, 'u_color');
 	}
 
-	protected getVertexSource(): string {
+	public getVertexSource(): string {
 		return vertexShaderSource;
 	}
 
-	protected getFragmentSource(): string {
+	public getFragmentSource(): string {
 		return fragmentShaderSource;
 	}
 

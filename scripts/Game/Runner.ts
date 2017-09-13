@@ -72,6 +72,9 @@ export default class Runner {
 	}
 
 	private combineLists(gameObjects: GameObject[], transientObjects: BaseObject[]): BaseObject[] {
+		if (!transientObjects) return [...gameObjects];
+		if (!gameObjects) return [...transientObjects];
+
 		const removed: BaseObject[] = gameObjects.
 			filter((go) => transientObjects.find((to) => go.ID === to.ID) === undefined);
 

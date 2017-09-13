@@ -50,8 +50,8 @@ abstract class Shader {
 		}
 	}
 
-	protected abstract getVertexSource(): string;
-	protected abstract getFragmentSource(): string;
+	public abstract getVertexSource(): string;
+	public abstract getFragmentSource(): string;
 
 	protected getAttributeLocation(gl: WebGLRenderingContext, name: string): number {
 		return gl.getAttribLocation(this.program, name);
