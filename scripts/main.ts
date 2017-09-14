@@ -67,6 +67,7 @@ function startGame(): void {
 
 	game = new Game(randomizer, 15, playerControllers, 20, 20);
 	// game = new Game(randomizer, 15, playerControllers, 50, 50);
+
 	game.start();
 }
 

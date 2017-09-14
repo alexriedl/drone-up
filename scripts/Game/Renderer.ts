@@ -68,16 +68,15 @@ export default class Renderer {
 		this.overflowYTiles = overflowYPixels / pixelsPerTile;
 
 		// NOTE: Create texture
+		const extra = 6;
 		{
-			// TODO: Make texture a few tiles larger than grid.
-			// This would allow animations to be rendered if they go too far off
-			const gameBoardWidth = canvasWidth - overflowXPixels;
-			const gameBoardHeight = canvasHeight - overflowYPixels;
-			const overdrawTiles = 6;
-			const overdrawWidth = overdrawTiles * pixelsPerTile;
-			const overdrawHeight = overdrawTiles * pixelsPerTile;
-			const textureWidth = gameBoardWidth + overdrawWidth;
-			const textureHeight = gameBoardHeight + overdrawHeight;
+			const boardWidth = xSize * pixelsPerTile;
+			const overdrawWidth = extra * pixelsPerTile;
+			const textureWidth = boardWidth + overdrawWidth;
+
+			const boardHeight = ySize * pixelsPerTile;
+			const overdrawHeight = extra * pixelsPerTile;
+			const textureHeight = boardHeight + overdrawHeight;
 
 			const texture = gl.createTexture();
 			gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -110,7 +109,7 @@ export default class Renderer {
 		}
 
 		this.gridModel = new GridModel(new Color(1, 0.6, 0), xSize / 1000, xSize, ySize);
-		this.outputModel = new SimpleTextureRectangle(this.renderTarget.texture, xSize, ySize);
+		this.outputModel = new SimpleTextureRectangle(this.renderTarget.texture, xSize + extra, ySize + extra);
 	}
 
 	protected static clearScreen(gl: WebGLRenderingContext): void {
@@ -132,15 +131,19 @@ export default class Renderer {
 
 		// NOTE: Render to texture first
 		{
+			const canvasWidth = gl.canvas.clientWidth;
+			const canvasHeight = gl.canvas.clientHeight;
+			const pixelsPerTile = Math.min(canvasWidth / this.xSize, canvasHeight / this.ySize);
+			const offsetX = this.renderTarget.offsetX / pixelsPerTile;
+			const offsetY = this.renderTarget.offsetY / pixelsPerTile;
+
 			gl.bindFramebuffer(gl.FRAMEBUFFER, this.renderTarget.frameBuffer);
-			gl.viewport(
-				0, 0,
-				this.renderTarget.width, this.renderTarget.height);
+			gl.viewport(0, 0, this.renderTarget.width, this.renderTarget.height);
 			gl.clearColor(0, 0, 0, 0);
 			Renderer.clearScreen(gl);
 			const orthoMatrix = TSM.mat4.orthographic(
-				-this.renderTarget.offsetX / 2, this.xSize,
-				this.ySize, -this.renderTarget.offsetY / 2,
+				-offsetX, this.xSize + offsetX,
+				this.ySize + offsetY, -offsetY,
 				-1, 1);
 			Renderer.renderObjects(gl, orthoMatrix, objects);
 
