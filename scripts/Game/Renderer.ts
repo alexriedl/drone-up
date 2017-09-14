@@ -4,6 +4,13 @@ import { BaseObject } from './GameObject';
 import { Register } from '../Utils';
 import { GridModel, SimpleTextureRectangle } from '../Model';
 
+export interface IRenderOptions {
+	povPosition?: Coordinate;
+	renderGrid?: boolean;
+	tiledRender?: boolean;
+	viewSize?: number;
+}
+
 export default class Renderer {
 	private gl: WebGLRenderingContext;
 	private grid: GridModel;
@@ -18,6 +25,13 @@ export default class Renderer {
 	private targetTexture: WebGLTexture;
 	private frameBuffer: WebGLFramebuffer;
 	private outputModel: SimpleTextureRectangle;
+
+	private defaultOptions: IRenderOptions = {
+		povPosition: null,
+		renderGrid: true,
+		tiledRender: true,
+		viewSize: 10,
+	};
 
 	public constructor(canvasId: string, xSize: number, ySize: number) {
 		const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
@@ -63,6 +77,8 @@ export default class Renderer {
 			const width = canvasWidth - overflowXPixels;
 			const height = canvasHeight - overflowYPixels;
 
+			// TODO: Make texture a few tiles larger than grid.
+			// This would allow animations to be rendered if they go too far off
 			this.targetWidth = width;
 			this.targetHeight = height;
 
@@ -105,36 +121,18 @@ export default class Renderer {
 	/*************************************************************************
 	*************************************************************************/
 
-	public renderMap(objects: BaseObject[]): void {
-		const gl: WebGLRenderingContext = this.gl;
-
-		// NOTE: Here to initialize any resources that are registered after startup
-		Register.initializeRegistered(gl);
-
-		Renderer.clearScreen(gl);
-
-		const orthoMatrix = TSM.mat4.orthographic(
-			-this.overflowXTiles / 2, this.xSize + this.overflowXTiles / 2,
-			this.ySize + this.overflowYTiles / 2, -this.overflowYTiles / 2,
-			-1, 1);
-
-		Renderer.renderGrid(gl, orthoMatrix, this.grid);
-		Renderer.renderObjects(gl, orthoMatrix, objects);
-	}
-
-	/**
-	 * This can be expanded to only render a section of the map. Then re-render the map
-	 * in different spots to make it look continuous.
-	 */
-	public renderSection(objects: BaseObject[], position: Coordinate): void {
+	public render(objects: BaseObject[], options: IRenderOptions = this.defaultOptions): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const gridBackground = Color.BLACK.lighten(.15);
 		const borderBackground = Color.BLACK.lighten(.3);
 
-		const width = gl.canvas.clientWidth;
-		const height = gl.canvas.clientHeight;
+		// NOTE: Expand options
+		const position = options.povPosition;
+		const renderGrid = options.renderGrid === undefined ? this.defaultOptions.renderGrid : options.renderGrid;
+		const tiledRender = options.tiledRender === undefined ? this.defaultOptions.tiledRender : options.tiledRender;
+		const viewSize = Math.min(options.viewSize || this.defaultOptions.viewSize, this.xSize, this.ySize);
 
-		Register.initializeRegistered(gl);
+		Register.initializeRegistered(this.gl);
 
 		// NOTE: Render to texture first
 		{
@@ -150,25 +148,30 @@ export default class Renderer {
 
 		// NOTE: Render target texture to screen
 		{
+			const width = gl.canvas.clientWidth;
+			const height = gl.canvas.clientHeight;
+
 			gl.viewport(0, 0, width, height);
 			gl.clearColor(borderBackground.r, borderBackground.g, borderBackground.b, 1.0);
 			Renderer.clearScreen(gl);
 
-			const original = false;
 			let orthoMatrix;
-
-			if (original) {
-				const pixelsPerTile = Math.min(width / this.xSize, height / this.ySize);
-				// orthoMatrix = TSM.mat4.orthographic(0, width / pixelsPerTile, height / pixelsPerTile, 0, -1, 1);
-				orthoMatrix = TSM.mat4.orthographic(-2, width / pixelsPerTile + 2, height / pixelsPerTile + 2, -2, -1, 1);
+			if (!position) {
+				const extra = 2;
+				orthoMatrix = TSM.mat4.orthographic(
+					-this.overflowXTiles / 2 - extra, this.xSize + this.overflowXTiles / 2 + extra,
+					this.ySize + this.overflowYTiles / 2 + extra, -this.overflowYTiles / 2 - extra,
+					-1, 1);
 			}
 			else {
-				const aspect = width / height;
+				const aspect = height / width;
+				const w = viewSize;
+				const h = viewSize * aspect;
 
 				orthoMatrix = TSM.mat4.orthographic(
-					position.x - 8, position.x + 9,
-					(this.ySize - position.y + 5) * aspect, (this.ySize - position.y - 6) * aspect
-					, -1, 1);
+					position.x - w, position.x + w + 1,
+					this.ySize - position.y + h, this.ySize - position.y - (h + 1),
+					-1, 1);
 			}
 
 			const centerY = (this.ySize - 1) / 2;
@@ -179,37 +182,52 @@ export default class Renderer {
 			const topBorder = centerY - this.ySize;
 			this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, centerY));
 
-			if (position.x > this.xSize / 2) {
-				this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, centerY));
-				if (position.y > this.ySize / 2) {
+			if (tiledRender) {
+				if (!position) {
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, centerY));
 					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, topBorder));
-					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, topBorder));
-				}
-				else {
 					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, bottomBorder));
-					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, bottomBorder));
-				}
-			}
-			else {
-				this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, centerY));
-				if (position.y > this.ySize / 2) {
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, centerY));
 					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, topBorder));
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, bottomBorder));
 					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, topBorder));
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, bottomBorder));
 				}
 				else {
-					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, bottomBorder));
-					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, bottomBorder));
+					if (position.x > this.xSize / 2) {
+						this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, centerY));
+						if (position.y > this.ySize / 2) {
+							this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, topBorder));
+							this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, topBorder));
+						}
+						else {
+							this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, bottomBorder));
+							this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, bottomBorder));
+						}
+					}
+					else {
+						this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, centerY));
+						if (position.y > this.ySize / 2) {
+							this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, topBorder));
+							this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, topBorder));
+						}
+						else {
+							this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, bottomBorder));
+							this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, bottomBorder));
+						}
+					}
 				}
 			}
 
-			Renderer.renderGrid(gl, orthoMatrix, this.grid);
+			if (renderGrid) Renderer.renderGrid(gl, orthoMatrix, this.grid);
 		}
 	}
 
-	protected static renderGrid(gl: WebGLRenderingContext, orthoMatrix: TSM.mat4, grid: GridModel) {
+	protected static renderGrid(gl: WebGLRenderingContext, orthoMatrix: TSM.mat4, grid: GridModel,
+		offset: Coordinate = new Coordinate(0, 0)) {
 		grid.useShader(gl);
 		gl.uniformMatrix4fv(grid.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
-		grid.render(gl);
+		grid.render(gl, offset);
 	}
 
 	protected renderOutput(gl: WebGLRenderingContext, orthoMatrix: TSM.mat4, output: SimpleTextureRectangle,
