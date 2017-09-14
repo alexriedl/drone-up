@@ -59,11 +59,13 @@ export default class Runner {
 			const p = this.map.getPlayers();
 			const firstPlayer = p && p.length > 0 && p[p.length - 1];
 
+			const usePosition = false;
+
 			// TODO: Allow user to change these values
 			this.renderer.render(renderObjects, {
-				povPosition: firstPlayer.getPosition(),
+				povPosition: usePosition ? firstPlayer && firstPlayer.getPosition() : null,
 				renderGrid: true,
-				tiledRender: true,
+				tiledRender: false,
 				viewSize: 10,
 			});
 
