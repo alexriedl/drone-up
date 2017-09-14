@@ -131,6 +131,9 @@ export default class Renderer {
 		const gridBackground = Color.BLACK.lighten(.15);
 		const borderBackground = Color.BLACK.lighten(.3);
 
+		const width = gl.canvas.clientWidth;
+		const height = gl.canvas.clientHeight;
+
 		Register.initializeRegistered(gl);
 
 		// NOTE: Render to texture first
@@ -147,8 +150,6 @@ export default class Renderer {
 
 		// NOTE: Render target texture to screen
 		{
-			const width = gl.canvas.clientWidth;
-			const height = gl.canvas.clientHeight;
 			gl.viewport(0, 0, width, height);
 			gl.clearColor(borderBackground.r, borderBackground.g, borderBackground.b, 1.0);
 			Renderer.clearScreen(gl);
@@ -162,19 +163,20 @@ export default class Renderer {
 				orthoMatrix = TSM.mat4.orthographic(-2, width / pixelsPerTile + 2, height / pixelsPerTile + 2, -2, -1, 1);
 			}
 			else {
+				const aspect = width / height;
 
 				orthoMatrix = TSM.mat4.orthographic(
 					position.x - 8, position.x + 9,
-					this.ySize - position.y + 5, this.ySize - position.y - 6
+					(this.ySize - position.y + 5) * aspect, (this.ySize - position.y - 6) * aspect
 					, -1, 1);
 			}
 
 			const centerY = (this.ySize - 1) / 2;
 			const centerX = (this.xSize - 1) / 2;
-			const rightBorder = this.xSize / 2 * 3 - 0.5;
-			const leftBorder = this.xSize / 2 * 1 - 0.5 - this.xSize;
-			const bottomBorder = this.ySize / 2 * 3 - 0.5;
-			const topBorder = this.ySize / 2 * 1 - 0.5 - this.ySize;
+			const rightBorder = centerX + this.xSize;
+			const leftBorder = centerX - this.xSize;
+			const bottomBorder = centerY + this.ySize;
+			const topBorder = centerY - this.ySize;
 			this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, centerY));
 
 			if (position.x > this.xSize / 2) {
