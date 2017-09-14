@@ -1,4 +1,4 @@
-import { Color } from '../Utils';
+import { Coordinate, Color } from '../Utils';
 import { BaseObject } from './GameObject';
 
 import { Register } from '../Utils';
@@ -126,7 +126,7 @@ export default class Renderer {
 	 * This can be expanded to only render a section of the map. Then re-render the map
 	 * in different spots to make it look continuous.
 	 */
-	public renderSection(objects: BaseObject[]): void {
+	public renderSection(objects: BaseObject[], position: Coordinate): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const gridBackground = Color.BLACK.lighten(.15);
 		const borderBackground = Color.BLACK.lighten(.3);
@@ -153,11 +153,54 @@ export default class Renderer {
 			gl.clearColor(borderBackground.r, borderBackground.g, borderBackground.b, 1.0);
 			Renderer.clearScreen(gl);
 
-			const pixelsPerTile = Math.min(width / this.xSize, height / this.ySize);
-			const orthoMatrix = TSM.mat4.orthographic(0, width / pixelsPerTile, height / pixelsPerTile, 0, -1, 1);
+			const original = false;
+			let orthoMatrix;
+
+			if (original) {
+				const pixelsPerTile = Math.min(width / this.xSize, height / this.ySize);
+				// orthoMatrix = TSM.mat4.orthographic(0, width / pixelsPerTile, height / pixelsPerTile, 0, -1, 1);
+				orthoMatrix = TSM.mat4.orthographic(-2, width / pixelsPerTile + 2, height / pixelsPerTile + 2, -2, -1, 1);
+			}
+			else {
+
+				orthoMatrix = TSM.mat4.orthographic(
+					position.x - 8, position.x + 9,
+					this.ySize - position.y + 5, this.ySize - position.y - 6
+					, -1, 1);
+			}
+
+			const centerY = (this.ySize - 1) / 2;
+			const centerX = (this.xSize - 1) / 2;
+			const rightBorder = this.xSize / 2 * 3 - 0.5;
+			const leftBorder = this.xSize / 2 * 1 - 0.5 - this.xSize;
+			const bottomBorder = this.ySize / 2 * 3 - 0.5;
+			const topBorder = this.ySize / 2 * 1 - 0.5 - this.ySize;
+			this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, centerY));
+
+			if (position.x > this.xSize / 2) {
+				this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, centerY));
+				if (position.y > this.ySize / 2) {
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, topBorder));
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, topBorder));
+				}
+				else {
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, bottomBorder));
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, bottomBorder));
+				}
+			}
+			else {
+				this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, centerY));
+				if (position.y > this.ySize / 2) {
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, topBorder));
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, topBorder));
+				}
+				else {
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, bottomBorder));
+					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, bottomBorder));
+				}
+			}
 
 			Renderer.renderGrid(gl, orthoMatrix, this.grid);
-			Renderer.renderOutput(gl, orthoMatrix, this.outputModel);
 		}
 	}
 
@@ -167,10 +210,11 @@ export default class Renderer {
 		grid.render(gl);
 	}
 
-	protected static renderOutput(gl: WebGLRenderingContext, orthoMatrix: TSM.mat4, output: SimpleTextureRectangle) {
+	protected renderOutput(gl: WebGLRenderingContext, orthoMatrix: TSM.mat4, output: SimpleTextureRectangle,
+		offset: Coordinate) {
 		output.useShader(gl);
 		gl.uniformMatrix4fv(output.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
-		output.render(gl);
+		output.render(gl, offset);
 	}
 
 	protected static renderObjects(gl: WebGLRenderingContext, orthoMatrix: TSM.mat4, objects: BaseObject[]) {

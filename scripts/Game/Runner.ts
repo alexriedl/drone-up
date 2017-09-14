@@ -57,7 +57,9 @@ export default class Runner {
 
 			const renderObjects = this.combineLists(gameObjects, transientObjects);
 			// this.renderer.renderMap(renderObjects);
-			this.renderer.renderSection(renderObjects);
+			const p = this.map.getPlayers();
+			const firstPlayer = p && p.length > 0 && p[p.length - 1];
+			this.renderer.renderSection(renderObjects, firstPlayer.getPosition());
 
 			if (!tickState.isAnimating()) {
 				this.checkGameDone();
