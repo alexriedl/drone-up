@@ -12,7 +12,6 @@
         "align": [ true, "statements", "members", "elements" ],
         "no-console": [ false ],
         "object-literal-sort-keys": [ false ],
-        "no-bitwise": false,
         "ordered-imports": false,
         "member-ordering": [ true, {
           "order": [

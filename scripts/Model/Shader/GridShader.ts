@@ -6,7 +6,7 @@ attribute vec4 a_position;
 uniform mat4 u_model_view;
 uniform mat4 u_projection;
 
-varying lowp vec2 v_uv;
+varying vec2 v_uv;
 
 void main() {
 	gl_Position = u_projection * u_model_view * a_position;
@@ -21,7 +21,7 @@ uniform float u_y_count;
 uniform float u_grid_thickness;
 uniform vec4 u_grid_color;
 
-varying lowp vec2 v_uv;
+varying vec2 v_uv;
 
 bool onGrid(float pos) {
 	float f = fract(pos);

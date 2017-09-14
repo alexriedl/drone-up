@@ -1,17 +1,43 @@
-import { Color } from '../Utils';
+import { Coordinate, Color } from '../Utils';
 import { BaseObject } from './GameObject';
 
 import { Register } from '../Utils';
-import { GridModel } from '../Model';
+import { Model, GridModel, SimpleTextureRectangle } from '../Model';
+
+export interface IRenderOptions {
+	povPosition?: Coordinate;
+	renderGrid?: boolean;
+	tiledRender?: boolean;
+	viewSize?: number;
+}
+
+export interface IRenderTargetInfo {
+	frameBuffer: WebGLFramebuffer;
+	texture: WebGLTexture;
+	offsetX: number;
+	offsetY: number;
+	height: number;
+	width: number;
+}
 
 export default class Renderer {
 	private gl: WebGLRenderingContext;
-	private grid: GridModel;
+	private gridModel: GridModel;
 	private xSize: number;
 	private ySize: number;
 
 	private overflowXTiles: number = 0;
 	private overflowYTiles: number = 0;
+
+	private renderTarget: IRenderTargetInfo;
+	private outputModel: SimpleTextureRectangle;
+
+	private defaultOptions: IRenderOptions = {
+		povPosition: null,
+		renderGrid: true,
+		tiledRender: true,
+		viewSize: 10,
+	};
 
 	public constructor(canvasId: string, xSize: number, ySize: number) {
 		const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
@@ -23,60 +49,194 @@ export default class Renderer {
 
 		this.gl = gl;
 
-		// gl.enable(gl.DEPTH_TEST);
-		// gl.depthFunc(gl.LEQUAL);
+		gl.enable(gl.DEPTH_TEST);
+		gl.depthFunc(gl.LEQUAL);
 
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-		this.setBackgroundColor(Color.BLACK.lighten(.15));
-		this.clearScreen();
-
 		this.xSize = xSize;
 		this.ySize = ySize;
 
-		// NOTE: Setup viewport into canvas, and how much extra space is available around map
+		const canvasWidth = canvas.width;
+		const canvasHeight = canvas.height;
+		const pixelsPerTile = Math.min(canvasWidth / this.xSize, canvasHeight / this.ySize);
+		const overflowXPixels = canvasWidth - this.xSize * pixelsPerTile;
+		const overflowYPixels = canvasHeight - this.ySize * pixelsPerTile;
+
+		this.overflowXTiles = overflowXPixels / pixelsPerTile;
+		this.overflowYTiles = overflowYPixels / pixelsPerTile;
+
+		// NOTE: Create texture
+		const extra = 6;
+		{
+			const boardWidth = xSize * pixelsPerTile;
+			const overdrawWidth = extra * pixelsPerTile;
+			const textureWidth = boardWidth + overdrawWidth;
+
+			const boardHeight = ySize * pixelsPerTile;
+			const overdrawHeight = extra * pixelsPerTile;
+			const textureHeight = boardHeight + overdrawHeight;
+
+			const texture = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, texture);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+										textureWidth, textureHeight, 0,
+										gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+			// set the filtering so we don't need mips
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+			// NOTE: Setup framebuffer
+			const frameBuffer = gl.createFramebuffer();
+			gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+			// NOTE: Unbind all the things
+			gl.bindTexture(gl.TEXTURE_2D, null);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+			this.renderTarget = {
+				frameBuffer,
+				texture,
+				width: textureWidth,
+				height: textureHeight,
+				offsetX: overdrawWidth / 2,
+				offsetY: overdrawHeight / 2,
+			};
+		}
+
+		this.gridModel = new GridModel(new Color(1, 0.6, 0), xSize / 1000, xSize, ySize);
+		this.outputModel = new SimpleTextureRectangle(this.renderTarget.texture, xSize + extra, ySize + extra);
+	}
+
+	protected static clearScreen(gl: WebGLRenderingContext): void {
+		// tslint:disable-next-line:no-bitwise
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	}
+
+	public render(objects: BaseObject[], options: IRenderOptions = this.defaultOptions): void {
+		const gl: WebGLRenderingContext = this.gl;
+		const background = Color.BLACK.lighten(.3);
+
+		// NOTE: Expand options
+		const position = options.povPosition;
+		const renderGrid = options.renderGrid === undefined ? this.defaultOptions.renderGrid : options.renderGrid;
+		const tiledRender = options.tiledRender === undefined ? this.defaultOptions.tiledRender : options.tiledRender;
+		const viewSize = Math.min(options.viewSize || this.defaultOptions.viewSize, this.xSize, this.ySize);
+
+		Register.initializeRegistered(this.gl);
+
+		// NOTE: Render to texture first
+		{
+			const canvasWidth = gl.canvas.clientWidth;
+			const canvasHeight = gl.canvas.clientHeight;
+			const pixelsPerTile = Math.min(canvasWidth / this.xSize, canvasHeight / this.ySize);
+			const offsetX = this.renderTarget.offsetX / pixelsPerTile;
+			const offsetY = this.renderTarget.offsetY / pixelsPerTile;
+
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this.renderTarget.frameBuffer);
+			gl.viewport(0, 0, this.renderTarget.width, this.renderTarget.height);
+			gl.clearColor(0, 0, 0, 0);
+			Renderer.clearScreen(gl);
+			const orthoMatrix = TSM.mat4.orthographic(
+				-offsetX, this.xSize + offsetX,
+				this.ySize + offsetY, -offsetY,
+				-1, 1);
+			Renderer.renderObjects(gl, orthoMatrix, objects);
+
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		}
+
+		// NOTE: Render target texture to screen
 		{
 			const width = gl.canvas.clientWidth;
 			const height = gl.canvas.clientHeight;
+
 			gl.viewport(0, 0, width, height);
+			gl.clearColor(background.r, background.g, background.b, 1.0);
+			Renderer.clearScreen(gl);
 
-			if (height < width) {
-				const size = height / this.ySize;
-				const overflowPixels = width - this.xSize * size;
-				this.overflowXTiles = overflowPixels / size;
+			let orthoMatrix;
+			if (!position) {
+				const extra = 2;
+				orthoMatrix = TSM.mat4.orthographic(
+					-this.overflowXTiles / 2 - extra, this.xSize + this.overflowXTiles / 2 + extra,
+					this.ySize + this.overflowYTiles / 2 + extra, -this.overflowYTiles / 2 - extra,
+					-1, 1);
 			}
-			else if (width > height) {
-				const size = width / this.xSize;
-				const overflowPixels = height - this.ySize * size;
-				this.overflowYTiles = overflowPixels / size;
+			else {
+				const aspect = height / width;
+				const w = viewSize;
+				const h = viewSize * aspect;
+
+				orthoMatrix = TSM.mat4.orthographic(
+					position.x - w, position.x + w + 1,
+					this.ySize - position.y + h, this.ySize - position.y - (h + 1),
+					-1, 1);
 			}
+
+			// NOTE: This positioning seems odd...
+			const centerY = (this.ySize - 1) / 2;
+			const centerX = (this.xSize - 1) / 2;
+			const rightBorder = centerX + this.xSize;
+			const leftBorder = centerX - this.xSize;
+			const bottomBorder = centerY + this.ySize;
+			const topBorder = centerY - this.ySize;
+			Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, centerY));
+
+			// TODO: Cleanup how tiling works.
+			if (tiledRender) {
+				if (!position) {
+					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, centerY));
+					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, topBorder));
+					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, bottomBorder));
+					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, centerY));
+					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, topBorder));
+					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, bottomBorder));
+					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, topBorder));
+					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, bottomBorder));
+				}
+				else {
+					if (position.x > this.xSize / 2) {
+						Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, centerY));
+						if (position.y > this.ySize / 2) {
+							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, topBorder));
+							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, topBorder));
+						}
+						else {
+							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, bottomBorder));
+							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, bottomBorder));
+						}
+					}
+					else {
+						Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, centerY));
+						if (position.y > this.ySize / 2) {
+							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, topBorder));
+							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, topBorder));
+						}
+						else {
+							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, bottomBorder));
+							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, bottomBorder));
+						}
+					}
+				}
+			}
+
+			// TODO: Option to render grid on all tiles?
+			if (renderGrid) Renderer.renderModel(gl, orthoMatrix, this.gridModel);
 		}
-
-		this.grid = new GridModel(new Color(1, 0.6, 0), xSize / 1000, xSize, ySize);
 	}
 
-	public setBackgroundColor(color: Color): void {
-		this.gl.clearColor(color.r, color.g, color.b, 1.0);
+	protected static renderModel(gl: WebGLRenderingContext, orthoMatrix: TSM.mat4, model: Model,
+		position: Coordinate = new Coordinate(0, 0)) {
+		model.useShader(gl, new Float32Array(orthoMatrix.all()));
+		model.render(gl, position);
 	}
 
-	protected clearScreen(): void {
-		this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-	}
-
-	/*************************************************************************
-	*************************************************************************/
-
-	public renderMap(objects: BaseObject[]): void {
-		const gl: WebGLRenderingContext = this.gl;
-
-		this.clearScreen();
-
-		const orthoMatrix = TSM.mat4.orthographic(
-			-this.overflowXTiles / 2, this.xSize + this.overflowXTiles / 2,
-			this.ySize + this.overflowYTiles / 2, -this.overflowYTiles / 2,
-			-1, 1);
-
+	protected static renderObjects(gl: WebGLRenderingContext, orthoMatrix: TSM.mat4, objects: BaseObject[]) {
 		// TODO: Sort objects before rendering
 		/*
 		 By:
@@ -85,24 +245,14 @@ export default class Renderer {
 			- Same shader program
 		 */
 
-		// NOTE: Here to initialize any resources that are registered after startup
-		Register.initializeRegistered(gl);
-
-		{
-			// TODO: Here temporarily until background objects are implemented
-			const grid = this.grid;
-			grid.useShader(gl);
-			gl.uniformMatrix4fv(grid.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
-			grid.render(gl);
-		}
-
+		const ortho = new Float32Array(orthoMatrix.all());
 		for (const o of objects) {
 			if (!o.canRender()) continue;
 
+			// TODO: Only bind a shader if it is not currently in use
+			// if (currentShader !== o.model.getShader()) {
 			{
-				// TODO: Only bind a shader if it is not currently in use
-				o.model.useShader(gl);
-				gl.uniformMatrix4fv(o.model.getModelViewMatrixUniformLocation(), false, new Float32Array(orthoMatrix.all()));
+				o.model.useShader(gl, ortho);
 			}
 
 			o.render(gl);

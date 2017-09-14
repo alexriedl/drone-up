@@ -1,4 +1,4 @@
-import { Animation } from '../../Animations';
+import { Animation, MoveAnimation } from '../../Animations';
 import { Coordinate } from '../../Utils';
 import { Model } from '../../Model';
 
@@ -15,6 +15,7 @@ abstract class BaseObject {
 	}
 
 	public canRender(): boolean {
+		// TODO: Improve this to ensure buffer and shader is also loaded
 		return !!this.model;
 	}
 
@@ -34,6 +35,16 @@ abstract class BaseObject {
 
 	public setAnimation(animation: Animation): void {
 		this.animation = animation;
+	}
+
+	public getPosition() {
+		if (this.animation) {
+			if (this.animation instanceof MoveAnimation) {
+				return this.animation.position;
+			}
+		}
+
+		return this.position;
 	}
 }
 

@@ -12,11 +12,12 @@ abstract class Model {
 		this.buffer = this.createBuffer();
 	}
 
-	public useShader(gl: WebGLRenderingContext): void {
+	public useShader(gl: WebGLRenderingContext, modelViewMatrix?: Float32Array): void {
 		this.shader.use(gl);
+		if (modelViewMatrix) gl.uniformMatrix4fv(this.getModelViewMatrixUniformLocation(), false, modelViewMatrix);
 	}
 
-	public abstract getModelViewMatrixUniformLocation(): WebGLUniformLocation;
+	protected abstract getModelViewMatrixUniformLocation(): WebGLUniformLocation;
 
 	public render(gl: WebGLRenderingContext, position?: Coordinate, animation?: Animation): void {
 		const state = this.setupRenderState(position, animation);

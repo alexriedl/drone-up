@@ -54,7 +54,20 @@ export default class Runner {
 			const effectiveDeltaTime = deltaTime * this.animationSpeed;
 			const transientObjects = tickState.update(effectiveDeltaTime, this.map);
 			const gameObjects = this.map.getGameObjects();
-			this.renderer.renderMap(this.combineLists(gameObjects, transientObjects));
+
+			const renderObjects = this.combineLists(gameObjects, transientObjects);
+			const p = this.map.getPlayers();
+			const firstPlayer = p && p.length > 0 && p[p.length - 1];
+
+			const usePosition = true;
+
+			// TODO: Allow user to change these values
+			this.renderer.render(renderObjects, {
+				povPosition: usePosition ? firstPlayer && firstPlayer.getPosition() : null,
+				renderGrid: false,
+				tiledRender: true,
+				viewSize: 10,
+			});
 
 			if (!tickState.isAnimating()) {
 				this.checkGameDone();
