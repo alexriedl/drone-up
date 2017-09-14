@@ -174,6 +174,7 @@ export default class Renderer {
 					-1, 1);
 			}
 
+			// NOTE: This positioning seems odd...
 			const centerY = (this.ySize - 1) / 2;
 			const centerX = (this.xSize - 1) / 2;
 			const rightBorder = centerX + this.xSize;
@@ -182,6 +183,7 @@ export default class Renderer {
 			const topBorder = centerY - this.ySize;
 			this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, centerY));
 
+			// TODO: Cleanup how tiling works.
 			if (tiledRender) {
 				if (!position) {
 					this.renderOutput(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, centerY));
@@ -219,6 +221,7 @@ export default class Renderer {
 				}
 			}
 
+			// TODO: Option to render grid on all tiles?
 			if (renderGrid) Renderer.renderGrid(gl, orthoMatrix, this.grid);
 		}
 	}

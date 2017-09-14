@@ -58,6 +58,8 @@ export default class Runner {
 			const renderObjects = this.combineLists(gameObjects, transientObjects);
 			const p = this.map.getPlayers();
 			const firstPlayer = p && p.length > 0 && p[p.length - 1];
+
+			// TODO: Allow user to change these values
 			this.renderer.render(renderObjects, {
 				povPosition: firstPlayer.getPosition(),
 				renderGrid: true,
