@@ -176,11 +176,10 @@ export default class Renderer {
 				const aspect = height / width;
 				const w = viewSize;
 				const h = viewSize * aspect;
-				const v = 0.5 * aspect;
 
 				orthoMatrix = TSM.mat4.orthographic(
 					position.x - w + 0.5, position.x + w + 0.5,
-					position.y + h + v, position.y - h + v,
+					position.y + h + 0.5, position.y - h + 0.5,
 					-1, 1);
 			}
 
