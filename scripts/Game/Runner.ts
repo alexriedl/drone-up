@@ -66,7 +66,7 @@ export default class Runner {
 				povPosition: usePosition ? firstPlayer && firstPlayer.getPosition() : null,
 				renderGrid: true,
 				tiledRender: true,
-				viewSize: 11,
+				viewSize: Math.max(this.map.xSize, this.map.ySize) / 2,
 			});
 
 			if (!tickState.isAnimating()) {

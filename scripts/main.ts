@@ -65,7 +65,7 @@ function startGame(): void {
 		new Bot.Shove(randomizer),
 	];
 
-	game = new Game(randomizer, 15, playerControllers, 20, 20);
+	game = new Game(randomizer, 15, playerControllers, 30, 20);
 	// game = new Game(randomizer, 15, playerControllers, 50, 50);
 
 	game.start();

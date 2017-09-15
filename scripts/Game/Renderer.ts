@@ -9,6 +9,8 @@ export interface IRenderOptions {
 	renderGrid?: boolean;
 	tiledRender?: boolean;
 	viewSize?: number;
+
+	debugGrid?: boolean;
 }
 
 export interface IRenderTargetInfo {
@@ -84,8 +86,8 @@ export default class Renderer {
 										textureWidth, textureHeight, 0,
 										gl.RGBA, gl.UNSIGNED_BYTE, null);
 
-			// set the filtering so we don't need mips
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
@@ -126,6 +128,7 @@ export default class Renderer {
 		const renderGrid = options.renderGrid === undefined ? this.defaultOptions.renderGrid : options.renderGrid;
 		const tiledRender = options.tiledRender === undefined ? this.defaultOptions.tiledRender : options.tiledRender;
 		const viewSize = Math.min(options.viewSize || this.defaultOptions.viewSize, this.xSize, this.ySize) / 2;
+		const debugGrid = options.debugGrid === undefined ? this.defaultOptions.debugGrid : options.debugGrid;
 
 		Register.initializeRegistered(this.gl);
 
@@ -145,6 +148,8 @@ export default class Renderer {
 				-offsetX, this.xSize + offsetX,
 				-offsetY, this.ySize + offsetY,
 				-1, 1);
+
+			if (renderGrid && !debugGrid) Renderer.renderModel(gl, orthoMatrix, this.gridModel);
 			Renderer.renderObjects(gl, orthoMatrix, objects);
 
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -179,8 +184,7 @@ export default class Renderer {
 					-1, 1);
 			}
 
-			// TODO: Option to render grid on all tiles?
-			if (renderGrid) Renderer.renderModel(gl, orthoMatrix, this.gridModel);
+			if (debugGrid) Renderer.renderModel(gl, orthoMatrix, this.gridModel);
 
 			// NOTE: This positioning seems odd...
 			const centerY = (this.ySize - 1) / 2;
