@@ -64,9 +64,9 @@ export default class Runner {
 			// TODO: Allow user to change these values
 			this.renderer.render(renderObjects, {
 				povPosition: usePosition ? firstPlayer && firstPlayer.getPosition() : null,
-				renderGrid: false,
+				renderGrid: true,
 				tiledRender: true,
-				viewSize: 10,
+				viewSize: 11,
 			});
 
 			if (!tickState.isAnimating()) {

@@ -125,7 +125,7 @@ export default class Renderer {
 		const position = options.povPosition;
 		const renderGrid = options.renderGrid === undefined ? this.defaultOptions.renderGrid : options.renderGrid;
 		const tiledRender = options.tiledRender === undefined ? this.defaultOptions.tiledRender : options.tiledRender;
-		const viewSize = Math.min(options.viewSize || this.defaultOptions.viewSize, this.xSize, this.ySize);
+		const viewSize = Math.min(options.viewSize || this.defaultOptions.viewSize, this.xSize, this.ySize) / 2;
 
 		Register.initializeRegistered(this.gl);
 
@@ -143,7 +143,7 @@ export default class Renderer {
 			Renderer.clearScreen(gl);
 			const orthoMatrix = TSM.mat4.orthographic(
 				-offsetX, this.xSize + offsetX,
-				this.ySize + offsetY, -offsetY,
+				-offsetY, this.ySize + offsetY,
 				-1, 1);
 			Renderer.renderObjects(gl, orthoMatrix, objects);
 
@@ -171,12 +171,16 @@ export default class Renderer {
 				const aspect = height / width;
 				const w = viewSize;
 				const h = viewSize * aspect;
+				const v = 0.5 * aspect;
 
 				orthoMatrix = TSM.mat4.orthographic(
-					position.x - w, position.x + w + 1,
-					this.ySize - position.y + h, this.ySize - position.y - (h + 1),
+					position.x - w + 0.5, position.x + w + 0.5,
+					position.y + h + v, position.y - h + v,
 					-1, 1);
 			}
+
+			// TODO: Option to render grid on all tiles?
+			if (renderGrid) Renderer.renderModel(gl, orthoMatrix, this.gridModel);
 
 			// NOTE: This positioning seems odd...
 			const centerY = (this.ySize - 1) / 2;
@@ -202,7 +206,7 @@ export default class Renderer {
 				else {
 					if (position.x > this.xSize / 2) {
 						Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, centerY));
-						if (position.y > this.ySize / 2) {
+						if (position.y < this.ySize / 2) {
 							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(rightBorder, topBorder));
 							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, topBorder));
 						}
@@ -213,7 +217,7 @@ export default class Renderer {
 					}
 					else {
 						Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, centerY));
-						if (position.y > this.ySize / 2) {
+						if (position.y < this.ySize / 2) {
 							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(leftBorder, topBorder));
 							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new Coordinate(centerX, topBorder));
 						}
@@ -224,9 +228,6 @@ export default class Renderer {
 					}
 				}
 			}
-
-			// TODO: Option to render grid on all tiles?
-			if (renderGrid) Renderer.renderModel(gl, orthoMatrix, this.gridModel);
 		}
 	}
 
