@@ -17,6 +17,10 @@ abstract class Model {
 		if (modelViewMatrix) gl.uniformMatrix4fv(this.getModelViewMatrixUniformLocation(), false, modelViewMatrix);
 	}
 
+	public getShader(): Shader {
+		return this.shader;
+	}
+
 	protected abstract getModelViewMatrixUniformLocation(): WebGLUniformLocation;
 
 	public render(gl: WebGLRenderingContext, position?: Coordinate, animation?: Animation): void {

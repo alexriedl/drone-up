@@ -249,14 +249,15 @@ export default class Renderer {
 			- Same shader program
 		 */
 
+		let shader;
 		const ortho = new Float32Array(orthoMatrix.all());
 		for (const o of objects) {
 			if (!o.canRender()) continue;
 
-			// TODO: Only bind a shader if it is not currently in use
-			// if (currentShader !== o.model.getShader()) {
-			{
+			const objectsShader = o.model.getShader();
+			if (shader !== objectsShader) {
 				o.model.useShader(gl, ortho);
+				shader = objectsShader;
 			}
 
 			o.render(gl);
