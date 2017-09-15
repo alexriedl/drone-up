@@ -1,7 +1,7 @@
-import { Game, Bot } from './Game';
+import { initializeGame, Runner, Bot } from './Game';
 import { Random } from './Utils';
 
-let game: Game;
+let runner: Runner;
 
 const inputSeedElement = (document.getElementById('seedInput') as HTMLInputElement);
 const startStopButtonElement = (document.getElementById('startStopButton') as HTMLButtonElement);
@@ -11,21 +11,15 @@ pauseResumeButtonElement.onclick = () => pauseResumeButtonClick();
 startStopButtonElement.onclick = () => startStopButtonClick();
 
 function pauseResumeButtonClick(): void {
-	if (game && game.isStarted() && !game.isPaused()) {
-		pauseGame();
-	}
-	else {
-		resumeGame();
-	}
+	if (!runner || !runner.isStarted()) return;
+
+	if (runner.isPaused()) resumeGame();
+	else pauseGame();
 }
 
 function startStopButtonClick(): void {
-	if (game && game.isStarted()) {
-		stopGame();
-	}
-	else {
-		startGame();
-	}
+	if (runner && runner.isStarted()) stopGame();
+	else startGame();
 }
 
 function getRandomSeed(): number {
@@ -38,7 +32,8 @@ function stopGame(): void {
 	pauseResumeButtonElement.disabled = true;
 	pauseResumeButtonElement.innerHTML = 'Pause Game';
 
-	game.kill();
+	runner.kill();
+	runner = null;
 }
 
 function startGame(): void {
@@ -65,20 +60,18 @@ function startGame(): void {
 		new Bot.Shove(randomizer),
 	];
 
-	game = new Game(randomizer, 15, playerControllers, 30, 20);
-	// game = new Game(randomizer, 15, playerControllers, 50, 50);
-
-	game.start();
+	runner = initializeGame(randomizer, 15, playerControllers, 30, 20);
+	runner.run();
 }
 
 function pauseGame(): void {
 	pauseResumeButtonElement.innerHTML = 'Resume Game';
-	game.pause();
+	runner.pause();
 }
 
 function resumeGame(): void {
 	pauseResumeButtonElement.innerHTML = 'Pause Game';
-	game.resume();
+	runner.resume();
 }
 
 // Allow Hot Module Reloading

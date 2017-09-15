@@ -1,7 +1,9 @@
-import Game from './Game';
 import * as Bot from './Bot';
+import { initializeGame } from './Initializer';
+import Runner from './Runner';
 
 export {
-	Game,
 	Bot,
+	initializeGame,
+	Runner,
 };

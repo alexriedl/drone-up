@@ -6,6 +6,8 @@ import TickState from './TickState';
 export default class Runner {
 	private gameDone: boolean;
 	private gamePaused: boolean;
+	private gameStarted: boolean;
+
 	private map: Map;
 	private animationSpeed: number;
 	private renderer: Renderer;
@@ -16,6 +18,7 @@ export default class Runner {
 		this.renderer = new Renderer('game-canvas', map.xSize, map.ySize);
 		this.gameDone = false;
 		this.gamePaused = false;
+		this.gameStarted = false;
 		this.map = map;
 		this.animationSpeed = animationSpeed;
 	}
@@ -25,8 +28,17 @@ export default class Runner {
 	}
 
 	public resume(): void {
+		if (!this.isPaused()) return;
 		this.gamePaused = false;
 		requestAnimationFrame(this.frame);
+	}
+
+	public isPaused(): boolean {
+		return this.gamePaused;
+	}
+
+	public isStarted(): boolean {
+		return this.gameStarted;
 	}
 
 	public kill(): void {
@@ -34,6 +46,7 @@ export default class Runner {
 	}
 
 	public run() {
+		this.gameStarted = true;
 		let then;
 		const tickState = new TickState();
 
