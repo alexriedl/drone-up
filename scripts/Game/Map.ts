@@ -1,6 +1,7 @@
-import { Coordinate, MarkList, Random, Interfaces } from '../Utils';
 import { Drone, Spike, GameObject } from './GameObject';
+import { MarkList, Random, Interfaces } from '../Utils';
 import { Model } from '../Model';
+import { vec2 } from '../Math';
 
 export default class Map {
 	public readonly xSize: number;
@@ -42,7 +43,7 @@ export default class Map {
 			for (const otherObject of this.gameObjects) {
 				const player = this.players[i];
 
-				if (player.ID !== otherObject.ID && player.position.equal(otherObject.position)) {
+				if (player.ID !== otherObject.ID && player.position.exactEquals(otherObject.position)) {
 					crashed.push(player);
 				}
 			}
@@ -161,6 +162,12 @@ export default class Map {
 		return sameXList;
 	}
 
+	private static randomPosition(randomzier: Random, maxX: number, maxY: number): vec2 {
+		const x = randomzier.nextRangeInt(0, maxX);
+		const y = randomzier.nextRangeInt(0, maxY);
+		return new vec2(x, y);
+	}
+
 	private generatePlayers(randomizer: Random, players: Drone[], markedList: MarkList): void {
 		for (const player of players) {
 			let attempts = 0;
@@ -173,7 +180,7 @@ export default class Map {
 					return null;
 				}
 
-				const position = Coordinate.random(randomizer, this.xSize, this.ySize);
+				const position = Map.randomPosition(randomizer, this.xSize, this.ySize);
 				const invalidPosition = markedList.isMarked(position);
 
 				if (!invalidPosition) {
@@ -199,7 +206,7 @@ export default class Map {
 		const neededSpikes = (this.xSize * this.ySize * spikePercent) / 100;
 
 		while (spikesGenned < neededSpikes && spikesFailed < 1000) {
-			const position = Coordinate.random(randomizer, this.xSize, this.ySize);
+			const position = Map.randomPosition(randomizer, this.xSize, this.ySize);
 			const invalidPosition = markedList.isMarked(position);
 
 			if (!invalidPosition) {

@@ -1,12 +1,13 @@
-import { ResizeAnimation, MoveAnimation, Animation, AnimationType } from '../Animations';
-import { Coordinate, Color } from '../Utils';
+import { Color } from '../Utils';
+import { vec2, vec3, mat4 } from '../Math';
 import { RectangleBuffer } from './Buffer';
+import { ResizeAnimation, MoveAnimation, Animation, AnimationType } from '../Animations';
 import { SimpleShader } from './Shader';
 import Model from './Model';
 
 export interface IRenderState {
-	size: TSM.vec3;
-	position: Coordinate;
+	size: vec3;
+	position: vec2;
 }
 
 abstract class SimpleRectangle extends Model {
@@ -31,7 +32,7 @@ abstract class SimpleRectangle extends Model {
 		return this.shader.uniformProjectionMatrixLocation;
 	}
 
-	protected setupRenderState(position?: Coordinate, animation?: Animation): IRenderState {
+	protected setupRenderState(position?: vec2, animation?: Animation): IRenderState {
 		let bonusSize = 0;
 		if (animation) {
 			if (animation instanceof MoveAnimation) {
@@ -42,8 +43,8 @@ abstract class SimpleRectangle extends Model {
 				bonusSize = animation.size;
 			}
 		}
-		const size = new TSM.vec3([1 + bonusSize, 1 + bonusSize, 1]);
-		position = position || new Coordinate(0, 0);
+		const size = new vec3(1 + bonusSize, 1 + bonusSize, 1);
+		position = position || new vec2();
 
 		return {
 			size,
@@ -65,13 +66,10 @@ abstract class SimpleRectangle extends Model {
 		const size = renderState.size;
 		const position = renderState.position;
 
-		const offset = new TSM.vec3([0.5 - size.x / 2, 0.5 - size.y / 2, 0]);
-		const modelViewMatrix = TSM.mat4.identity
-			.copy()
-			.translate(position.vec3().add(offset))
-			.scale(size);
+		const offset = new vec3(0.5 - size.x / 2, 0.5 - size.y / 2, 0);
+		const modelViewMatrix = mat4.fromTranslation(position.toVec3().add(offset)).scale(size);
 
-		gl.uniformMatrix4fv(shader.uniformModelViewMatrixLocation, false, new Float32Array(modelViewMatrix.all()));
+		gl.uniformMatrix4fv(shader.uniformModelViewMatrixLocation, false, modelViewMatrix.toFloat32Array());
 		gl.uniform4fv(shader.uniformColorLocation, new Float32Array(this.color.all()));
 	}
 

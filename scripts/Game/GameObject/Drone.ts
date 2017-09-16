@@ -25,7 +25,7 @@ export default class Drone extends GameObject {
 		const scanResult = map.scanFor(this);
 		this.controller.scanResult = scanResult;
 
-		const scan = new ScanObject(`${this.ID}-scan`, this.position.copy());
+		const scan = new ScanObject(`${this.ID}-scan`, this.position);
 		return [scan];
 	}
 

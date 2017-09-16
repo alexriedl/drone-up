@@ -1,7 +1,7 @@
-import Coordinate from './Coordinate';
+import { vec2 } from '../Math';
 
 export default class MarkList {
-	private markedArray: Coordinate[];
+	private markedArray: vec2[];
 	private xSize: number;
 	private ySize: number;
 
@@ -11,13 +11,13 @@ export default class MarkList {
 		this.ySize = ySize;
 	}
 
-	public getMarkedList(): Coordinate[] {
+	public getMarkedList(): vec2[] {
 		return this.markedArray;
 	}
 
-	public isMarked(position: Coordinate): boolean {
+	public isMarked(position: vec2): boolean {
 		for (const inv of this.markedArray) {
-			if (position.equal(inv)) {
+			if (position.exactEquals(inv)) {
 				return true;
 			}
 		}
@@ -25,7 +25,7 @@ export default class MarkList {
 		return false;
 	}
 
-	public mark(position: Coordinate, numSpread: number): void {
+	public mark(position: vec2, numSpread: number): void {
 		this.internalMark(position.x, position.y, numSpread);
 	}
 
@@ -33,9 +33,9 @@ export default class MarkList {
 		if (numSpread < 0) return;
 
 		// check if the current tile is invalid to avoid adding duplicates
-		const marked = this.isMarked(new Coordinate(x, y));
+		const marked = this.isMarked(new vec2(x, y));
 		if (!marked) {
-			this.markedArray.push(new Coordinate(x, y));
+			this.markedArray.push(new vec2(x, y));
 		}
 
 		// recursively call out in cardinal directions

@@ -1,14 +1,14 @@
 import { Animation, MoveAnimation } from '../../Animations';
-import { Coordinate } from '../../Utils';
 import { Model } from '../../Model';
+import { vec2 } from '../../Math';
 
 abstract class BaseObject {
 	public readonly ID: string;
 	public readonly model: Model;
-	public position: Coordinate;
+	public position: vec2;
 	private animation?: Animation;
 
-	public constructor(ID: string, position: Coordinate, model: Model) {
+	public constructor(ID: string, position: vec2, model: Model) {
 		this.ID = ID;
 		this.position = position;
 		this.model = model;

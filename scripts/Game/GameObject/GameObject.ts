@@ -1,6 +1,7 @@
 import { AnimationType, MoveAnimation } from '../../Animations';
 import { Controller } from '../Bot';
-import { Coordinate, Enums } from '../../Utils';
+import { Enums } from '../../Utils';
+import { vec2 } from '../../Math';
 import { Model } from '../../Model';
 import BaseObject from './BaseObject';
 import Map from '../Map';
@@ -9,7 +10,7 @@ abstract class GameObject extends BaseObject {
 	public readonly type: Enums.ObjectType;
 	public readonly controller?: Controller;
 
-	public constructor(ID: string, type: Enums.ObjectType, model: Model, controller?: Controller, position?: Coordinate) {
+	public constructor(ID: string, type: Enums.ObjectType, model: Model, controller?: Controller, position?: vec2) {
 		super(ID, position, model);
 
 		this.type = type;
@@ -67,17 +68,24 @@ abstract class GameObject extends BaseObject {
 		const xMax = map.xSize - 1;
 		const yMax = map.ySize - 1;
 
+		let x = this.position.x;
+		let y = this.position.y;
+
 		if (this.position.x > xMax) {
-			this.position.x = 0;
+			x = 0;
 		}
 		if (this.position.x < 0) {
-			this.position.x = xMax;
+			x = xMax;
 		}
 		if (this.position.y > yMax) {
-			this.position.y = 0;
+			y = 0;
 		}
 		if (this.position.y < 0) {
-			this.position.y = yMax;
+			y = yMax;
+		}
+
+		if (x !== this.position.x || y !== this.position.y) {
+			this.position = new vec2(x, y);
 		}
 	}
 
@@ -101,10 +109,9 @@ abstract class GameObject extends BaseObject {
 			if (deltaY) possibleAffected = map.getAllObjectsOnSameX(this.position.x);
 		}
 
-		const startPos = this.position.copy();
-		this.position.x += deltaX;
-		this.position.y += deltaY;
-		const endPos = this.position.copy();
+		const startPos = this.position;
+		this.position = this.position.addValues(deltaX, deltaY);
+		const endPos = this.position;
 		this.wrapCoordinates(map);
 
 		this.setAnimation(new MoveAnimation(startPos, endPos, animationType));

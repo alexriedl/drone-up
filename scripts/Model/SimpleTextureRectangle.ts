@@ -1,6 +1,7 @@
 import { Animation } from '../Animations';
-import { Coordinate, Color } from '../Utils';
+import { Color } from '../Utils';
 import { SimpleTextureShader } from './Shader';
+import { vec2, vec3 } from '../Math';
 import SimpleRectangle, { IRenderState } from './SimpleRectangle';
 
 export default class SimpleTextureRectangle extends SimpleRectangle {
@@ -21,10 +22,10 @@ export default class SimpleTextureRectangle extends SimpleRectangle {
 		return SimpleTextureShader.createShader();
 	}
 
-	protected setupRenderState(position?: Coordinate, animation?: Animation): IRenderState {
+	protected setupRenderState(position?: vec2, animation?: Animation): IRenderState {
 		return {
 			...super.setupRenderState(position, animation),
-			size: new TSM.vec3([this.xSize, this.ySize, 1]),
+			size: new vec3(this.xSize, this.ySize, 1),
 		};
 	}
 

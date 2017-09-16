@@ -1,7 +1,7 @@
 import { Animation } from '../Animations';
-import { Coordinate } from '../Utils';
-import { Shader } from './Shader';
 import { Buffer } from './Buffer';
+import { Shader } from './Shader';
+import { vec2 } from '../Math';
 
 abstract class Model {
 	protected shader: Shader;
@@ -23,7 +23,7 @@ abstract class Model {
 
 	protected abstract getModelViewMatrixUniformLocation(): WebGLUniformLocation;
 
-	public render(gl: WebGLRenderingContext, position?: Coordinate, animation?: Animation): void {
+	public render(gl: WebGLRenderingContext, position?: vec2, animation?: Animation): void {
 		const state = this.setupRenderState(position, animation);
 		this.updateAttributes(gl, state);
 		this.updateUniforms(gl, state);
@@ -32,7 +32,7 @@ abstract class Model {
 
 	protected abstract createShader(): Shader;
 	protected abstract createBuffer(): Buffer;
-	protected abstract setupRenderState(position?: Coordinate, animation?: Animation): any;
+	protected abstract setupRenderState(position?: vec2, animation?: Animation): any;
 	protected abstract updateAttributes(gl: WebGLRenderingContext, renderState: any): void;
 	protected abstract updateUniforms(gl: WebGLRenderingContext, renderState: any): void;
 	protected abstract draw(gl: WebGLRenderingContext, renderState: any): void;

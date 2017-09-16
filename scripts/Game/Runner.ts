@@ -1,5 +1,5 @@
-import { Coordinate } from '../Utils';
 import { GameObject, BaseObject } from './GameObject';
+import { vec2 } from '../Math';
 import Map from './Map';
 import Renderer from './Renderer';
 import TickState from './TickState';
@@ -57,9 +57,9 @@ export default class Runner {
 	}
 
 	public run(options: IRunnerOptions) {
+		const tickState = new TickState();
 		this.gameStarted = true;
 		let then;
-		const tickState = new TickState();
 
 		this.frame = (now: number) => {
 			const deltaTime = now - then;
@@ -105,7 +105,7 @@ export default class Runner {
 		requestAnimationFrame(this.frame);
 	}
 
-	private getPlayersPosition(ID: string): Coordinate {
+	private getPlayersPosition(ID: string): vec2 {
 		const player = this.map.getPlayers().find((p) => p.ID === ID);
 		return player && player.getPosition();
 	}
