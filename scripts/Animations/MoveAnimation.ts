@@ -16,15 +16,10 @@ export default class MoveAnimation extends Animation {
 	}
 
 	public update(deltaTimeMs: number): boolean {
-		let effectiveDeltaTime = deltaTimeMs;
-		if (effectiveDeltaTime > this.remainingDurationMs) effectiveDeltaTime = this.remainingDurationMs;
-
 		const p = this.getProgressPercent();
 		const x = (1 - p) * this.startPos.x + p * this.endPos.x;
 		const y = (1 - p) * this.startPos.y + p * this.endPos.y;
 		this.position = new vec2(x, y);
-
-		this.remainingDurationMs -= effectiveDeltaTime;
-		return this.isFinished();
+		return super.update(deltaTimeMs);
 	}
 }

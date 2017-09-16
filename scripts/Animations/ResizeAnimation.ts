@@ -15,13 +15,8 @@ export default class ResizeAnimation extends Animation {
 	}
 
 	public update(deltaTimeMs: number): boolean {
-		let effectiveDeltaTime = deltaTimeMs;
-		if (effectiveDeltaTime > this.remainingDurationMs) effectiveDeltaTime = this.remainingDurationMs;
-
 		const p = this.getProgressPercent();
 		this.size = (1 - p) * this.startSize + p * this.endSize;
-
-		this.remainingDurationMs -= effectiveDeltaTime;
-		return this.isFinished();
+		return super.update(deltaTimeMs);
 	}
 }

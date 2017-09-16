@@ -1,6 +1,6 @@
 import AnimationType from './AnimationType';
 
-abstract class Animation {
+export default class Animation {
 	public readonly animationType: AnimationType;
 	public remainingDurationMs: number;
 	private readonly originalDurationMs: number;
@@ -10,7 +10,12 @@ abstract class Animation {
 		this.originalDurationMs = this.remainingDurationMs = durationMs;
 	}
 
-	public abstract update(deltaTimeMs: number): boolean;
+	public update(deltaTimeMs: number): boolean {
+		let effectiveDeltaTime = deltaTimeMs;
+		if (effectiveDeltaTime > this.remainingDurationMs) effectiveDeltaTime = this.remainingDurationMs;
+		this.remainingDurationMs -= effectiveDeltaTime;
+		return this.isFinished();
+	}
 
 	public getProgressPercent(): number {
 		if (this.originalDurationMs <= 0) return 0;
@@ -21,5 +26,3 @@ abstract class Animation {
 		return this.remainingDurationMs <= 0;
 	}
 }
-
-export default Animation;
