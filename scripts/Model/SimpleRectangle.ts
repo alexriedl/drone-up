@@ -70,7 +70,7 @@ abstract class SimpleRectangle extends Model {
 		const modelViewMatrix = mat4.fromTranslation(position.toVec3().add(offset)).scale(size);
 
 		gl.uniformMatrix4fv(shader.uniformModelViewMatrixLocation, false, modelViewMatrix.toFloat32Array());
-		gl.uniform4fv(shader.uniformColorLocation, new Float32Array(this.color.all()));
+		gl.uniform4fv(shader.uniformColorLocation, this.color.toFloat32Array());
 	}
 
 	protected draw(gl: WebGLRenderingContext, renderState: IRenderState): void {
