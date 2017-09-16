@@ -16,19 +16,31 @@
 		<div class="columns" style="margin-top: 20px; margin-bottom: 20px;">
 			<div class="column">
 				<div>
-					<button type="button" id="startStopButton">Start Game</button>
-					<button disabled type="button" id="pauseResumeButton">Pause Game</button>
+					<button type="button" id="start-stop-button">Start Game</button>
+					<button disabled type="button" id="pause-resume-button">Pause Game</button>
 				</div>
 				<div>
-					Seed:
-					<input id="seedInput" type="text" onkeypress="return event.charCode >= 48 && event.charCode <= 57"></input>
+					<label for="seep-input">Seed:</label>
+					<input id="seed-input" type="text" onkeypress="return event.charCode >= 48 && event.charCode <= 57"></input>
 				</div>
 				<div>
-					<input type="file" id="fileUploader">
+					<input type="file" id="file-uploader">
 				</div>
 				<div>
-					<div>Loaded Drones</div>
-					<textarea disabled cols="50" id="droneNameList"></textarea>
+					<div>Options</div>
+					<div>
+						<label for="render-grid-checkbox">Render Grid:</label>
+						<input id="render-grid-checkbox" type="checkbox" />
+					</div>
+
+					<div>
+						<label for="animation-speed-slider">Animation Speed: <span id="animation-speed-value" /></label>
+						<br />
+						<input id="animation-speed-slider" type="range" min="0.5" max="5" step="0.5" />
+					</div>
+					<div>
+						<input type="text" id="focus-player-id"></input>
+					</div>
 				</div>
 			</div>
 			<div class="column">

@@ -107,7 +107,7 @@ export default class Runner {
 
 	private getPlayersPosition(ID: string): Coordinate {
 		const player = this.map.getPlayers().find((p) => p.ID === ID);
-		return player && player.position;
+		return player && player.getPosition();
 	}
 
 	private combineLists(gameObjects: GameObject[], transientObjects: BaseObject[]): BaseObject[] {

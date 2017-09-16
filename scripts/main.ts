@@ -8,12 +8,25 @@ const options = {
 	renderGrid: true,
 };
 
-const inputSeedElement = (document.getElementById('seedInput') as HTMLInputElement);
-const startStopButtonElement = (document.getElementById('startStopButton') as HTMLButtonElement);
-const pauseResumeButtonElement = (document.getElementById('pauseResumeButton') as HTMLButtonElement);
+const inputSeedElement = (document.getElementById('seed-input') as HTMLInputElement);
+const startStopButtonElement = (document.getElementById('start-stop-button') as HTMLButtonElement);
+const pauseResumeButtonElement = (document.getElementById('pause-resume-button') as HTMLButtonElement);
+const renderGridCheckboxElement = (document.getElementById('render-grid-checkbox') as HTMLInputElement);
+const animationSpeedSliderElement = (document.getElementById('animation-speed-slider') as HTMLInputElement);
+const animationSpeedValueElement = (document.getElementById('animation-speed-value') as HTMLInputElement);
+const focusPlayerIdElement = (document.getElementById('focus-player-id') as HTMLInputElement);
 
-pauseResumeButtonElement.onclick = () => pauseResumeButtonClick();
-startStopButtonElement.onclick = () => startStopButtonClick();
+// NOTE: Initialize option values
+renderGridCheckboxElement.checked = options.renderGrid;
+animationSpeedSliderElement.value = options.animationSpeed.toString();
+animationSpeedValueElement.innerText = options.animationSpeed.toString();
+focusPlayerIdElement.value = options.focusOnPlayerId;
+
+pauseResumeButtonElement.onclick = pauseResumeButtonClick;
+startStopButtonElement.onclick = startStopButtonClick;
+renderGridCheckboxElement.onchange = renderGridChanged;
+animationSpeedSliderElement.onchange = animationSpeedChanged;
+focusPlayerIdElement.onkeyup = focusPlayerIdChange;
 
 function pauseResumeButtonClick(): void {
 	if (!runner || !runner.isStarted()) return;
@@ -39,6 +52,19 @@ function stopGame(): void {
 
 	runner.kill();
 	runner = null;
+}
+
+function renderGridChanged() {
+	options.renderGrid = renderGridCheckboxElement.checked;
+}
+
+function animationSpeedChanged() {
+	options.animationSpeed = +animationSpeedSliderElement.value;
+	animationSpeedValueElement.innerText = animationSpeedSliderElement.value;
+}
+
+function focusPlayerIdChange() {
+	options.focusOnPlayerId = focusPlayerIdElement.value;
 }
 
 function startGame(): void {
