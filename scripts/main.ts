@@ -4,8 +4,8 @@ import { Random } from './Utils';
 let runner: Runner;
 const options = {
 	animationSpeed: 1,
-	focusOnPlayerId: null,
-	renderGrid: true,
+	focusOnPlayerId: 'player5',
+	renderGrid: false,
 };
 
 const inputSeedElement = (document.getElementById('seed-input') as HTMLInputElement);
@@ -91,7 +91,7 @@ function startGame(): void {
 		new Bot.Shove(randomizer),
 	];
 
-	runner = initializeGame(randomizer, 15, playerControllers, 30, 20);
+	runner = initializeGame(randomizer, 15, playerControllers, 50, 50);
 	runner.run(options);
 }
 

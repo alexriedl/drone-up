@@ -11,6 +11,7 @@ import ScanObject from './ScanObject';
 export default class Drone extends GameObject {
 	public constructor(ID: string, model: Model,  controller: Controller) {
 		super(ID, model, controller);
+		this.canBump = false;
 
 		if (controller) {
 			controller.setActions([
