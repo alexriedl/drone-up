@@ -21,7 +21,7 @@ abstract class Shader {
 	 * Use <My Shader>.create(); instead
 	 */
 	public constructor() {
-		Register.register(this);
+		Register.registerGLItem(this);
 	}
 
 	public use(gl: WebGLRenderingContext): void {

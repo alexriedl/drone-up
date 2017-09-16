@@ -4,7 +4,7 @@ abstract class Buffer {
 	private buffer: WebGLBuffer;
 
 	public constructor() {
-		Register.register(this);
+		Register.registerGLItem(this);
 	}
 
 	public initialize(gl: WebGLRenderingContext): void {

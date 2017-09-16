@@ -35,6 +35,6 @@ export default class SimpleTextureShader extends SimpleShader {
 	}
 
 	public static createShader(): SimpleTextureShader {
-		return Shader.create<SimpleTextureShader>(SimpleTextureShader);
+		return Shader.create(SimpleTextureShader);
 	}
 }

@@ -131,7 +131,7 @@ export default class Renderer {
 		const viewSize = Math.min(options.viewSize || Renderer.defaultOptions.viewSize, this.xSize, this.ySize) / 2;
 		const debugGrid = options.debugGrid === undefined ? Renderer.defaultOptions.debugGrid : options.debugGrid;
 
-		Register.initializeRegistered(this.gl);
+		Register.initializeGLItems(gl);
 
 		// NOTE: Render to texture first
 		{

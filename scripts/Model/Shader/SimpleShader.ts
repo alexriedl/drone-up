@@ -42,6 +42,6 @@ export default class SimpleShader extends Shader {
 	}
 
 	public static createShader(): SimpleShader {
-		return Shader.create<SimpleShader>(SimpleShader);
+		return Shader.create(SimpleShader);
 	}
 }

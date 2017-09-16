@@ -54,6 +54,6 @@ export default class ScanShader extends Shader {
 	}
 
 	public static createShader(): ScanShader {
-		return Shader.create<ScanShader>(ScanShader);
+		return Shader.create(ScanShader);
 	}
 }
