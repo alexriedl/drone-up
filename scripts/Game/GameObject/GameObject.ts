@@ -1,19 +1,16 @@
 import { AnimationType, MoveAnimation } from '../../Animations';
 import { Controller } from '../Bot';
-import { Enums } from '../../Utils';
-import { vec2 } from '../../Math';
 import { Model } from '../../Model';
+import { vec2 } from '../../Math';
 import BaseObject from './BaseObject';
+import Drone from './Drone';
 import Map from '../Map';
 
 abstract class GameObject extends BaseObject {
-	public readonly type: Enums.ObjectType;
 	public readonly controller?: Controller;
 
-	public constructor(ID: string, type: Enums.ObjectType, model: Model, controller?: Controller, position?: vec2) {
+	public constructor(ID: string, model: Model, controller?: Controller, position?: vec2) {
 		super(ID, position, model);
-
-		this.type = type;
 
 		if (controller) {
 			this.controller = controller;
@@ -117,11 +114,11 @@ abstract class GameObject extends BaseObject {
 		this.setAnimation(new MoveAnimation(startPos, endPos, animationType));
 		const result: BaseObject[] = [this];
 
-		if (this.type !== Enums.ObjectType.Drone) {
+		if (!(this instanceof Drone)) {
 			const collisions = this.findCollided(possibleAffected);
 			for (const go of collisions) {
 				// TODO: This needs to be smarter. Perhaps query that object the response of being bumped into.
-				if (go.type === Enums.ObjectType.Drone) continue;
+				if (go instanceof Drone) continue;
 				result.push.apply(result, go.internalMove(deltaX, deltaY, map, AnimationType.Bump, possibleAffected));
 			}
 		}

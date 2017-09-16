@@ -1,6 +1,5 @@
 import { AnimationType } from '../../Animations';
 import { Controller } from '../Bot';
-import { Enums } from '../../Utils';
 import { Model } from '../../Model';
 import BaseObject from './BaseObject';
 import GameObject from './GameObject';
@@ -9,7 +8,7 @@ import Map from '../Map';
 
 export default class Drone extends GameObject {
 	public constructor(ID: string, model: Model,  controller: Controller) {
-		super(ID, Enums.ObjectType.Drone, model, controller);
+		super(ID, model, controller);
 
 		if (controller) {
 			controller.setActions([

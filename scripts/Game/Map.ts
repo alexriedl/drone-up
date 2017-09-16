@@ -78,7 +78,7 @@ export default class Map {
 		}
 
 		return gameObjectsInRange.map((gameObject) => {
-			const type = gameObject.ID === entity.ID ? 'you' : gameObject.type.toString();
+			const type = gameObject.ID === entity.ID ? 'you' : gameObject.constructor.name;
 			const x = gameObject.position.x - entity.position.x;
 			const y = gameObject.position.y - entity.position.y;
 			return { type, x, y };
