@@ -1,14 +1,25 @@
 import Animation from './Animation';
-import AnimationType from './AnimationType';
 import { vec2 } from '../Math';
 
-export default class MoveAnimation extends Animation {
+enum MoveType {
+	Basic, // Move on entity's own
+	Bump, // Get physically pushed
+	Pull, // Pulled with gun
+	Push, // Pushed with gun
+}
+
+export default class MoveAnimation extends Animation<MoveType> {
 	public position: vec2;
 	protected startPos: vec2;
 	protected endPos: vec2;
 
-	public constructor(startPos: vec2, endPos: vec2, animationType: AnimationType, duration: number = 250) {
-		super(animationType, duration);
+	public static MoveTypeBasic = MoveType.Basic;
+	public static MoveTypeBump = MoveType.Bump;
+	public static MoveTypePull = MoveType.Pull;
+	public static MoveTypePush = MoveType.Push;
+
+	public constructor(startPos: vec2, endPos: vec2, duration: number = 250, moveType: MoveType = MoveType.Basic) {
+		super(duration, moveType);
 
 		this.position = startPos;
 		this.startPos = startPos;

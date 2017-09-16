@@ -1,7 +1,7 @@
-import { AnimationType } from '../../Animations';
 import { Controller, IScanResult } from '../Bot';
 import { MarkList } from '../../Utils';
 import { Model } from '../../Model';
+import { MoveAnimation} from '../../Animations';
 import { vec2 } from '../../Math';
 import BaseObject from './BaseObject';
 import GameObject from './GameObject';
@@ -22,52 +22,6 @@ export default class Drone extends GameObject {
 		}
 	}
 
-	public scan(map: Map): BaseObject[] {
-		this.controller.scanResult = Drone.scanMap(map, this);
-		const scan = new ScanObject(`${this.ID}-scan`, this.position);
-		return [scan];
-	}
-
-	public pullUp(map: Map): BaseObject[] {
-		const toPull = map.getNextObjectUpFrom(this);
-		return toPull.moveDown(map, AnimationType.Pull);
-	}
-
-	public pullDown(map: Map): BaseObject[] {
-		const toPull = map.getNextObjectDownFrom(this);
-		return toPull.moveUp(map, AnimationType.Pull);
-	}
-
-	public pullLeft(map: Map): BaseObject[] {
-		const toPull = map.getNextObjectLeftFrom(this);
-		return toPull.moveRight(map, AnimationType.Pull);
-	}
-
-	public pullRight(map: Map): BaseObject[] {
-		const toPull = map.getNextObjectRightFrom(this);
-		return toPull.moveLeft(map, AnimationType.Pull);
-	}
-
-	public pushUp(map: Map): BaseObject[] {
-		const toPush = map.getNextObjectUpFrom(this);
-		return toPush.moveUp(map, AnimationType.Push);
-	}
-
-	public pushDown(map: Map): BaseObject[] {
-		const toPush = map.getNextObjectDownFrom(this);
-		return toPush.moveDown(map, AnimationType.Push);
-	}
-
-	public pushLeft(map: Map): BaseObject[] {
-		const toPush = map.getNextObjectLeftFrom(this);
-		return toPush.moveLeft(map, AnimationType.Push);
-	}
-
-	public pushRight(map: Map): BaseObject[] {
-		const toPush = map.getNextObjectRightFrom(this);
-		return toPush.moveRight(map, AnimationType.Push);
-	}
-
 	public perform(action: string, map: Map): BaseObject[] {
 		switch (action) {
 			case 'PullUp': return this.pullUp(map);
@@ -82,6 +36,52 @@ export default class Drone extends GameObject {
 			default:
 				return super.perform(action, map);
 		}
+	}
+
+	protected scan(map: Map): BaseObject[] {
+		this.controller.scanResult = Drone.scanMap(map, this);
+		const scan = new ScanObject(`${this.ID}-scan`, this.position);
+		return [scan];
+	}
+
+	protected pullUp(map: Map): BaseObject[] {
+		const toPull = map.getNextObjectUpFrom(this);
+		return toPull.moveDown(map, MoveAnimation.MoveTypePull);
+	}
+
+	protected pullDown(map: Map): BaseObject[] {
+		const toPull = map.getNextObjectDownFrom(this);
+		return toPull.moveUp(map, MoveAnimation.MoveTypePull);
+	}
+
+	protected pullLeft(map: Map): BaseObject[] {
+		const toPull = map.getNextObjectLeftFrom(this);
+		return toPull.moveRight(map, MoveAnimation.MoveTypePull);
+	}
+
+	protected pullRight(map: Map): BaseObject[] {
+		const toPull = map.getNextObjectRightFrom(this);
+		return toPull.moveLeft(map, MoveAnimation.MoveTypePull);
+	}
+
+	protected pushUp(map: Map): BaseObject[] {
+		const toPush = map.getNextObjectUpFrom(this);
+		return toPush.moveUp(map, MoveAnimation.MoveTypePush);
+	}
+
+	protected pushDown(map: Map): BaseObject[] {
+		const toPush = map.getNextObjectDownFrom(this);
+		return toPush.moveDown(map, MoveAnimation.MoveTypePush);
+	}
+
+	protected pushLeft(map: Map): BaseObject[] {
+		const toPush = map.getNextObjectLeftFrom(this);
+		return toPush.moveLeft(map, MoveAnimation.MoveTypePush);
+	}
+
+	protected pushRight(map: Map): BaseObject[] {
+		const toPush = map.getNextObjectRightFrom(this);
+		return toPush.moveRight(map, MoveAnimation.MoveTypePush);
 	}
 
 	protected static scanMap(map: Map, entity: Drone): IScanResult[] {

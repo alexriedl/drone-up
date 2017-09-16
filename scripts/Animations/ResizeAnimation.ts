@@ -1,5 +1,4 @@
 import Animation from './Animation';
-import AnimationType from './AnimationType';
 
 export default class ResizeAnimation extends Animation {
 	public size: number;
@@ -7,7 +6,7 @@ export default class ResizeAnimation extends Animation {
 	protected endSize: number;
 
 	public constructor(startSize: number, endSize: number, duration: number = 250) {
-		super(AnimationType.Resize, duration);
+		super(duration);
 
 		this.size = startSize;
 		this.startSize = startSize;

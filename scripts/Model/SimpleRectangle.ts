@@ -1,8 +1,8 @@
 import { Color } from '../Utils';
-import { vec2, vec3, mat4 } from '../Math';
 import { RectangleBuffer } from './Buffer';
-import { ResizeAnimation, MoveAnimation, Animation, AnimationType } from '../Animations';
+import { ResizeAnimation, MoveAnimation, Animation } from '../Animations';
 import { SimpleShader } from './Shader';
+import { vec2, vec3, mat4 } from '../Math';
 import Model from './Model';
 
 export interface IRenderState {
@@ -36,7 +36,7 @@ abstract class SimpleRectangle extends Model {
 		let bonusSize = 0;
 		if (animation) {
 			if (animation instanceof MoveAnimation) {
-				bonusSize = this.getAnimationBonusSize(animation);
+				bonusSize = this.getAnimationBonusSize(animation.extraInfo);
 				position = animation.position;
 			}
 			else if (animation instanceof ResizeAnimation) {
@@ -77,13 +77,13 @@ abstract class SimpleRectangle extends Model {
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 	}
 
-	protected getAnimationBonusSize(animation: Animation): number {
-		switch (animation.animationType) {
-			case AnimationType.Move: return 0.5;
-			case AnimationType.Bump: return 0;
-			case AnimationType.Pull:
-			case AnimationType.Push:
-				return -0.5;
+	protected getAnimationBonusSize(extraInfo: any): number {
+		if (!extraInfo) return 0;
+		switch (extraInfo) {
+			case MoveAnimation.MoveTypeBasic: return 0.5;
+			case MoveAnimation.MoveTypePull: return -0.5;
+			case MoveAnimation.MoveTypePush: return -0.5;
+			default: return 0;
 		}
 	}
 }

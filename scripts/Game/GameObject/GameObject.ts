@@ -1,4 +1,4 @@
-import { AnimationType, MoveAnimation } from '../../Animations';
+import { MoveAnimation } from '../../Animations';
 import { Controller } from '../Bot';
 import { Model } from '../../Model';
 import { vec2 } from '../../Math';
@@ -18,22 +18,6 @@ abstract class GameObject extends BaseObject {
 		}
 	}
 
-	public moveUp(map: Map, animationType?: AnimationType): BaseObject[] {
-		return this.move(0, -1, map, animationType);
-	}
-
-	public moveDown(map: Map, animationType?: AnimationType): BaseObject[] {
-		return this.move(0, 1, map, animationType);
-	}
-
-	public moveLeft(map: Map, animationType?: AnimationType): BaseObject[] {
-		return this.move(-1, 0, map, animationType);
-	}
-
-	public moveRight(map: Map, animationType?: AnimationType): BaseObject[] {
-		return this.move(1, 0, map, animationType);
-	}
-
 	public perform(action: string, map: Map): BaseObject[] {
 		switch (action) {
 			case 'MoveUp':
@@ -49,13 +33,29 @@ abstract class GameObject extends BaseObject {
 		return [];
 	}
 
+	public moveUp(map: Map, moveType?: any): BaseObject[] {
+		return this.move(0, -1, map, moveType);
+	}
+
+	public moveDown(map: Map, moveType?: any): BaseObject[] {
+		return this.move(0, 1, map, moveType);
+	}
+
+	public moveLeft(map: Map, moveType?: any): BaseObject[] {
+		return this.move(-1, 0, map, moveType);
+	}
+
+	public moveRight(map: Map, moveType?: any): BaseObject[] {
+		return this.move(1, 0, map, moveType);
+	}
+
 	/**
 	 * Returns an array of affected objects. Assumes a change in either x or y direction, but not both.
 	 * Also assumes either delta is -1, 0, or 1
 	 */
-	public move(deltaX: number, deltaY: number, map: Map,
-		animationType: AnimationType = AnimationType.Move): BaseObject[] {
-		return this.internalMove(deltaX, deltaY, map, animationType);
+	protected move(deltaX: number, deltaY: number, map: Map,
+		moveType: any = MoveAnimation.MoveTypeBasic): BaseObject[] {
+		return this.internalMove(deltaX, deltaY, map, moveType);
 	}
 
 	/**
@@ -99,7 +99,7 @@ abstract class GameObject extends BaseObject {
 		return result;
 	}
 
-	private internalMove(deltaX: number, deltaY: number, map: Map, animationType: AnimationType,
+	private internalMove(deltaX: number, deltaY: number, map: Map, moveType: any,
 		possibleAffected?: GameObject[]): BaseObject[] {
 		if (!possibleAffected) {
 			if (deltaX) possibleAffected = map.getAllObjectsOnSameY(this.position.y);
@@ -111,7 +111,7 @@ abstract class GameObject extends BaseObject {
 		const endPos = this.position;
 		this.wrapCoordinates(map);
 
-		this.setAnimation(new MoveAnimation(startPos, endPos, animationType));
+		this.setAnimation(new MoveAnimation(startPos, endPos, undefined, moveType));
 		const result: BaseObject[] = [this];
 
 		if (!(this instanceof Drone)) {
@@ -119,7 +119,7 @@ abstract class GameObject extends BaseObject {
 			for (const go of collisions) {
 				// TODO: This needs to be smarter. Perhaps query that object the response of being bumped into.
 				if (go instanceof Drone) continue;
-				result.push.apply(result, go.internalMove(deltaX, deltaY, map, AnimationType.Bump, possibleAffected));
+				result.push.apply(result, go.internalMove(deltaX, deltaY, map, MoveAnimation.MoveTypeBump, possibleAffected));
 			}
 		}
 

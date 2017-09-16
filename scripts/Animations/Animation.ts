@@ -1,13 +1,11 @@
-import AnimationType from './AnimationType';
-
-export default class Animation {
-	public readonly animationType: AnimationType;
+export default class Animation<T = any> {
 	public remainingDurationMs: number;
 	private readonly originalDurationMs: number;
+	public readonly extraInfo: T;
 
-	public constructor(animationType: AnimationType, durationMs: number) {
-		this.animationType = animationType;
+	public constructor(durationMs: number, extraInfo?: T) {
 		this.originalDurationMs = this.remainingDurationMs = durationMs;
+		this.extraInfo = extraInfo;
 	}
 
 	public update(deltaTimeMs: number): boolean {
