@@ -1,7 +1,14 @@
+import { Coordinate } from '../Utils';
 import { GameObject, BaseObject } from './GameObject';
 import Map from './Map';
 import Renderer from './Renderer';
 import TickState from './TickState';
+
+export interface IRunnerOptions {
+	animationSpeed: number;
+	focusOnPlayerId?: string;
+	renderGrid: boolean;
+}
 
 export default class Runner {
 	private gameDone: boolean;
@@ -9,18 +16,22 @@ export default class Runner {
 	private gameStarted: boolean;
 
 	private map: Map;
-	private animationSpeed: number;
 	private renderer: Renderer;
+
+	private static defaultOptions: IRunnerOptions = {
+		renderGrid: true,
+		animationSpeed: 1,
+		focusOnPlayerId: null,
+	};
 
 	private frame: (now: number) => void;
 
-	public constructor(map: Map, animationSpeed: number) {
+	public constructor(map: Map) {
 		this.renderer = new Renderer('game-canvas', map.xSize, map.ySize);
 		this.gameDone = false;
 		this.gamePaused = false;
 		this.gameStarted = false;
 		this.map = map;
-		this.animationSpeed = animationSpeed;
 	}
 
 	public pause(): void {
@@ -45,7 +56,7 @@ export default class Runner {
 		this.gameDone = true;
 	}
 
-	public run() {
+	public run(options: IRunnerOptions) {
 		this.gameStarted = true;
 		let then;
 		const tickState = new TickState();
@@ -64,20 +75,17 @@ export default class Runner {
 				}
 			}
 
-			const effectiveDeltaTime = deltaTime * this.animationSpeed;
+			options = options || Runner.defaultOptions;
+
+			const effectiveDeltaTime = deltaTime * options.animationSpeed;
 			const transientObjects = tickState.update(effectiveDeltaTime, this.map);
 			const gameObjects = this.map.getGameObjects();
 
 			const renderObjects = this.combineLists(gameObjects, transientObjects);
-			const p = this.map.getPlayers();
-			const firstPlayer = p && p.length > 0 && p[p.length - 1];
 
-			const usePosition = true;
-
-			// TODO: Allow user to change these values
 			this.renderer.render(renderObjects, {
-				povPosition: usePosition ? firstPlayer && firstPlayer.getPosition() : null,
-				renderGrid: true,
+				povPosition: options.focusOnPlayerId ? this.getPlayersPosition(options.focusOnPlayerId) : null,
+				renderGrid: options.renderGrid,
 				tiledRender: true,
 				viewSize: Math.max(this.map.xSize, this.map.ySize) / 2,
 			});
@@ -95,6 +103,11 @@ export default class Runner {
 		};
 
 		requestAnimationFrame(this.frame);
+	}
+
+	private getPlayersPosition(ID: string): Coordinate {
+		const player = this.map.getPlayers().find((p) => p.ID === ID);
+		return player && player.position;
 	}
 
 	private combineLists(gameObjects: GameObject[], transientObjects: BaseObject[]): BaseObject[] {

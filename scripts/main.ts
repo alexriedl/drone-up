@@ -2,6 +2,11 @@ import { initializeGame, Runner, Bot } from './Game';
 import { Random } from './Utils';
 
 let runner: Runner;
+const options = {
+	animationSpeed: 1,
+	focusOnPlayerId: null,
+	renderGrid: true,
+};
 
 const inputSeedElement = (document.getElementById('seedInput') as HTMLInputElement);
 const startStopButtonElement = (document.getElementById('startStopButton') as HTMLButtonElement);
@@ -61,7 +66,7 @@ function startGame(): void {
 	];
 
 	runner = initializeGame(randomizer, 15, playerControllers, 30, 20);
-	runner.run();
+	runner.run(options);
 }
 
 function pauseGame(): void {

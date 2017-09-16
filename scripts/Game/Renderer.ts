@@ -34,7 +34,7 @@ export default class Renderer {
 	private renderTarget: IRenderTargetInfo;
 	private outputModel: SimpleTextureRectangle;
 
-	private defaultOptions: IRenderOptions = {
+	private static defaultOptions: IRenderOptions = {
 		povPosition: null,
 		renderGrid: true,
 		tiledRender: true,
@@ -119,16 +119,16 @@ export default class Renderer {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
 
-	public render(objects: BaseObject[], options: IRenderOptions = this.defaultOptions): void {
+	public render(objects: BaseObject[], options: IRenderOptions = Renderer.defaultOptions): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const background = Color.BLACK.lighten(.3);
 
 		// NOTE: Expand options
 		const position = options.povPosition;
-		const renderGrid = options.renderGrid === undefined ? this.defaultOptions.renderGrid : options.renderGrid;
-		const tiledRender = options.tiledRender === undefined ? this.defaultOptions.tiledRender : options.tiledRender;
-		const viewSize = Math.min(options.viewSize || this.defaultOptions.viewSize, this.xSize, this.ySize) / 2;
-		const debugGrid = options.debugGrid === undefined ? this.defaultOptions.debugGrid : options.debugGrid;
+		const renderGrid = options.renderGrid === undefined ? Renderer.defaultOptions.renderGrid : options.renderGrid;
+		const tiledRender = options.tiledRender === undefined ? Renderer.defaultOptions.tiledRender : options.tiledRender;
+		const viewSize = Math.min(options.viewSize || Renderer.defaultOptions.viewSize, this.xSize, this.ySize) / 2;
+		const debugGrid = options.debugGrid === undefined ? Renderer.defaultOptions.debugGrid : options.debugGrid;
 
 		Register.initializeRegistered(this.gl);
 
