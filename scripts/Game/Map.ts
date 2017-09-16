@@ -1,5 +1,5 @@
 import { Drone, Spike, GameObject } from './GameObject';
-import { MarkList, Random, Interfaces } from '../Utils';
+import { MarkList, Random } from '../Utils';
 import { Model } from '../Model';
 import { vec2 } from '../Math';
 
@@ -62,27 +62,6 @@ export default class Map {
 		}
 
 		return crashed;
-	}
-
-	public scanFor(entity: GameObject): Interfaces.IScanResult[] {
-		const scanDistance = Math.ceil(.33 * Math.min(this.xSize, this.ySize, 15));
-		const gameObjectsInRange: GameObject[] = [];
-		const markList = new MarkList(this.xSize, this.ySize);
-
-		markList.mark(entity.position, scanDistance);
-
-		for (const scanned of this.gameObjects) {
-			if (markList.isMarked(scanned.position)) {
-				gameObjectsInRange.push(scanned);
-			}
-		}
-
-		return gameObjectsInRange.map((gameObject) => {
-			const type = gameObject.ID === entity.ID ? 'you' : gameObject.constructor.name;
-			const x = gameObject.position.x - entity.position.x;
-			const y = gameObject.position.y - entity.position.y;
-			return { type, x, y };
-		});
 	}
 
 	// GetNextObjectUpFrom(this.Id) returns an ID of the next object up from the object with the given ID

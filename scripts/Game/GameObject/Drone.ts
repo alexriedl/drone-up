@@ -1,10 +1,12 @@
 import { AnimationType } from '../../Animations';
-import { Controller } from '../Bot';
+import { Controller, IScanResult } from '../Bot';
+import { MarkList } from '../../Utils';
 import { Model } from '../../Model';
+import { vec2 } from '../../Math';
 import BaseObject from './BaseObject';
 import GameObject from './GameObject';
-import ScanObject from './ScanObject';
 import Map from '../Map';
+import ScanObject from './ScanObject';
 
 export default class Drone extends GameObject {
 	public constructor(ID: string, model: Model,  controller: Controller) {
@@ -21,9 +23,7 @@ export default class Drone extends GameObject {
 	}
 
 	public scan(map: Map): BaseObject[] {
-		const scanResult = map.scanFor(this);
-		this.controller.scanResult = scanResult;
-
+		this.controller.scanResult = Drone.scanMap(map, this);
 		const scan = new ScanObject(`${this.ID}-scan`, this.position);
 		return [scan];
 	}
@@ -82,5 +82,26 @@ export default class Drone extends GameObject {
 			default:
 				return super.perform(action, map);
 		}
+	}
+
+	protected static scanMap(map: Map, entity: Drone): IScanResult[] {
+		const scanDistance = Math.ceil(.33 * Math.min(map.xSize, map.ySize, 15));
+		const gameObjectsInRange: GameObject[] = [];
+		const markList = new MarkList(map.xSize, map.ySize);
+
+		markList.mark(entity.position, scanDistance);
+
+		for (const scanned of map.getGameObjects()) {
+			if (markList.isMarked(scanned.position)) {
+				gameObjectsInRange.push(scanned);
+			}
+		}
+
+		return gameObjectsInRange.map((gameObject) => {
+			const type = gameObject.ID === entity.ID ? 'you' : gameObject.constructor.name;
+			const x = gameObject.position.x - entity.position.x;
+			const y = gameObject.position.y - entity.position.y;
+			return { type, position: new vec2(x, y) };
+		});
 	}
 }

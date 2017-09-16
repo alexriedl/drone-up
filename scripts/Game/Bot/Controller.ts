@@ -1,7 +1,13 @@
-import { Random, Interfaces } from '../../Utils';
+import { Random } from '../../Utils';
+import { vec2 } from '../../Math';
+
+export interface IScanResult {
+	position: vec2;
+	type: string;
+}
 
 abstract class Controller {
-	public scanResult: Interfaces.IScanResult[];
+	public scanResult: IScanResult[];
 	protected actions: string[];
 	protected readonly randomizer: Random;
 

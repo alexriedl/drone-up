@@ -1,5 +1,5 @@
 import Chicken from './Chicken';
-import Controller from './Controller';
+import Controller, { IScanResult } from './Controller';
 import Luigi from './Luigi';
 import Pull from './Pull';
 import Push from './Push';
@@ -9,6 +9,7 @@ import Shove from './Shove';
 export {
 	Chicken,
 	Controller,
+	IScanResult,
 	Luigi,
 	Pull,
 	Push,
