@@ -42,7 +42,6 @@ module.exports = {
 	postcss: ([ autoprefixer ]),
 	plugins: [
 		new ExtractTextPlugin('[name].css'),
-		new webpack.optimize.CommonsChunkPlugin({name: "common"})
 	].concat(isDevBuild ? [
 		// Plugins that apply in development builds only
 	] : [
