@@ -16,9 +16,9 @@ const predefinedColors: Color[] = [
 	// new Color(1, 1, 1),
 ];
 
-function getNextPlayerColor(randomizer: Random): Color {
-	if (predefinedColors && predefinedColors.length > 0) {
-		return predefinedColors.pop();
+function getNextPlayerColor(randomizer: Random, options: Color[]): Color {
+	if (options && options.length > 0) {
+		return options.pop();
 	}
 	else {
 		const r = () => randomizer.nextRangeFloat(0.3, 1);
@@ -28,7 +28,8 @@ function getNextPlayerColor(randomizer: Random): Color {
 
 export function initializeGame(randomizer: Random, spikePercent: number, playerControllers: Controller[],
 	xSize: number, ySize: number): Runner {
-	const createDroneModel = (id: string) => new DroneModel(getNextPlayerColor(randomizer));
+	const playerColors = [...predefinedColors];
+	const createDroneModel = (id: string) => new DroneModel(getNextPlayerColor(randomizer, playerColors));
 	const createSpikeModel = (id: string) => new SpikeModel();
 
 	const drones = [];
