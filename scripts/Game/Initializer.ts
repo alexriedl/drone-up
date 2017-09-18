@@ -42,7 +42,5 @@ export function initializeGame(randomizer: Random, spikePercent: number, playerC
 	const map = new Map(xSize, ySize);
 	map.initialize(randomizer, drones, spikePercent, createSpikeModel);
 
-	const runner = new Runner(map);
-
-	return runner;
+	return new Runner(map);
 }
