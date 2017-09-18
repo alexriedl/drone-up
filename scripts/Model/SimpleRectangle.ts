@@ -36,11 +36,13 @@ abstract class SimpleRectangle extends Model {
 		let bonusSize = 0;
 		if (animation) {
 			if (animation instanceof MoveAnimation) {
-				bonusSize = this.getAnimationBonusSize(animation.extraInfo);
-				const p = animation.getProgressPercent();
-				if (p < 0.1) bonusSize = 10 * p * bonusSize;
-				else if (p > 0.9) bonusSize = 10 * (1 - p) * bonusSize;
 				position = animation.position;
+				bonusSize = this.getAnimationBonusSize(animation.extraInfo);
+				if (bonusSize) {
+					const p = animation.getProgressPercent();
+					if (p < 0.1) bonusSize = 10 * p * bonusSize;
+					else if (p > 0.9) bonusSize = 10 * (1 - p) * bonusSize;
+				}
 			}
 			else if (animation instanceof ResizeAnimation) {
 				bonusSize = animation.size;
