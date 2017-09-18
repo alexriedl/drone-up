@@ -1,24 +1,12 @@
 import Animation from './Animation';
 import { vec2 } from '../Math';
 
-enum MoveType {
-	Basic, // Move on entity's own
-	Bump, // Get physically pushed
-	Pull, // Pulled with gun
-	Push, // Pushed with gun
-}
-
-export default class MoveAnimation extends Animation<MoveType> {
+export class MoveAnimation extends Animation<MoveAnimation.MoveType> {
 	public position: vec2;
 	protected startPos: vec2;
 	protected endPos: vec2;
 
-	public static MoveTypeBasic = MoveType.Basic;
-	public static MoveTypeBump = MoveType.Bump;
-	public static MoveTypePull = MoveType.Pull;
-	public static MoveTypePush = MoveType.Push;
-
-	public constructor(startPos: vec2, endPos: vec2, duration: number = 250, moveType: MoveType = MoveType.Basic) {
+	public constructor(startPos: vec2, endPos: vec2, duration: number = 250, moveType: MoveAnimation.MoveType) {
 		super(duration, moveType);
 
 		this.position = startPos;
@@ -34,3 +22,16 @@ export default class MoveAnimation extends Animation<MoveType> {
 		return super.update(deltaTimeMs);
 	}
 }
+
+// tslint:disable-next-line:no-namespace
+// tslint:disable-next-line:no-internal-module
+export module MoveAnimation {
+	export enum MoveType {
+		Basic, // Move on entity's own
+		Bump, // Get physically pushed
+		Pull, // Pulled with gun
+		Push, // Pushed with gun
+	}
+}
+
+export default MoveAnimation;

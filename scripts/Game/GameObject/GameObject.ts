@@ -57,12 +57,12 @@ abstract class GameObject extends BaseObject {
 	 * Also assumes either delta is -1, 0, or 1
 	 */
 	protected move(deltaX: number, deltaY: number, map: Map,
-		moveType: any = MoveAnimation.MoveTypeBasic): BaseObject[] {
+		moveType: MoveAnimation.MoveType = MoveAnimation.MoveType.Basic): BaseObject[] {
 		if (!GameObject.PUSH_LIMIT) return this.internalMove(deltaX, deltaY, map, moveType);
 		else return this.internalMoveLimit(new vec2(deltaX, deltaY), map, GameObject.PUSH_LIMIT, moveType).objects;
 	}
 
-	private internalMove(deltaX: number, deltaY: number, map: Map, moveType: any,
+	private internalMove(deltaX: number, deltaY: number, map: Map, moveType: MoveAnimation.MoveType,
 		possibleAffected?: GameObject[]): BaseObject[] {
 		if (!possibleAffected) {
 			if (deltaX) possibleAffected = map.getAllObjectsOnSameY(this.position.y);
@@ -82,7 +82,7 @@ abstract class GameObject extends BaseObject {
 			for (const go of collisions) {
 				// TODO: This needs to be smarter. Perhaps query that object the response of being bumped into.
 				if (go instanceof Drone) continue;
-				result.push.apply(result, go.internalMove(deltaX, deltaY, map, MoveAnimation.MoveTypeBump, possibleAffected));
+				result.push.apply(result, go.internalMove(deltaX, deltaY, map, MoveAnimation.MoveType.Bump, possibleAffected));
 			}
 		}
 
@@ -108,7 +108,7 @@ abstract class GameObject extends BaseObject {
 			const collisions = this.findAt(newPos, possibleAffected);
 			for (const go of collisions) {
 				const childResult = go.internalMoveLimit(delta, map, movesRemaining - 1,
-					MoveAnimation.MoveTypeBump, possibleAffected);
+					MoveAnimation.MoveType.Bump, possibleAffected);
 				if (!childResult.canMove) result.canMove = false;
 				result.objects = childResult.objects;
 			}

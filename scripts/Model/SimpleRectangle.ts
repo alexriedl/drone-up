@@ -77,12 +77,11 @@ abstract class SimpleRectangle extends Model {
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 	}
 
-	protected getAnimationBonusSize(extraInfo: any): number {
-		if (!extraInfo) return 0;
+	protected getAnimationBonusSize(extraInfo: MoveAnimation.MoveType): number {
 		switch (extraInfo) {
-			case MoveAnimation.MoveTypeBasic: return 0.5;
-			case MoveAnimation.MoveTypePull: return -0.5;
-			case MoveAnimation.MoveTypePush: return -0.5;
+			case MoveAnimation.MoveType.Basic: return 0.5;
+			case MoveAnimation.MoveType.Pull: return -0.5;
+			case MoveAnimation.MoveType.Push: return -0.5;
 			default: return 0;
 		}
 	}

@@ -47,42 +47,42 @@ export default class Drone extends GameObject {
 
 	protected pullUp(map: Map): BaseObject[] {
 		const toPull = map.getNextObjectUpFrom(this);
-		return toPull.moveDown(map, MoveAnimation.MoveTypePull);
+		return toPull.moveDown(map, MoveAnimation.MoveType.Pull);
 	}
 
 	protected pullDown(map: Map): BaseObject[] {
 		const toPull = map.getNextObjectDownFrom(this);
-		return toPull.moveUp(map, MoveAnimation.MoveTypePull);
+		return toPull.moveUp(map, MoveAnimation.MoveType.Pull);
 	}
 
 	protected pullLeft(map: Map): BaseObject[] {
 		const toPull = map.getNextObjectLeftFrom(this);
-		return toPull.moveRight(map, MoveAnimation.MoveTypePull);
+		return toPull.moveRight(map, MoveAnimation.MoveType.Pull);
 	}
 
 	protected pullRight(map: Map): BaseObject[] {
 		const toPull = map.getNextObjectRightFrom(this);
-		return toPull.moveLeft(map, MoveAnimation.MoveTypePull);
+		return toPull.moveLeft(map, MoveAnimation.MoveType.Pull);
 	}
 
 	protected pushUp(map: Map): BaseObject[] {
 		const toPush = map.getNextObjectUpFrom(this);
-		return toPush.moveUp(map, MoveAnimation.MoveTypePush);
+		return toPush.moveUp(map, MoveAnimation.MoveType.Push);
 	}
 
 	protected pushDown(map: Map): BaseObject[] {
 		const toPush = map.getNextObjectDownFrom(this);
-		return toPush.moveDown(map, MoveAnimation.MoveTypePush);
+		return toPush.moveDown(map, MoveAnimation.MoveType.Push);
 	}
 
 	protected pushLeft(map: Map): BaseObject[] {
 		const toPush = map.getNextObjectLeftFrom(this);
-		return toPush.moveLeft(map, MoveAnimation.MoveTypePush);
+		return toPush.moveLeft(map, MoveAnimation.MoveType.Push);
 	}
 
 	protected pushRight(map: Map): BaseObject[] {
 		const toPush = map.getNextObjectRightFrom(this);
-		return toPush.moveRight(map, MoveAnimation.MoveTypePush);
+		return toPush.moveRight(map, MoveAnimation.MoveType.Push);
 	}
 
 	protected static scanMap(map: Map, entity: Drone): IScanResult[] {
