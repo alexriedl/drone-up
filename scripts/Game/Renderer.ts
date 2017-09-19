@@ -3,7 +3,7 @@ import { BaseObject } from './GameObject';
 import { vec2, mat4 } from '../Math';
 
 import { Register } from '../Utils';
-import { Model, GridModel, SimpleTextureRectangle, DroneModel } from '../Model';
+import { Model, GridModel, SimpleTextureRectangle } from '../Model';
 
 export interface IRenderOptions {
 	povPosition?: vec2;
