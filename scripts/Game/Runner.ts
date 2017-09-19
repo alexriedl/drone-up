@@ -83,10 +83,11 @@ export default class Runner {
 
 			const renderObjects = this.combineLists(gameObjects, transientObjects);
 
+			// this.renderer.textRender();
 			this.renderer.render(renderObjects, {
 				povPosition: options.focusOnPlayerId ? this.getPlayersPosition(options.focusOnPlayerId) : null,
 				renderGrid: options.renderGrid,
-				tiledRender: true,
+				tiledRender: false,
 				viewSize: Math.max(this.map.xSize, this.map.ySize) / 2,
 			});
 

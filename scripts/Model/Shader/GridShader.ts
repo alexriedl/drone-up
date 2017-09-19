@@ -1,4 +1,5 @@
 import Shader from './Shader';
+import SimpleShader from './SimpleShader';
 
 const vertexShaderSource = `
 attribute vec4 a_position;
@@ -19,7 +20,7 @@ precision mediump float;
 uniform float u_x_count;
 uniform float u_y_count;
 uniform float u_grid_thickness;
-uniform vec4 u_grid_color;
+uniform vec4 u_color;
 
 varying vec2 v_uv;
 
@@ -31,14 +32,10 @@ bool onGrid(float pos) {
 void main() {
 	bool onXGrid = onGrid(v_uv.x * u_x_count);
 	bool onYGrid = onGrid(v_uv.y * u_y_count);
-	gl_FragColor = onXGrid || onYGrid ? u_grid_color : vec4(0.0, 0.0, 0.0, 0.0);
+	gl_FragColor = onXGrid || onYGrid ? u_color : vec4(0.0, 0.0, 0.0, 0.0);
 }`;
 
-export default class GridShader extends Shader {
-	public attributePositionLocation: number;
-	public uniformModelViewMatrixLocation: WebGLUniformLocation;
-	public uniformProjectionMatrixLocation: WebGLUniformLocation;
-	public uniformColorLocation: WebGLUniformLocation;
+export default class GridShader extends SimpleShader {
 	public uniformGridThicknessLocation: WebGLUniformLocation;
 	public uniformXCountLocation: WebGLUniformLocation;
 	public uniformYCountLocation: WebGLUniformLocation;
@@ -46,10 +43,6 @@ export default class GridShader extends Shader {
 	public initialize(gl: WebGLRenderingContext) {
 		super.initialize(gl);
 
-		this.attributePositionLocation = this.getAttributeLocation(gl, 'a_position');
-		this.uniformModelViewMatrixLocation = this.getUniformLocation(gl, 'u_model_view');
-		this.uniformProjectionMatrixLocation = this.getUniformLocation(gl, 'u_projection');
-		this.uniformColorLocation = this.getUniformLocation(gl, 'u_grid_color');
 		this.uniformGridThicknessLocation = this.getUniformLocation(gl, 'u_grid_thickness');
 		this.uniformXCountLocation = this.getUniformLocation(gl, 'u_x_count');
 		this.uniformYCountLocation = this.getUniformLocation(gl, 'u_y_count');
@@ -64,6 +57,6 @@ export default class GridShader extends Shader {
 	}
 
 	public static createShader(): GridShader {
-		return Shader.create<GridShader>(GridShader);
+		return Shader.create(GridShader);
 	}
 }

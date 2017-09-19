@@ -1,7 +1,6 @@
-import { Animation } from '../Animations';
 import { Color } from '../Utils';
 import { SimpleTextureShader } from './Shader';
-import { vec2, vec3 } from '../Math';
+import { vec2, vec3, mat4 } from '../Math';
 import SimpleRectangle, { IRenderState } from './SimpleRectangle';
 
 export default class SimpleTextureRectangle extends SimpleRectangle {
@@ -22,11 +21,14 @@ export default class SimpleTextureRectangle extends SimpleRectangle {
 		return SimpleTextureShader.createShader();
 	}
 
-	protected setupRenderState(position?: vec2, animation?: Animation): IRenderState {
-		return {
-			...super.setupRenderState(position, animation),
-			size: new vec3(this.xSize, this.ySize, 1),
-		};
+	protected calculateState(vpMatrix: mat4, position: vec2 = new vec2()): IRenderState {
+		const size = new vec3(this.xSize, this.ySize, 1);
+		const offset = new vec3(0.5 - size.x / 2, 0.5 - size.y / 2, 0);
+		const modelMatrix = mat4.fromTranslation(position.toVec3().add(offset)).scale(size);
+		// const mvpMatrix = modelMatrix.mul(vpMatrix);
+		// const mvpMatrix = vpMatrix.mul(modelMatrix);
+
+		return { modelMatrix, orthoMatrix: vpMatrix };
 	}
 
 	protected updateAttributes(gl: WebGLRenderingContext, renderState: IRenderState): void {

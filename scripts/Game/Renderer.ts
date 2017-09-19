@@ -3,7 +3,7 @@ import { BaseObject } from './GameObject';
 import { vec2, mat4 } from '../Math';
 
 import { Register } from '../Utils';
-import { Model, GridModel, SimpleTextureRectangle } from '../Model';
+import { Model, GridModel, SimpleTextureRectangle, DroneModel } from '../Model';
 
 export interface IRenderOptions {
 	povPosition?: vec2;
@@ -237,8 +237,8 @@ export default class Renderer {
 
 	protected static renderModel(gl: WebGLRenderingContext, orthoMatrix: mat4, model: Model,
 		position: vec2 = new vec2()) {
-		model.useShader(gl, orthoMatrix.toFloat32Array());
-		model.render(gl, position);
+		model.useShader(gl);
+		model.render(gl, orthoMatrix);
 	}
 
 	protected static renderObjects(gl: WebGLRenderingContext, orthoMatrix: mat4, objects: BaseObject[]) {
@@ -249,7 +249,6 @@ export default class Renderer {
 			- Transparency
 			- Same shader program
 		 */
-		const ortho = orthoMatrix.toFloat32Array();
 
 		let shader;
 		for (const o of objects) {
@@ -257,11 +256,11 @@ export default class Renderer {
 
 			const objectsShader = o.model.getShader();
 			if (shader !== objectsShader) {
-				o.model.useShader(gl, ortho);
+				o.model.useShader(gl);
 				shader = objectsShader;
 			}
 
-			o.render(gl);
+			o.render(gl, orthoMatrix);
 		}
 	}
 }

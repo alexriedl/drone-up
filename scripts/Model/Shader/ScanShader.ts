@@ -1,4 +1,5 @@
 import Shader from './Shader';
+import SimpleShader from './SimpleShader';
 
 const vertexShaderSource = `
 attribute vec4 a_position;
@@ -30,21 +31,7 @@ void main() {
 	gl_FragColor = d < 0.5 && d > 0.1 && (f < THICKNESS || f > 1.0 - THICKNESS) ? u_color : vec4(0.0);
 }`;
 
-export default class ScanShader extends Shader {
-	public attributePositionLocation: number;
-	public uniformModelViewMatrixLocation: WebGLUniformLocation;
-	public uniformProjectionMatrixLocation: WebGLUniformLocation;
-	public uniformColorLocation: WebGLUniformLocation;
-
-	public initialize(gl: WebGLRenderingContext) {
-		super.initialize(gl);
-
-		this.attributePositionLocation = this.getAttributeLocation(gl, 'a_position');
-		this.uniformModelViewMatrixLocation = this.getUniformLocation(gl, 'u_model_view');
-		this.uniformProjectionMatrixLocation = this.getUniformLocation(gl, 'u_projection');
-		this.uniformColorLocation = this.getUniformLocation(gl, 'u_color');
-	}
-
+export default class ScanShader extends SimpleShader {
 	public getVertexSource(): string {
 		return vertexShaderSource;
 	}

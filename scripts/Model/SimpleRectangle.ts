@@ -6,11 +6,11 @@ import { vec2, vec3, mat4 } from '../Math';
 import Model from './Model';
 
 export interface IRenderState {
-	size: vec3;
-	position: vec2;
+	modelMatrix: mat4;
+	orthoMatrix: mat4;
 }
 
-abstract class SimpleRectangle extends Model {
+abstract class SimpleRectangle extends Model<IRenderState> {
 	protected buffer: RectangleBuffer;
 	protected shader: SimpleShader;
 	protected color: Color;
@@ -28,11 +28,7 @@ abstract class SimpleRectangle extends Model {
 		return RectangleBuffer.createBuffer();
 	}
 
-	public getModelViewMatrixUniformLocation(): WebGLUniformLocation {
-		return this.shader.uniformProjectionMatrixLocation;
-	}
-
-	protected setupRenderState(position?: vec2, animation?: Animation): IRenderState {
+	protected calculateState(vpMatrix: mat4, position: vec2, animation: Animation): IRenderState {
 		let bonusSize = 0;
 		if (animation) {
 			if (animation instanceof MoveAnimation) {
@@ -51,10 +47,12 @@ abstract class SimpleRectangle extends Model {
 		const size = new vec3(1 + bonusSize, 1 + bonusSize, 1);
 		position = position || new vec2();
 
-		return {
-			size,
-			position,
-		};
+		const offset = new vec3(0.5 - size.x / 2, 0.5 - size.y / 2, 0);
+		const modelMatrix = mat4.fromTranslation(position.toVec3().add(offset)).scale(size);
+		// const mvpMatrix = modelMatrix.mul(vpMatrix);
+		// const mvpMatrix = vpMatrix.mul(modelMatrix);
+
+		return { modelMatrix, orthoMatrix: vpMatrix };
 	}
 
 	protected updateAttributes(gl: WebGLRenderingContext, renderState: IRenderState): void {
@@ -68,13 +66,9 @@ abstract class SimpleRectangle extends Model {
 
 	protected updateUniforms(gl: WebGLRenderingContext, renderState: IRenderState): void {
 		const shader = this.shader;
-		const size = renderState.size;
-		const position = renderState.position;
 
-		const offset = new vec3(0.5 - size.x / 2, 0.5 - size.y / 2, 0);
-		const modelViewMatrix = mat4.fromTranslation(position.toVec3().add(offset)).scale(size);
-
-		gl.uniformMatrix4fv(shader.uniformModelViewMatrixLocation, false, modelViewMatrix.toFloat32Array());
+		gl.uniformMatrix4fv(shader.uniformProjectionMatrixLocation, false, renderState.orthoMatrix.toFloat32Array());
+		gl.uniformMatrix4fv(shader.uniformModelViewMatrixLocation, false, renderState.modelMatrix.toFloat32Array());
 		gl.uniform4fv(shader.uniformColorLocation, this.color.toFloat32Array());
 	}
 
