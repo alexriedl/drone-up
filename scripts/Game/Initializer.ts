@@ -29,14 +29,12 @@ function getNextPlayerColor(randomizer: Random, options: Color[]): Color {
 export function initializeGame(randomizer: Random, spikePercent: number, playerControllers: Controller[],
 	xSize: number, ySize: number): Runner {
 	const playerColors = [...predefinedColors];
-	const createDroneModel = (id: string) => new DroneModel(getNextPlayerColor(randomizer, playerColors));
-	const createSpikeModel = (id: string) => new SpikeModel();
+	const createDroneModel = () => new DroneModel(getNextPlayerColor(randomizer, playerColors));
+	const createSpikeModel = () => new SpikeModel();
 
 	const drones = [];
-	for (let i = 0; i < playerControllers.length; i++) {
-		const controller = playerControllers[i];
-		const ID = `player${i}`;
-		drones.push(new Drone(ID, createDroneModel(ID), controller));
+	for (const controller of playerControllers) {
+		drones.push(new Drone(createDroneModel(), controller));
 	}
 
 	const map = new Map(xSize, ySize);

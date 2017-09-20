@@ -4,7 +4,7 @@ import { Random } from './Utils';
 let runner: Runner;
 const options = {
 	animationSpeed: 1,
-	focusOnPlayerId: 'player5',
+	focusOnPlayerId: '',
 	renderGrid: false,
 };
 

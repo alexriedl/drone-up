@@ -107,7 +107,10 @@ export default class Runner {
 	}
 
 	private getPlayersPosition(ID: string): vec2 {
-		const player = this.map.getPlayers().find((p) => p.ID === ID);
+		// const player = this.map.getPlayers().find((p) => p.ID === ID);
+		// TODO: Allow user to select which player to watch
+		const players = this.map.getPlayers();
+		const player = players[players.length - 1];
 		return player && player.getPosition();
 	}
 
@@ -116,7 +119,7 @@ export default class Runner {
 		if (!gameObjects) return [...transientObjects];
 
 		const removed: BaseObject[] = gameObjects.
-			filter((go) => transientObjects.find((to) => go.ID === to.ID) === undefined);
+			filter((go) => transientObjects.find((to) => go === to) === undefined);
 
 		return removed.concat(transientObjects);
 	}

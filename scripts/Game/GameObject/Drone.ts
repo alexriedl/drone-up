@@ -9,8 +9,8 @@ import Map from '../Map';
 import ScanObject from './ScanObject';
 
 export default class Drone extends GameObject {
-	public constructor(ID: string, model: Model,  controller: Controller) {
-		super(ID, model, controller);
+	public constructor(model: Model,  controller: Controller) {
+		super(model, controller);
 		this.canBump = false;
 
 		if (controller) {
@@ -41,7 +41,7 @@ export default class Drone extends GameObject {
 
 	protected scan(map: Map): BaseObject[] {
 		this.controller.scanResult = Drone.scanMap(map, this);
-		const scan = new ScanObject(`${this.ID}-scan`, this.position);
+		const scan = new ScanObject(this.position);
 		return [scan];
 	}
 
@@ -99,7 +99,7 @@ export default class Drone extends GameObject {
 		}
 
 		return gameObjectsInRange.map((gameObject) => {
-			const type = gameObject.ID === entity.ID ? 'you' : gameObject.constructor.name;
+			const type = gameObject === entity ? 'you' : gameObject.constructor.name.toLowerCase();
 			const x = gameObject.position.x - entity.position.x;
 			const y = gameObject.position.y - entity.position.y;
 			return { type, position: new vec2(x, y) };

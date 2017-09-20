@@ -11,8 +11,8 @@ abstract class GameObject extends BaseObject {
 	protected canBump: boolean;
 	public static PUSH_LIMIT: number = 5;
 
-	public constructor(ID: string, model: Model, controller?: Controller, position?: vec2) {
-		super(ID, position, model);
+	public constructor(model: Model, controller?: Controller, position?: vec2) {
+		super(position, model);
 		this.canBump = true;
 
 		if (controller) {
@@ -150,7 +150,7 @@ abstract class GameObject extends BaseObject {
 		if (!tests) return result;
 
 		for (const test of tests) {
-			if (this.ID !== test.ID && pos.x === test.position.x && pos.y === test.position.y) {
+			if (this !== test && pos.x === test.position.x && pos.y === test.position.y) {
 				result.push(test);
 			}
 		}

@@ -3,13 +3,11 @@ import { Model } from '../../Model';
 import { vec2, mat4 } from '../../Math';
 
 abstract class BaseObject {
-	public readonly ID: string;
 	public readonly model: Model;
 	public position: vec2;
 	private animation?: Animation;
 
-	public constructor(ID: string, position: vec2, model?: Model) {
-		this.ID = ID;
+	public constructor(position: vec2, model?: Model) {
 		this.position = position;
 		this.model = model;
 

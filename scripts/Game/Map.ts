@@ -15,7 +15,7 @@ export default class Map {
 	}
 
 	public initialize(randomizer: Random, players: Drone[], spikePercent: number,
-		createSpikeModel: (id: string) => Model) {
+		createSpikeModel: () => Model) {
 		const markedList = new MarkList(this.xSize, this.ySize);
 
 		// first, generate all players and mark their "safe space" as invalid for further placements
@@ -43,7 +43,7 @@ export default class Map {
 			for (const otherObject of this.gameObjects) {
 				const player = this.players[i];
 
-				if (player.ID !== otherObject.ID && player.position.exactEquals(otherObject.position)) {
+				if (player !== otherObject && player.position.exactEquals(otherObject.position)) {
 					crashed.push(player);
 				}
 			}
@@ -74,7 +74,7 @@ export default class Map {
 		});
 
 		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
-			if (sortedObjects[k].ID === entity.ID) {
+			if (sortedObjects[k] === entity) {
 				return sortedObjects[(k + 1) % sortedObjects.length];
 			}
 		}
@@ -89,7 +89,7 @@ export default class Map {
 		});
 
 		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
-			if (sortedObjects[k].ID === entity.ID) {
+			if (sortedObjects[k] === entity) {
 				return sortedObjects[(k + 1) % sortedObjects.length];
 			}
 		}
@@ -104,7 +104,7 @@ export default class Map {
 		});
 
 		for (let k = 0; k < sortedObjects.length; k++) {
-			if (sortedObjects[k].ID === entity.ID) {
+			if (sortedObjects[k] === entity) {
 				return sortedObjects[(k + 1) % sortedObjects.length];
 			}
 		}
@@ -119,7 +119,7 @@ export default class Map {
 		});
 
 		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
-			if (sortedObjects[k].ID === entity.ID) {
+			if (sortedObjects[k] === entity) {
 				return sortedObjects[(k + 1) % sortedObjects.length];
 			}
 		}
@@ -178,7 +178,7 @@ export default class Map {
 	}
 
 	private generateSpikes(randomizer: Random, spikePercent: number, markedList: MarkList,
-		createSpikeModel: (id: string) => Model): Spike[] {
+		createSpikeModel: () => Model): Spike[] {
 		const spikeArray: Spike[] = [];
 		let spikesGenned = 0;
 		let spikesFailed = 0;
@@ -189,9 +189,8 @@ export default class Map {
 			const invalidPosition = markedList.isMarked(position);
 
 			if (!invalidPosition) {
-				const ID = `__reservedSpikeNumber${spikesGenned + 1}__`;
-				const model = createSpikeModel(ID);
-				spikeArray.push(new Spike(ID, model, position));
+				const model = createSpikeModel();
+				spikeArray.push(new Spike(model, position));
 
 				// spikes only invalidate their tile, they get no "safe space"
 				markedList.mark(position, 0);
