@@ -8,7 +8,6 @@ export default class SimpleTextureRectangle extends SimpleRectangle {
 
 	public constructor(texture: WebGLTexture) {
 		super(new Color(1, 1, 1));
-
 		this.texture = texture;
 	}
 
@@ -17,7 +16,7 @@ export default class SimpleTextureRectangle extends SimpleRectangle {
 	}
 
 	protected updateAttributes(gl: WebGLRenderingContext, renderState: IRenderState): void {
+		super.updateAttributes(gl, renderState);
 		gl.bindTexture(gl.TEXTURE_2D, this.texture);
-		return super.updateAttributes(gl, renderState);
 	}
 }

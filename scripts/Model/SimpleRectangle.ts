@@ -8,7 +8,7 @@ export interface IRenderState {
 	mvpMatrix: mat4;
 }
 
-abstract class SimpleRectangle extends Model<IRenderState> {
+class SimpleRectangle extends Model<IRenderState> {
 	protected buffer: RectangleBuffer;
 	protected shader: SimpleShader;
 	protected color: Color;
