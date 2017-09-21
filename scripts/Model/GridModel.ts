@@ -1,6 +1,6 @@
 import { Color } from '../Utils';
 import { GridShader } from './Shader';
-import { vec2, vec3, mat4 } from '../Math';
+import { vec3, mat4 } from '../Math';
 import SimpleRectangle, { IRenderState } from './SimpleRectangle';
 
 export default class GridModel extends SimpleRectangle {
@@ -21,10 +21,9 @@ export default class GridModel extends SimpleRectangle {
 		return GridShader.createShader();
 	}
 
-	protected calculateState(vpMatrix: mat4, position: vec2 = new vec2()): IRenderState {
-		const size = new vec3(this.xSize, this.ySize, 1);
-		const offset = new vec3(0, 0, 0);
-		const modelMatrix = mat4.fromTranslation(position.toVec3().add(offset)).scale(size);
+	protected calculateState(vpMatrix: mat4, position: vec3, scale: vec3): IRenderState {
+		const offset = new vec3(-scale.x / 2, -scale.y / 2, 0);
+		const modelMatrix = mat4.fromTranslation(position.add(offset)).scale(scale);
 		// const mvpMatrix = modelMatrix.mul(vpMatrix);
 		// const mvpMatrix = vpMatrix.mul(modelMatrix);
 

@@ -1,5 +1,5 @@
 import { GameObject, BaseObject } from './GameObject';
-import { vec2 } from '../Math';
+import { vec3 } from '../Math';
 import Map from './Map';
 import Renderer from './Renderer';
 import TickState from './TickState';
@@ -83,12 +83,12 @@ export default class Runner {
 
 			const renderObjects = this.combineLists(gameObjects, transientObjects);
 
-			// this.renderer.textRender();
 			this.renderer.render(renderObjects, {
 				povPosition: options.focusOnPlayerId ? this.getPlayersPosition(options.focusOnPlayerId) : null,
-				renderGrid: options.renderGrid,
-				tiledRender: false,
 				viewSize: Math.max(this.map.xSize, this.map.ySize) / 2,
+				renderGrid: options.renderGrid,
+				tiledRender: true,
+				debugGrid: false,
 			});
 
 			if (!tickState.isAnimating()) {
@@ -106,7 +106,7 @@ export default class Runner {
 		requestAnimationFrame(this.frame);
 	}
 
-	private getPlayersPosition(ID: string): vec2 {
+	private getPlayersPosition(ID: string): vec3 {
 		// const player = this.map.getPlayers().find((p) => p.ID === ID);
 		// TODO: Allow user to select which player to watch
 		const players = this.map.getPlayers();

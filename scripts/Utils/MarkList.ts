@@ -1,7 +1,7 @@
-import { vec2 } from '../Math';
+import { vec3 } from '../Math';
 
 export default class MarkList {
-	private markedArray: vec2[];
+	private markedArray: vec3[];
 	private xSize: number;
 	private ySize: number;
 
@@ -11,11 +11,11 @@ export default class MarkList {
 		this.ySize = ySize;
 	}
 
-	public getMarkedList(): vec2[] {
+	public getMarkedList(): vec3[] {
 		return this.markedArray;
 	}
 
-	public isMarked(position: vec2): boolean {
+	public isMarked(position: vec3): boolean {
 		for (const inv of this.markedArray) {
 			if (position.exactEquals(inv)) {
 				return true;
@@ -25,7 +25,7 @@ export default class MarkList {
 		return false;
 	}
 
-	public mark(position: vec2, numSpread: number): void {
+	public mark(position: vec3, numSpread: number): void {
 		this.internalMark(position.x, position.y, numSpread);
 	}
 
@@ -33,9 +33,9 @@ export default class MarkList {
 		if (numSpread < 0) return;
 
 		// check if the current tile is invalid to avoid adding duplicates
-		const marked = this.isMarked(new vec2(x, y));
+		const marked = this.isMarked(new vec3(x, y));
 		if (!marked) {
-			this.markedArray.push(new vec2(x, y));
+			this.markedArray.push(new vec3(x, y));
 		}
 
 		// recursively call out in cardinal directions

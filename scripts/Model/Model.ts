@@ -1,14 +1,10 @@
-import { Animation } from '../Animations';
 import { Buffer } from './Buffer';
 import { Shader } from './Shader';
-import { vec2, mat4 } from '../Math';
-
-import { BaseObject } from '../Game/GameObject';
+import { vec3, mat4 } from '../Math';
 
 abstract class Model<Tstate = any> {
 	protected shader: Shader;
 	protected buffer: Buffer;
-	protected owner: BaseObject;
 
 	public constructor() {
 		this.shader = this.createShader();
@@ -23,14 +19,8 @@ abstract class Model<Tstate = any> {
 		return this.shader;
 	}
 
-	public setOwner(owner: BaseObject): void {
-		this.owner = owner;
-	}
-
-	public render(gl: WebGLRenderingContext, vpMatrix: mat4): void {
-		const position = this.owner && this.owner.getPosition();
-		const animation = this.owner && this.owner.getAnimation();
-		const state = this.calculateState(vpMatrix, position, animation);
+	public render(gl: WebGLRenderingContext, vpMatrix: mat4, position: vec3, scale: vec3): void {
+		const state = this.calculateState(vpMatrix, position, scale);
 
 		this.updateAttributes(gl, state);
 		this.updateUniforms(gl, state);
@@ -39,7 +29,7 @@ abstract class Model<Tstate = any> {
 
 	protected abstract createShader(): Shader;
 	protected abstract createBuffer(): Buffer;
-	protected abstract calculateState(vpMatrix: mat4, position: vec2, animation: Animation): Tstate;
+	protected abstract calculateState(vpMatrix: mat4, position: vec3, scale: vec3): Tstate;
 	protected abstract updateAttributes(gl: WebGLRenderingContext, renderState: Tstate): void;
 	protected abstract updateUniforms(gl: WebGLRenderingContext, renderState: Tstate): void;
 	protected abstract draw(gl: WebGLRenderingContext, renderState: Tstate): void;

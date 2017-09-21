@@ -1,17 +1,15 @@
-import { Animation, MoveAnimation } from '../../Animations';
+import { Animation, ResizeAnimation, MoveAnimation } from '../../Animations';
 import { Model } from '../../Model';
-import { vec2, mat4 } from '../../Math';
+import { vec3, mat4 } from '../../Math';
 
 abstract class BaseObject {
 	public readonly model: Model;
-	public position: vec2;
+	public position: vec3;
 	private animation?: Animation;
 
-	public constructor(position: vec2, model?: Model) {
+	public constructor(position: vec3, model?: Model) {
 		this.position = position;
 		this.model = model;
-
-		if (model) model.setOwner(this);
 	}
 
 	public canRender(): boolean {
@@ -21,7 +19,7 @@ abstract class BaseObject {
 
 	public render(gl: WebGLRenderingContext, vpMatrix: mat4): void {
 		if (!this.model) return;
-		else this.model.render(gl, vpMatrix);
+		else this.model.render(gl, vpMatrix, this.getPosition(), this.getScale());
 	}
 
 	public updateAnimation(deltaTime: number): boolean {
@@ -41,14 +39,27 @@ abstract class BaseObject {
 		return this.animation;
 	}
 
-	public getPosition(): vec2 {
-		if (this.animation) {
-			if (this.animation instanceof MoveAnimation) {
-				return this.animation.position;
-			}
+	public getPosition(): vec3 {
+		if (this.animation && this.animation instanceof MoveAnimation) {
+			return this.animation.position;
 		}
 
 		return this.position;
+	}
+
+	public getScale(): vec3 {
+		if (this.animation) {
+			if (this.animation instanceof ResizeAnimation) {
+				const s = this.animation.size;
+				return new vec3(s, s, 1);
+			}
+			else if (this.animation instanceof MoveAnimation) {
+				const bonusSize = this.animation.bonusSize;
+				return new vec3(1 + bonusSize, 1 + bonusSize, 1);
+			}
+		}
+
+		return new vec3(1, 1, 1);
 	}
 }
 

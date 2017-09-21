@@ -1,7 +1,7 @@
 import { MoveAnimation } from '../../Animations';
 import { Controller } from '../Bot';
 import { Model } from '../../Model';
-import { vec2 } from '../../Math';
+import { vec3 } from '../../Math';
 import BaseObject from './BaseObject';
 import Drone from './Drone';
 import Map from '../Map';
@@ -11,7 +11,7 @@ abstract class GameObject extends BaseObject {
 	protected canBump: boolean;
 	public static PUSH_LIMIT: number = 5;
 
-	public constructor(model: Model, controller?: Controller, position?: vec2) {
+	public constructor(model: Model, controller?: Controller, position?: vec3) {
 		super(position, model);
 		this.canBump = true;
 
@@ -59,7 +59,7 @@ abstract class GameObject extends BaseObject {
 	protected move(deltaX: number, deltaY: number, map: Map,
 		moveType: MoveAnimation.MoveType = MoveAnimation.MoveType.Basic): BaseObject[] {
 		if (!GameObject.PUSH_LIMIT) return this.internalMove(deltaX, deltaY, map, moveType);
-		else return this.internalMoveLimit(new vec2(deltaX, deltaY), map, GameObject.PUSH_LIMIT, moveType).objects;
+		else return this.internalMoveLimit(new vec3(deltaX, deltaY), map, GameObject.PUSH_LIMIT, moveType).objects;
 	}
 
 	private internalMove(deltaX: number, deltaY: number, map: Map, moveType: MoveAnimation.MoveType,
@@ -70,7 +70,7 @@ abstract class GameObject extends BaseObject {
 		}
 
 		const startPos = this.position;
-		this.position = this.position.addValues(deltaX, deltaY);
+		this.position = this.position.addValues(deltaX, deltaY, 0);
 		const endPos = this.position;
 		this.position = GameObject.wrapCoordinates(this.position, map);
 
@@ -89,7 +89,7 @@ abstract class GameObject extends BaseObject {
 		return result;
 	}
 
-	private internalMoveLimit(delta: vec2, map: Map, movesRemaining: number,
+	private internalMoveLimit(delta: vec3, map: Map, movesRemaining: number,
 		moveType: any, possibleAffected?: GameObject[]): IMoveResult {
 		// TODO: If a drone is at the end of a chain, it will prevent the spikes from moving, and survive
 		if (movesRemaining <= 0) return { canMove: false, objects: [] };
@@ -129,7 +129,7 @@ abstract class GameObject extends BaseObject {
 	/**
 	 * Clips position to map coordinates. Wraps position to oposite side of map if they are off of the board.
 	 */
-	protected static wrapCoordinates(position: vec2, map: Map): vec2 {
+	protected static wrapCoordinates(position: vec3, map: Map): vec3 {
 		const xMax = map.xSize - 1;
 		const yMax = map.ySize - 1;
 
@@ -142,10 +142,10 @@ abstract class GameObject extends BaseObject {
 		if (y > yMax) y = 0;
 		else if (y < 0) y = yMax;
 
-		return new vec2(x, y);
+		return new vec3(x, y);
 	}
 
-	private findAt(pos: vec2, tests: GameObject[]): GameObject[] {
+	private findAt(pos: vec3, tests: GameObject[]): GameObject[] {
 		const result = [];
 		if (!tests) return result;
 

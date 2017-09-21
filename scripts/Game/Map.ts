@@ -1,7 +1,7 @@
 import { Drone, Spike, GameObject } from './GameObject';
 import { MarkList, Random } from '../Utils';
 import { Model } from '../Model';
-import { vec2 } from '../Math';
+import { vec3 } from '../Math';
 
 export default class Map {
 	public readonly xSize: number;
@@ -141,10 +141,10 @@ export default class Map {
 		return sameXList;
 	}
 
-	private static randomPosition(randomzier: Random, maxX: number, maxY: number): vec2 {
+	private static randomPosition(randomzier: Random, maxX: number, maxY: number): vec3 {
 		const x = randomzier.nextRangeInt(0, maxX);
 		const y = randomzier.nextRangeInt(0, maxY);
-		return new vec2(x, y);
+		return new vec3(x, y);
 	}
 
 	private generatePlayers(randomizer: Random, players: Drone[], markedList: MarkList): void {
