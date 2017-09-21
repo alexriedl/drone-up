@@ -3,14 +3,12 @@ import SimpleShader from './SimpleShader';
 
 const vertexShaderSource = `
 attribute vec4 a_position;
-
-uniform mat4 u_model_view;
-uniform mat4 u_projection;
+uniform mat4 u_mvp_matrix;
 
 varying lowp vec2 v_uv;
 
 void main() {
-	gl_Position = u_projection * u_model_view * a_position;
+	gl_Position = u_mvp_matrix * a_position;
 	v_uv = a_position.xy;
 }`;
 

@@ -1,6 +1,5 @@
 import { Color } from '../Utils';
 import { GridShader } from './Shader';
-import { vec3, mat4 } from '../Math';
 import SimpleRectangle, { IRenderState } from './SimpleRectangle';
 
 export default class GridModel extends SimpleRectangle {
@@ -19,15 +18,6 @@ export default class GridModel extends SimpleRectangle {
 
 	protected createShader(): GridShader {
 		return GridShader.createShader();
-	}
-
-	protected calculateState(vpMatrix: mat4, position: vec3, scale: vec3): IRenderState {
-		const offset = new vec3(-scale.x / 2, -scale.y / 2, 0);
-		const modelMatrix = mat4.fromTranslation(position.add(offset)).scale(scale);
-		// const mvpMatrix = modelMatrix.mul(vpMatrix);
-		// const mvpMatrix = vpMatrix.mul(modelMatrix);
-
-		return { modelMatrix, orthoMatrix: vpMatrix };
 	}
 
 	protected updateUniforms(gl: WebGLRenderingContext, renderState: IRenderState): void {

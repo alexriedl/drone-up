@@ -5,8 +5,7 @@ import { vec3, mat4 } from '../Math';
 import Model from './Model';
 
 export interface IRenderState {
-	modelMatrix: mat4;
-	orthoMatrix: mat4;
+	mvpMatrix: mat4;
 }
 
 abstract class SimpleRectangle extends Model<IRenderState> {
@@ -30,11 +29,9 @@ abstract class SimpleRectangle extends Model<IRenderState> {
 	protected calculateState(vpMatrix: mat4, position: vec3, scale: vec3): IRenderState {
 		const offset = new vec3(-scale.x / 2, -scale.y / 2, 0);
 		const modelMatrix = mat4.fromTranslation(position.add(offset)).scale(scale);
+		const mvpMatrix = modelMatrix.mul(vpMatrix);
 
-		// const mvpMatrix = modelMatrix.mul(vpMatrix);
-		// const mvpMatrix = vpMatrix.mul(modelMatrix);
-
-		return { modelMatrix, orthoMatrix: vpMatrix };
+		return { mvpMatrix };
 	}
 
 	protected updateAttributes(gl: WebGLRenderingContext, renderState: IRenderState): void {
@@ -49,8 +46,7 @@ abstract class SimpleRectangle extends Model<IRenderState> {
 	protected updateUniforms(gl: WebGLRenderingContext, renderState: IRenderState): void {
 		const shader = this.shader;
 
-		gl.uniformMatrix4fv(shader.uniformProjectionMatrixLocation, false, renderState.orthoMatrix.toFloat32Array());
-		gl.uniformMatrix4fv(shader.uniformModelViewMatrixLocation, false, renderState.modelMatrix.toFloat32Array());
+		gl.uniformMatrix4fv(shader.uniformMVPMatrixLocation, false, renderState.mvpMatrix.toFloat32Array());
 		gl.uniform4fv(shader.uniformColorLocation, this.color.toFloat32Array());
 	}
 
