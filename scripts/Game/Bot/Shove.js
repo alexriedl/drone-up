@@ -6,9 +6,9 @@ export default class Shove extends Controller {
 	getAction() {
 		this.nextAction = (this.nextAction + 1) % 3;
 		switch (this.nextAction) {
-			case 0: this.pushRight(); break;
-			case 1: this.pushUp(); break;
-			case 2: this.moveRight(); break;
+			case 0: return this.pushRight();
+			case 1: return this.pushUp();
+			default: return this.moveRight();
 		}
 	}
 }

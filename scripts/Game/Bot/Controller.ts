@@ -11,34 +11,26 @@ abstract class Controller {
 	protected actions: string[];
 	protected readonly randomizer: Random;
 
-	private internalAction: string;
-
 	constructor(randomizer: Random) {
 		this.randomizer = randomizer;
 	}
 
-	protected abstract getAction(): string;
+	public abstract getAction(): string;
 
-	protected moveRight(): void { this.internalAction = 'MoveRight'; }
-	protected moveLeft(): void { this.internalAction = 'MoveLeft'; }
-	protected moveUp(): void { this.internalAction = 'MoveUp'; }
-	protected moveDown(): void { this.internalAction = 'MoveDown'; }
+	protected moveRight(): string { return 'MoveRight'; }
+	protected moveLeft(): string { return 'MoveLeft'; }
+	protected moveUp(): string { return 'MoveUp'; }
+	protected moveDown(): string { return 'MoveDown'; }
 
-	protected pushRight(): void { this.internalAction = 'PushRight'; }
-	protected pushLeft(): void { this.internalAction = 'PushLeft'; }
-	protected pushUp(): void { this.internalAction = 'PushUp'; }
-	protected pushDown(): void { this.internalAction = 'PushDown'; }
+	protected pushRight(): string { return 'PushRight'; }
+	protected pushLeft(): string { return 'PushLeft'; }
+	protected pushUp(): string { return 'PushUp'; }
+	protected pushDown(): string { return 'PushDown'; }
 
-	protected pullRight(): void { this.internalAction = 'PullRight'; }
-	protected pullLeft(): void { this.internalAction = 'PullLeft'; }
-	protected pullUp(): void { this.internalAction = 'PullUp'; }
-	protected pullDown(): void { this.internalAction = 'PullDown'; }
-
-	public runController(): string {
-		const action = this.getAction() || this.internalAction;
-		this.internalAction = '';
-		return action;
-	}
+	protected pullRight(): string { return 'PullRight'; }
+	protected pullLeft(): string { return 'PullLeft'; }
+	protected pullUp(): string { return 'PullUp'; }
+	protected pullDown(): string { return 'PullDown'; }
 
 	public setActions(actions: string[]) {
 		this.actions = actions;
