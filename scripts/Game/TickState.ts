@@ -15,7 +15,7 @@ export default class TickState {
 		if (!this.isAnimating()) {
 			this.loopPosition = (this.loopPosition + 1) % players.length;
 			const player = players[this.loopPosition];
-			const action = player.controller.getAction();
+			const action = player.controller.runController();
 			this.animatingObjects = player.perform(action, map);
 		}
 
