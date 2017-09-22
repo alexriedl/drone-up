@@ -1,9 +1,9 @@
-import { Color } from '../Utils';
 import { BaseObject } from './GameObject';
+import { Color } from '../Utils';
 import { vec3, mat4 } from '../Math';
 
 import { Register } from '../Utils';
-import { Model, GridModel, SimpleTextureRectangle } from '../Model';
+import { GridModel, SimpleTextureRectangle } from '../Model';
 
 export interface IRenderOptions {
 	povPosition?: vec3;
@@ -17,24 +17,23 @@ export interface IRenderOptions {
 export interface IRenderTargetInfo {
 	frameBuffer: WebGLFramebuffer;
 	texture: WebGLTexture;
-	offsetX: number;
-	offsetY: number;
+	offsetXTiles: number;
+	offsetYTiles: number;
 	height: number;
 	width: number;
 }
 
 export default class Renderer {
 	private gl: WebGLRenderingContext;
-	private gridModel: GridModel;
 	private xSize: number;
 	private ySize: number;
 
+	private renderTarget: IRenderTargetInfo;
 	private overflowXTiles: number = 0;
 	private overflowYTiles: number = 0;
 
-	private renderTarget: IRenderTargetInfo;
 	private mapObject: BaseObject;
-	private outputModel: Model;
+	private gridObject: BaseObject;
 
 	private static defaultOptions: IRenderOptions = {
 		povPosition: null,
@@ -107,15 +106,22 @@ export default class Renderer {
 				texture,
 				width: textureWidth,
 				height: textureHeight,
-				offsetX: overdrawWidth / 2,
-				offsetY: overdrawHeight / 2,
+				offsetXTiles: (overdrawWidth / 2) / pixelsPerTile,
+				offsetYTiles: (overdrawHeight / 2) / pixelsPerTile,
 			};
 		}
 
-		this.gridModel = new GridModel(new Color(1, 0.6, 0), xSize / 1000, xSize, ySize);
-		this.outputModel = new SimpleTextureRectangle(this.renderTarget.texture);
-		this.mapObject = new BaseObject(this.outputModel,
-			new vec3(this.xSize / 2, this.ySize / 2),
+		const centerY = this.ySize / 2;
+		const centerX = this.xSize / 2;
+
+		const gridModel = new GridModel(new Color(1, 0.6, 0), xSize / 1000, xSize, ySize);
+		this.gridObject = new BaseObject(gridModel,
+			new vec3(centerX - 0.5, centerY - 0.5),
+			new vec3(xSize, ySize, 1));
+
+		const gameModel = new SimpleTextureRectangle(this.renderTarget.texture);
+		this.mapObject = new BaseObject(gameModel,
+			new vec3(centerX, centerY),
 			new vec3(xSize + extra, ySize + extra, 1));
 	}
 
@@ -137,18 +143,10 @@ export default class Renderer {
 
 		Register.initializeGLItems(gl);
 
-		const centerY = this.ySize / 2;
-		const centerX = this.xSize / 2;
-		const gridScale = new vec3(this.xSize, this.ySize, 1);
-		const gridPos = new vec3(centerX - 0.5, centerY - 0.5);
-
 		// NOTE: Render to texture first
 		{
-			const canvasWidth = gl.canvas.clientWidth;
-			const canvasHeight = gl.canvas.clientHeight;
-			const pixelsPerTile = Math.min(canvasWidth / this.xSize, canvasHeight / this.ySize);
-			const offsetX = this.renderTarget.offsetX / pixelsPerTile;
-			const offsetY = this.renderTarget.offsetY / pixelsPerTile;
+			const offsetX = this.renderTarget.offsetXTiles;
+			const offsetY = this.renderTarget.offsetYTiles;
 
 			gl.bindFramebuffer(gl.FRAMEBUFFER, this.renderTarget.frameBuffer);
 			gl.viewport(0, 0, this.renderTarget.width, this.renderTarget.height);
@@ -159,7 +157,10 @@ export default class Renderer {
 				-offsetY, this.ySize + offsetY,
 				-1, 1);
 
-			if (renderGrid && !debugGrid) Renderer.renderModel(gl, orthoMatrix, this.gridModel, gridPos, gridScale);
+			if (renderGrid && !debugGrid) {
+				this.gridObject.model.useShader(gl);
+				this.gridObject.render(gl, orthoMatrix);
+			}
 			Renderer.renderObjects(gl, orthoMatrix, objects);
 
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -194,7 +195,8 @@ export default class Renderer {
 			}
 
 			if (debugGrid) {
-				Renderer.renderModel(gl, orthoMatrix, this.gridModel, gridPos, gridScale);
+				this.gridObject.model.useShader(gl);
+				this.gridObject.render(gl, orthoMatrix);
 			}
 
 			this.mapObject.model.useShader(gl);
@@ -213,17 +215,6 @@ export default class Renderer {
 				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(0, -this.ySize, 0));
 			}
 		}
-	}
-
-	protected static renderModel(gl: WebGLRenderingContext, orthoMatrix: mat4, model: Model,
-		position: vec3 = new vec3(), scale: vec3 = new vec3(1, 1, 1)) {
-		model.useShader(gl);
-
-		const offset = new vec3(0.5 - scale.x / 2, 0.5 - scale.y / 2, 0);
-		const modelMatrix = mat4.fromTranslation(position.add(offset)).scale(scale);
-		const mvpMatrix = modelMatrix.mul(orthoMatrix);
-
-		model.render(gl, mvpMatrix);
 	}
 
 	protected static renderObjects(gl: WebGLRenderingContext, orthoMatrix: mat4, objects: BaseObject[]) {
