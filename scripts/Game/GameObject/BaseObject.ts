@@ -45,11 +45,12 @@ export default class BaseObject {
 		return !!this.model;
 	}
 
-	public render(gl: WebGLRenderingContext, vpMatrix: mat4): void {
+	public render(gl: WebGLRenderingContext, vpMatrix: mat4, overridePosition?: vec3, overrideScale?: vec3): void {
 		if (!this.model) return;
 
-		const scale = this.getScale();
-		const position = this.getPosition();
+		const scale = overrideScale || this.getScale();
+		const position = overridePosition || this.getPosition();
+
 		// TODO: The 0.5 is the built in size of the object. Find a clean way to build that into the offset
 		const offset = new vec3(0.5 - scale.x / 2, 0.5 - scale.y / 2, 0);
 		const modelMatrix = mat4.fromTranslation(position.add(offset)).scale(scale);

@@ -142,10 +142,6 @@ export default class Renderer {
 		const gridScale = new vec3(this.xSize, this.ySize, 1);
 		const gridPos = new vec3(centerX - 0.5, centerY - 0.5);
 
-		if (centerY === 0) {
-			console.log(tiledRender);
-		}
-
 		// NOTE: Render to texture first
 		{
 			const canvasWidth = gl.canvas.clientWidth;
@@ -197,11 +193,6 @@ export default class Renderer {
 					-1, 1);
 			}
 
-/* 			const rightBorder = centerX + this.xSize;
-			const leftBorder = centerX - this.xSize;
-			const bottomBorder = centerY + this.ySize;
-			const topBorder = centerY - this.ySize;
- */
 			if (debugGrid) {
 				Renderer.renderModel(gl, orthoMatrix, this.gridModel, gridPos, gridScale);
 			}
@@ -209,43 +200,18 @@ export default class Renderer {
 			this.mapObject.model.useShader(gl);
 			this.mapObject.render(gl, orthoMatrix);
 
-			// TODO: Cleanup how tiling works.
-/* 			if (tiledRender) {
-				if (!position) {
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(rightBorder, centerY), mapScale);
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(rightBorder, topBorder), mapScale);
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(rightBorder, bottomBorder), mapScale);
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(leftBorder, centerY), mapScale);
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(leftBorder, topBorder), mapScale);
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(leftBorder, bottomBorder), mapScale);
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(centerX, topBorder), mapScale);
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(centerX, bottomBorder), mapScale);
-				}
-				else {
-					if (position.x > this.xSize / 2) {
-						Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(rightBorder, centerY), mapScale);
-						if (position.y < this.ySize / 2) {
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(rightBorder, topBorder), mapScale);
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(centerX, topBorder), mapScale);
-						}
-						else {
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(rightBorder, bottomBorder), mapScale);
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(centerX, bottomBorder), mapScale);
-						}
-					}
-					else {
-						Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(leftBorder, centerY), mapScale);
-						if (position.y < this.ySize / 2) {
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(leftBorder, topBorder), mapScale);
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(centerX, topBorder), mapScale);
-						}
-						else {
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(leftBorder, bottomBorder), mapScale);
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(centerX, bottomBorder), mapScale);
-						}
-					}
-				}
-			} */
+			if (tiledRender) {
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(+this.xSize, 0, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(+this.xSize, +this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(+this.xSize, -this.ySize, 0));
+
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(-this.xSize, 0, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(-this.xSize, +this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(-this.xSize, -this.ySize, 0));
+
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(0, +this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(0, -this.ySize, 0));
+			}
 		}
 	}
 
