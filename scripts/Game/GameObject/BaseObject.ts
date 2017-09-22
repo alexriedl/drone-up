@@ -2,33 +2,75 @@ import { Animation, ResizeAnimation, MoveAnimation } from '../../Animations';
 import { Model } from '../../Model';
 import { vec3, mat4 } from '../../Math';
 
-abstract class BaseObject {
+export default class BaseObject {
 	public readonly model: Model;
+	// TODO: This should not be public
 	public position: vec3;
+	protected scale: vec3;
+
 	private animation?: Animation;
 
-	public constructor(position: vec3, model?: Model) {
+	private parent?: BaseObject;
+	private children?: BaseObject[] = [];
+
+	public constructor(model: Model, position: vec3 = new vec3(), scale: vec3 = new vec3(1, 1, 1)) {
 		this.position = position;
+		this.scale = scale;
 		this.model = model;
+	}
+
+	public setParent(parent: BaseObject): void {
+		if (this.parent) {
+			this.parent.removeChild(this);
+		}
+
+		if (parent) {
+			this.parent.children.push(this);
+		}
+
+		this.parent = parent;
+	}
+
+	protected removeChild(child: BaseObject): void {
+		if (!child) return;
+		const index = this.children.indexOf(child);
+		if (index >= 0) {
+			this.children.splice(index, 1);
+		}
 	}
 
 	public canRender(): boolean {
 		// TODO: Improve this to ensure buffer and shader is also loaded
+		// TODO: Check if any child can render
 		return !!this.model;
 	}
 
 	public render(gl: WebGLRenderingContext, vpMatrix: mat4): void {
 		if (!this.model) return;
-		else this.model.render(gl, vpMatrix, this.getPosition(), this.getScale());
+
+		const scale = this.getScale();
+		const position = this.getPosition();
+		// TODO: The 0.5 is the built in size of the object. Find a clean way to build that into the offset
+		const offset = new vec3(0.5 - scale.x / 2, 0.5 - scale.y / 2, 0);
+		const modelMatrix = mat4.fromTranslation(position.add(offset)).scale(scale);
+		const mvpMatrix = modelMatrix.mul(vpMatrix);
+
+		this.model.render(gl, mvpMatrix);
 	}
 
-	public updateAnimation(deltaTime: number): boolean {
-		if (!this.animation) return true;
+	public update(deltaTime: number): boolean {
+		let childrenDone = true;
+		for (const child of this.children) {
+			const childDone = child.update(deltaTime);
+			if (!childDone) childrenDone = false;
+		}
 
-		const finished = this.animation.update(deltaTime);
-		if (finished) this.animation = undefined;
+		if (!this.animation) return childrenDone;
 
-		return finished;
+		const myAnimationDone = this.animation.update(deltaTime);
+		if (myAnimationDone) this.animation = undefined;
+
+		return myAnimationDone && childrenDone;
 	}
 
 	public setAnimation(animation: Animation): void {
@@ -55,12 +97,10 @@ abstract class BaseObject {
 			}
 			else if (this.animation instanceof MoveAnimation) {
 				const bonusSize = this.animation.bonusSize;
-				return new vec3(1 + bonusSize, 1 + bonusSize, 1);
+				return new vec3(this.scale.x + bonusSize, this.scale.y + bonusSize, this.scale.z);
 			}
 		}
 
-		return new vec3(1, 1, 1);
+		return this.scale;
 	}
 }
-
-export default BaseObject;

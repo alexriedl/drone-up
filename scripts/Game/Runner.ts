@@ -87,7 +87,7 @@ export default class Runner {
 				povPosition: options.focusOnPlayerId ? this.getPlayersPosition(options.focusOnPlayerId) : null,
 				viewSize: Math.max(this.map.xSize, this.map.ySize) / 2,
 				renderGrid: options.renderGrid,
-				tiledRender: true,
+				tiledRender: false,
 				debugGrid: false,
 			});
 

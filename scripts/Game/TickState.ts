@@ -24,7 +24,7 @@ export default class TickState {
 			const removes = [];
 
 			for (const ao of this.animatingObjects) {
-				const finished = ao.updateAnimation(deltaTime);
+				const finished = ao.update(deltaTime);
 				if (finished) removes.push(ao);
 			}
 

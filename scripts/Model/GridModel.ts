@@ -1,6 +1,7 @@
 import { Color } from '../Utils';
 import { GridShader } from './Shader';
-import SimpleRectangle, { IRenderState } from './SimpleRectangle';
+import { mat4 } from '../Math';
+import SimpleRectangle from './SimpleRectangle';
 
 export default class GridModel extends SimpleRectangle {
 	protected shader: GridShader;
@@ -20,9 +21,9 @@ export default class GridModel extends SimpleRectangle {
 		return GridShader.createShader();
 	}
 
-	protected updateUniforms(gl: WebGLRenderingContext, renderState: IRenderState): void {
+	protected updateUniforms(gl: WebGLRenderingContext, mvpMatrix: mat4): void {
 		const shader = this.shader;
-		super.updateUniforms(gl, renderState);
+		super.updateUniforms(gl, mvpMatrix);
 
 		gl.uniform1f(shader.uniformGridThicknessLocation, this.gridThickness);
 		gl.uniform1f(shader.uniformXCountLocation, this.xSize);

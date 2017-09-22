@@ -1,8 +1,8 @@
 import { Buffer } from './Buffer';
+import { mat4 } from '../Math';
 import { Shader } from './Shader';
-import { vec3, mat4 } from '../Math';
 
-abstract class Model<Tstate = any> {
+abstract class Model {
 	protected shader: Shader;
 	protected buffer: Buffer;
 
@@ -19,20 +19,17 @@ abstract class Model<Tstate = any> {
 		return this.shader;
 	}
 
-	public render(gl: WebGLRenderingContext, vpMatrix: mat4, position: vec3, scale: vec3): void {
-		const state = this.calculateState(vpMatrix, position, scale);
-
-		this.updateAttributes(gl, state);
-		this.updateUniforms(gl, state);
-		this.draw(gl, state);
+	public render(gl: WebGLRenderingContext, mvpMatrix: mat4): void {
+		this.updateAttributes(gl);
+		this.updateUniforms(gl, mvpMatrix);
+		this.draw(gl);
 	}
 
 	protected abstract createShader(): Shader;
 	protected abstract createBuffer(): Buffer;
-	protected abstract calculateState(vpMatrix: mat4, position: vec3, scale: vec3): Tstate;
-	protected abstract updateAttributes(gl: WebGLRenderingContext, renderState: Tstate): void;
-	protected abstract updateUniforms(gl: WebGLRenderingContext, renderState: Tstate): void;
-	protected abstract draw(gl: WebGLRenderingContext, renderState: Tstate): void;
+	protected abstract updateAttributes(gl: WebGLRenderingContext): void;
+	protected abstract updateUniforms(gl: WebGLRenderingContext, mvpMatrix: mat4): void;
+	protected abstract draw(gl: WebGLRenderingContext): void;
 }
 
 export default Model;

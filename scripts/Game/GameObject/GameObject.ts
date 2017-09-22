@@ -1,5 +1,4 @@
 import { MoveAnimation } from '../../Animations';
-import { Controller } from '../Bot';
 import { Model } from '../../Model';
 import { vec3 } from '../../Math';
 import BaseObject from './BaseObject';
@@ -7,18 +6,12 @@ import Drone from './Drone';
 import Map from '../Map';
 
 abstract class GameObject extends BaseObject {
-	public readonly controller?: Controller;
 	protected canBump: boolean;
 	public static PUSH_LIMIT: number = 5;
 
-	public constructor(model: Model, controller?: Controller, position?: vec3) {
-		super(position, model);
+	public constructor(model: Model, position?: vec3, scale?: vec3) {
+		super(model, position, scale);
 		this.canBump = true;
-
-		if (controller) {
-			this.controller = controller;
-			this.controller.setActions(['MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight']);
-		}
 	}
 
 	public perform(action: string, map: Map): BaseObject[] {

@@ -9,18 +9,12 @@ import Map from '../Map';
 import ScanObject from './ScanObject';
 
 export default class Drone extends GameObject {
-	public constructor(model: Model,  controller: Controller) {
-		super(model, controller);
-		this.canBump = false;
+	public readonly controller?: Controller;
 
-		if (controller) {
-			controller.setActions([
-				'Scan',
-				'MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight',
-				'PullUp', 'PullDown', 'PullLeft', 'PullRight',
-				'PushUp', 'PushDown', 'PushLeft', 'PushRight',
-			]);
-		}
+	public constructor(model: Model,  controller: Controller) {
+		super(model);
+		this.canBump = false;
+		this.controller = controller;
 	}
 
 	public perform(action: string, map: Map): BaseObject[] {

@@ -33,7 +33,8 @@ export default class Renderer {
 	private overflowYTiles: number = 0;
 
 	private renderTarget: IRenderTargetInfo;
-	private outputModel: SimpleTextureRectangle;
+	private mapObject: BaseObject;
+	private outputModel: Model;
 
 	private static defaultOptions: IRenderOptions = {
 		povPosition: null,
@@ -113,6 +114,9 @@ export default class Renderer {
 
 		this.gridModel = new GridModel(new Color(1, 0.6, 0), xSize / 1000, xSize, ySize);
 		this.outputModel = new SimpleTextureRectangle(this.renderTarget.texture);
+		this.mapObject = new BaseObject(this.outputModel,
+			new vec3(this.xSize / 2, this.ySize / 2),
+			new vec3(xSize + extra, ySize + extra, 1));
 	}
 
 	protected static clearScreen(gl: WebGLRenderingContext): void {
@@ -135,9 +139,12 @@ export default class Renderer {
 
 		const centerY = this.ySize / 2;
 		const centerX = this.xSize / 2;
-		const mapScale = new vec3(this.xSize + 6, this.ySize + 6, 1);
 		const gridScale = new vec3(this.xSize, this.ySize, 1);
 		const gridPos = new vec3(centerX - 0.5, centerY - 0.5);
+
+		if (centerY === 0) {
+			console.log(tiledRender);
+		}
 
 		// NOTE: Render to texture first
 		{
@@ -190,18 +197,20 @@ export default class Renderer {
 					-1, 1);
 			}
 
-			const rightBorder = centerX + this.xSize;
+/* 			const rightBorder = centerX + this.xSize;
 			const leftBorder = centerX - this.xSize;
 			const bottomBorder = centerY + this.ySize;
 			const topBorder = centerY - this.ySize;
-
+ */
 			if (debugGrid) {
 				Renderer.renderModel(gl, orthoMatrix, this.gridModel, gridPos, gridScale);
 			}
-			Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(centerX, centerY), mapScale);
+
+			this.mapObject.model.useShader(gl);
+			this.mapObject.render(gl, orthoMatrix);
 
 			// TODO: Cleanup how tiling works.
-			if (tiledRender) {
+/* 			if (tiledRender) {
 				if (!position) {
 					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(rightBorder, centerY), mapScale);
 					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec3(rightBorder, topBorder), mapScale);
@@ -236,14 +245,19 @@ export default class Renderer {
 						}
 					}
 				}
-			}
+			} */
 		}
 	}
 
 	protected static renderModel(gl: WebGLRenderingContext, orthoMatrix: mat4, model: Model,
 		position: vec3 = new vec3(), scale: vec3 = new vec3(1, 1, 1)) {
 		model.useShader(gl);
-		model.render(gl, orthoMatrix, position, scale);
+
+		const offset = new vec3(0.5 - scale.x / 2, 0.5 - scale.y / 2, 0);
+		const modelMatrix = mat4.fromTranslation(position.add(offset)).scale(scale);
+		const mvpMatrix = modelMatrix.mul(orthoMatrix);
+
+		model.render(gl, mvpMatrix);
 	}
 
 	protected static renderObjects(gl: WebGLRenderingContext, orthoMatrix: mat4, objects: BaseObject[]) {
