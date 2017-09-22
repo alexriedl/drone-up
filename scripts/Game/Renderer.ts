@@ -130,6 +130,7 @@ export default class Renderer {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
 
+	// TODO: Update this to take the parent render node instead of a list of objects
 	public render(objects: BaseObject[], options: IRenderOptions = Renderer.defaultOptions): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const background = Color.BLACK.lighten(.3);
@@ -157,11 +158,11 @@ export default class Renderer {
 				-offsetY, this.ySize + offsetY,
 				-1, 1);
 
-			if (renderGrid && !debugGrid) {
-				this.gridObject.model.useShader(gl);
-				this.gridObject.render(gl, orthoMatrix);
+			if (renderGrid && !debugGrid) this.gridObject.render(gl, orthoMatrix);
+
+			for (const o of objects) {
+				o.render(gl, orthoMatrix);
 			}
-			Renderer.renderObjects(gl, orthoMatrix, objects);
 
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		}
@@ -194,12 +195,7 @@ export default class Renderer {
 					-1, 1);
 			}
 
-			if (debugGrid) {
-				this.gridObject.model.useShader(gl);
-				this.gridObject.render(gl, orthoMatrix);
-			}
-
-			this.mapObject.model.useShader(gl);
+			if (debugGrid) this.gridObject.render(gl, orthoMatrix);
 			this.mapObject.render(gl, orthoMatrix);
 
 			if (tiledRender) {
@@ -214,29 +210,6 @@ export default class Renderer {
 				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(0, +this.ySize, 0));
 				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(0, -this.ySize, 0));
 			}
-		}
-	}
-
-	protected static renderObjects(gl: WebGLRenderingContext, orthoMatrix: mat4, objects: BaseObject[]) {
-		// TODO: Sort objects before rendering
-		/*
-		 By:
-			- Distance?
-			- Transparency
-			- Same shader program
-		 */
-
-		let shader;
-		for (const o of objects) {
-			if (!o.canRender()) continue;
-
-			const objectsShader = o.model.getShader();
-			if (shader !== objectsShader) {
-				o.model.useShader(gl);
-				shader = objectsShader;
-			}
-
-			o.render(gl, orthoMatrix);
 		}
 	}
 }

@@ -1,4 +1,3 @@
-import { GameObject, BaseObject } from './GameObject';
 import { vec3 } from '../Math';
 import Map from './Map';
 import Renderer from './Renderer';
@@ -78,14 +77,11 @@ export default class Runner {
 			options = options || Runner.defaultOptions;
 
 			const effectiveDeltaTime = deltaTime * options.animationSpeed;
-			const transientObjects = tickState.update(effectiveDeltaTime, this.map);
-			const gameObjects = this.map.getGameObjects();
+			tickState.update(effectiveDeltaTime, this.map);
 
-			const renderObjects = this.combineLists(gameObjects, transientObjects);
-
-			this.renderer.render(renderObjects, {
+			this.renderer.render(this.map.getGameObjects(), {
 				povPosition: options.focusOnPlayerId ? this.getPlayersPosition(options.focusOnPlayerId) : null,
-				viewSize: Math.max(this.map.xSize, this.map.ySize) / 2,
+				viewSize: Math.min(this.map.xSize, this.map.ySize) / 2,
 				renderGrid: options.renderGrid,
 				tiledRender: true,
 				debugGrid: false,
@@ -97,6 +93,7 @@ export default class Runner {
 
 			if (this.gameDone || this.gamePaused) {
 				then = undefined;
+				console.log('Game is done or is paused!');
 			}
 			else {
 				requestAnimationFrame(this.frame);
@@ -112,16 +109,6 @@ export default class Runner {
 		const players = this.map.getPlayers();
 		const player = players[players.length - 1];
 		return player && player.getPosition();
-	}
-
-	private combineLists(gameObjects: GameObject[], transientObjects: BaseObject[]): BaseObject[] {
-		if (!transientObjects) return [...gameObjects];
-		if (!gameObjects) return [...transientObjects];
-
-		const removed: BaseObject[] = gameObjects.
-			filter((go) => transientObjects.find((to) => go === to) === undefined);
-
-		return removed.concat(transientObjects);
 	}
 
 	private checkGameDone(): void {

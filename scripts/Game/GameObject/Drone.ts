@@ -3,7 +3,6 @@ import { MarkList } from '../../Utils';
 import { Model } from '../../Model';
 import { MoveAnimation} from '../../Animations';
 import { vec2 } from '../../Math';
-import BaseObject from './BaseObject';
 import GameObject from './GameObject';
 import Map from '../Map';
 import ScanObject from './ScanObject';
@@ -17,7 +16,7 @@ export default class Drone extends GameObject {
 		this.controller = controller;
 	}
 
-	public perform(action: string, map: Map): BaseObject[] {
+	public perform(action: string, map: Map): void {
 		switch (action) {
 			case 'PullUp': return this.pullUp(map);
 			case 'PullDown': return this.pullDown(map);
@@ -33,48 +32,49 @@ export default class Drone extends GameObject {
 		}
 	}
 
-	protected scan(map: Map): BaseObject[] {
+	protected scan(map: Map): void {
 		this.controller.scanResult = Drone.scanMap(map, this);
-		const scan = new ScanObject(this.position);
-		return [scan];
+
+		// tslint:disable-next-line:no-unused-expression
+		new ScanObject(this);
 	}
 
-	protected pullUp(map: Map): BaseObject[] {
+	protected pullUp(map: Map): void {
 		const toPull = map.getNextObjectUpFrom(this);
 		return toPull.moveDown(map, MoveAnimation.MoveType.Pull);
 	}
 
-	protected pullDown(map: Map): BaseObject[] {
+	protected pullDown(map: Map): void {
 		const toPull = map.getNextObjectDownFrom(this);
 		return toPull.moveUp(map, MoveAnimation.MoveType.Pull);
 	}
 
-	protected pullLeft(map: Map): BaseObject[] {
+	protected pullLeft(map: Map): void {
 		const toPull = map.getNextObjectLeftFrom(this);
 		return toPull.moveRight(map, MoveAnimation.MoveType.Pull);
 	}
 
-	protected pullRight(map: Map): BaseObject[] {
+	protected pullRight(map: Map): void {
 		const toPull = map.getNextObjectRightFrom(this);
 		return toPull.moveLeft(map, MoveAnimation.MoveType.Pull);
 	}
 
-	protected pushUp(map: Map): BaseObject[] {
+	protected pushUp(map: Map): void {
 		const toPush = map.getNextObjectUpFrom(this);
 		return toPush.moveUp(map, MoveAnimation.MoveType.Push);
 	}
 
-	protected pushDown(map: Map): BaseObject[] {
+	protected pushDown(map: Map): void {
 		const toPush = map.getNextObjectDownFrom(this);
 		return toPush.moveDown(map, MoveAnimation.MoveType.Push);
 	}
 
-	protected pushLeft(map: Map): BaseObject[] {
+	protected pushLeft(map: Map): void {
 		const toPush = map.getNextObjectLeftFrom(this);
 		return toPush.moveLeft(map, MoveAnimation.MoveType.Push);
 	}
 
-	protected pushRight(map: Map): BaseObject[] {
+	protected pushRight(map: Map): void {
 		const toPush = map.getNextObjectRightFrom(this);
 		return toPush.moveRight(map, MoveAnimation.MoveType.Push);
 	}

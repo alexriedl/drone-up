@@ -3,13 +3,14 @@ import { Model } from '../../Model';
 import { vec3, mat4 } from '../../Math';
 
 export default class BaseObject {
-	public readonly model: Model;
+	private readonly model: Model;
+	private animation?: Animation;
+
 	// TODO: This should not be public
 	public position: vec3;
 	protected scale: vec3;
 
-	private animation?: Animation;
-
+	protected tempLifeMS?: number;
 	private parent?: BaseObject;
 	private children?: BaseObject[] = [];
 
@@ -21,28 +22,17 @@ export default class BaseObject {
 
 	public setParent(parent: BaseObject): void {
 		if (this.parent) {
-			this.parent.removeChild(this);
+			const index = this.parent.children.indexOf(this);
+			if (index >= 0) {
+				this.children.splice(index, 1);
+			}
 		}
 
 		if (parent) {
-			this.parent.children.push(this);
+			parent.children.push(this);
 		}
 
 		this.parent = parent;
-	}
-
-	protected removeChild(child: BaseObject): void {
-		if (!child) return;
-		const index = this.children.indexOf(child);
-		if (index >= 0) {
-			this.children.splice(index, 1);
-		}
-	}
-
-	public canRender(): boolean {
-		// TODO: Improve this to ensure buffer and shader is also loaded
-		// TODO: Check if any child can render
-		return !!this.model;
 	}
 
 	public render(gl: WebGLRenderingContext, vpMatrix: mat4, overridePosition?: vec3, overrideScale?: vec3): void {
@@ -56,10 +46,24 @@ export default class BaseObject {
 		const modelMatrix = mat4.fromTranslation(position.add(offset)).scale(scale);
 		const mvpMatrix = modelMatrix.mul(vpMatrix);
 
+		this.model.useShader(gl);
 		this.model.render(gl, mvpMatrix);
+
+		this.children.forEach((c) => {
+			c.render(gl, mvpMatrix);
+		});
 	}
 
 	public update(deltaTime: number): boolean {
+		if (this.tempLifeMS) {
+			this.tempLifeMS -= deltaTime;
+
+			if (this.tempLifeMS <= 0) {
+				this.tempLifeMS = 0;
+				this.setParent(undefined);
+			}
+		}
+
 		let childrenDone = true;
 		for (const child of this.children) {
 			const childDone = child.update(deltaTime);

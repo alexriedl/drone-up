@@ -14,7 +14,7 @@ abstract class GameObject extends BaseObject {
 		this.canBump = true;
 	}
 
-	public perform(action: string, map: Map): BaseObject[] {
+	public perform(action: string, map: Map): void {
 		switch (action) {
 			case 'MoveUp':
 				return this.moveUp(map);
@@ -25,23 +25,21 @@ abstract class GameObject extends BaseObject {
 			case 'MoveRight':
 				return this.moveRight(map);
 		}
-
-		return [];
 	}
 
-	public moveUp(map: Map, moveType?: any): BaseObject[] {
+	public moveUp(map: Map, moveType?: any): void {
 		return this.move(0, -1, map, moveType);
 	}
 
-	public moveDown(map: Map, moveType?: any): BaseObject[] {
+	public moveDown(map: Map, moveType?: any): void {
 		return this.move(0, 1, map, moveType);
 	}
 
-	public moveLeft(map: Map, moveType?: any): BaseObject[] {
+	public moveLeft(map: Map, moveType?: any): void {
 		return this.move(-1, 0, map, moveType);
 	}
 
-	public moveRight(map: Map, moveType?: any): BaseObject[] {
+	public moveRight(map: Map, moveType?: any): void {
 		return this.move(1, 0, map, moveType);
 	}
 
@@ -50,13 +48,13 @@ abstract class GameObject extends BaseObject {
 	 * Also assumes either delta is -1, 0, or 1
 	 */
 	protected move(deltaX: number, deltaY: number, map: Map,
-		moveType: MoveAnimation.MoveType = MoveAnimation.MoveType.Basic): BaseObject[] {
-		if (!GameObject.PUSH_LIMIT) return this.internalMove(deltaX, deltaY, map, moveType);
-		else return this.internalMoveLimit(new vec3(deltaX, deltaY), map, GameObject.PUSH_LIMIT, moveType).objects;
+		moveType: MoveAnimation.MoveType = MoveAnimation.MoveType.Basic): void {
+		if (!GameObject.PUSH_LIMIT) this.internalMove(deltaX, deltaY, map, moveType);
+		else this.internalMoveLimit(new vec3(deltaX, deltaY), map, GameObject.PUSH_LIMIT, moveType);
 	}
 
 	private internalMove(deltaX: number, deltaY: number, map: Map, moveType: MoveAnimation.MoveType,
-		possibleAffected?: GameObject[]): BaseObject[] {
+		possibleAffected?: GameObject[]): void {
 		if (!possibleAffected) {
 			if (deltaX) possibleAffected = map.getAllObjectsOnSameY(this.position.y);
 			if (deltaY) possibleAffected = map.getAllObjectsOnSameX(this.position.x);
@@ -68,24 +66,23 @@ abstract class GameObject extends BaseObject {
 		this.position = GameObject.wrapCoordinates(this.position, map);
 
 		this.setAnimation(new MoveAnimation(startPos, endPos, undefined, moveType));
-		const result: BaseObject[] = [this];
 
 		if (!(this instanceof Drone)) {
 			const collisions = this.findAt(this.position, possibleAffected);
 			for (const go of collisions) {
 				// TODO: This needs to be smarter. Perhaps query that object the response of being bumped into.
 				if (go instanceof Drone) continue;
-				result.push.apply(result, go.internalMove(deltaX, deltaY, map, MoveAnimation.MoveType.Bump, possibleAffected));
+				go.internalMove(deltaX, deltaY, map, MoveAnimation.MoveType.Bump, possibleAffected);
 			}
 		}
-
-		return result;
 	}
 
 	private internalMoveLimit(delta: vec3, map: Map, movesRemaining: number,
-		moveType: any, possibleAffected?: GameObject[]): IMoveResult {
+		moveType: any, possibleAffected?: GameObject[]): boolean {
+
 		// TODO: If a drone is at the end of a chain, it will prevent the spikes from moving, and survive
-		if (movesRemaining <= 0) return { canMove: false, objects: [] };
+		if (movesRemaining <= 0) return false;
+
 		if (!possibleAffected) {
 			if (delta.x) possibleAffected = map.getAllObjectsOnSameY(this.position.y);
 			if (delta.y) possibleAffected = map.getAllObjectsOnSameX(this.position.x);
@@ -95,28 +92,26 @@ abstract class GameObject extends BaseObject {
 		let endPos = this.position.add(delta);
 		let newPos = GameObject.wrapCoordinates(endPos, map);
 
-		const result = { canMove: true, objects: [] };
+		let canMove = true;
 
 		if (this.canBump) {
 			const collisions = this.findAt(newPos, possibleAffected);
 			for (const go of collisions) {
-				const childResult = go.internalMoveLimit(delta, map, movesRemaining - 1,
+				const childCanMove = go.internalMoveLimit(delta, map, movesRemaining - 1,
 					MoveAnimation.MoveType.Bump, possibleAffected);
-				if (!childResult.canMove) result.canMove = false;
-				result.objects = childResult.objects;
+				if (!childCanMove) canMove = false;
 			}
 		}
 
-		if (!result.canMove) {
+		if (!canMove) {
 			endPos = startPos;
 			newPos = startPos;
 		}
 
 		this.setAnimation(new MoveAnimation(startPos, endPos, undefined, moveType));
 		this.position = newPos;
-		result.objects.push(this);
 
-		return result;
+		return canMove;
 	}
 
 	/**
@@ -150,11 +145,6 @@ abstract class GameObject extends BaseObject {
 
 		return result;
 	}
-}
-
-interface IMoveResult {
-	canMove: boolean;
-	objects: GameObject[];
 }
 
 export default GameObject;

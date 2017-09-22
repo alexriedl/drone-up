@@ -15,10 +15,6 @@ abstract class Model {
 		this.shader.use(gl);
 	}
 
-	public getShader(): Shader {
-		return this.shader;
-	}
-
 	public render(gl: WebGLRenderingContext, mvpMatrix: mat4): void {
 		this.updateAttributes(gl);
 		this.updateUniforms(gl, mvpMatrix);

@@ -1,52 +1,39 @@
-import { BaseObject } from './GameObject';
 import Map from './Map';
 
 export default class TickState {
 	protected loopPosition: number = 0;
-	protected animatingObjects: BaseObject[] = [];
+	protected animating: boolean = false;
 
 	public isAnimating(): boolean {
-		return this.animatingObjects && this.animatingObjects.length > 0;
+		return this.animating;
 	}
 
-	public update(deltaTime: number, map: Map): BaseObject[] {
-		const players = map.getPlayers();
+	public update(deltaTime: number, map: Map): void {
 
+		// Get next animation
 		if (!this.isAnimating()) {
+			const players = map.getPlayers();
 			this.loopPosition = (this.loopPosition + 1) % players.length;
 			const player = players[this.loopPosition];
 			const action = player.controller.getAction();
-			this.animatingObjects = player.perform(action, map);
+			player.perform(action, map);
 		}
 
-		// NOTE: Do not change this to an else. The first if statement may make this become true
-		if (this.isAnimating()) {
-			const removes = [];
+		// Update all objects
+		this.animating = false;
+		const objects = map.getGameObjects();
+		for (const object of objects) {
+			const finished = object.update(deltaTime);
+			if (!finished) this.animating = true;
+		}
 
-			for (const ao of this.animatingObjects) {
-				const finished = ao.update(deltaTime);
-				if (finished) removes.push(ao);
-			}
-
-			for (const remove of removes) {
-				const index = this.animatingObjects.indexOf(remove);
-				if (index > -1) {
-					this.animatingObjects.splice(index, 1);
-				}
-			}
-
-			if (!this.isAnimating()) {
-				// TODO: Add crash animation
-				const deadDrones = map.removeCrashedDrones();
-				if (deadDrones && deadDrones.length > 0) {
-					deadDrones.forEach((drone) => {
-						drone.setAnimation(null);
-					});
-					this.animatingObjects = deadDrones;
-				}
-			}
-
-			return this.animatingObjects;
+		// Remove dead players
+		// TODO: Generilze this. Maybe move it out of here entirely
+		const deadDrones = map.removeCrashedDrones();
+		if (deadDrones && deadDrones.length > 0) {
+			deadDrones.forEach((drone) => {
+				drone.setAnimation(null);
+			});
 		}
 	}
 }
