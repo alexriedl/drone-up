@@ -1,3 +1,4 @@
+import { ResizeAnimation } from '../Animations';
 import { Drone, Spike, GameObject } from './GameObject';
 import { MarkList, Random } from '../Utils';
 import { Model } from '../Model';
@@ -36,7 +37,7 @@ export default class Map {
 		return this.players;
 	}
 
-	public removeCrashedDrones(): Drone[] {
+	public removeCrashedDrones(): void {
 		const crashed: Drone[] = [];
 
 		for (let i = 0, playerCount = this.players.length; i < playerCount; i++) {
@@ -55,20 +56,13 @@ export default class Map {
 				this.gameObjects.splice(gameObjectsIndex, 1);
 			}
 
-			const playerIndex = this.players.indexOf(dead);
-			if (playerIndex > -1) {
-				this.players.splice(playerIndex, 1);
-			}
+			dead.setAnimation(new ResizeAnimation(1, 5, 200), true);
 		}
-
-		return crashed;
 	}
 
-	// GetNextObjectUpFrom(this.Id) returns an ID of the next object up from the object with the given ID
 	public getNextObjectUpFrom(entity: GameObject): GameObject {
 		const lineObjects = this.getAllObjectsOnSameX(entity.position.x);
 
-		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort((a, b) => {
 			return b.position.y - a.position.y;
 		});
@@ -83,7 +77,6 @@ export default class Map {
 	public getNextObjectDownFrom(entity: GameObject): GameObject {
 		const lineObjects = this.getAllObjectsOnSameX(entity.position.x);
 
-		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort((a, b) => {
 			return a.position.y - b.position.y;
 		});
@@ -98,7 +91,6 @@ export default class Map {
 	public getNextObjectLeftFrom(entity: GameObject): GameObject {
 		const lineObjects = this.getAllObjectsOnSameY(entity.position.y);
 
-		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort((a, b) => {
 			return b.position.x - a.position.x;
 		});
@@ -113,7 +105,6 @@ export default class Map {
 	public getNextObjectRightFrom(entity: GameObject): GameObject {
 		const lineObjects = this.getAllObjectsOnSameY(entity.position.y);
 
-		// sort the objects and find the ID -- we can then go one index further to find it
 		const sortedObjects = lineObjects.sort((a, b) => {
 			return a.position.x - b.position.x;
 		});
@@ -126,19 +117,11 @@ export default class Map {
 	}
 
 	public getAllObjectsOnSameY(y: number): GameObject[] {
-		const sameYList = [];
-		for (const mo of this.gameObjects) {
-			if (mo.position.y === y) sameYList.push(mo);
-		}
-		return sameYList;
+		return this.gameObjects.filter((go) => go.position.y === y);
 	}
 
 	public getAllObjectsOnSameX(x: number): GameObject[] {
-		const sameXList = [];
-		for (const mo of this.gameObjects) {
-			if (mo.position.x === x) sameXList.push(mo);
-		}
-		return sameXList;
+		return this.gameObjects.filter((go) => go.position.x === x);
 	}
 
 	private static randomPosition(randomzier: Random, maxX: number, maxY: number): vec3 {

@@ -9,8 +9,6 @@ export default class ScanObject extends BaseObject {
 		super(new ScanModel(color));
 		this.setParent(parent);
 
-		const tempLifeMS = 350;
-		this.setAnimation(new ResizeAnimation(5, 1, tempLifeMS));
-		this.tempLifeMS = tempLifeMS;
+		this.setAnimation(new ResizeAnimation(5, 1, 350), true);
 	}
 }

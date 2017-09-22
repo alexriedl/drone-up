@@ -4,13 +4,14 @@ import { vec3, mat4 } from '../../Math';
 
 export default class BaseObject {
 	private readonly model: Model;
+
 	private animation?: Animation;
+	private removeAtEndOfAnimation: boolean = false;
 
 	// TODO: This should not be public
 	public position: vec3;
 	protected scale: vec3;
 
-	protected tempLifeMS?: number;
 	private parent?: BaseObject;
 	private children?: BaseObject[] = [];
 
@@ -55,15 +56,6 @@ export default class BaseObject {
 	}
 
 	public update(deltaTime: number): boolean {
-		if (this.tempLifeMS) {
-			this.tempLifeMS -= deltaTime;
-
-			if (this.tempLifeMS <= 0) {
-				this.tempLifeMS = 0;
-				this.setParent(undefined);
-			}
-		}
-
 		let childrenDone = true;
 		for (const child of this.children) {
 			const childDone = child.update(deltaTime);
@@ -73,13 +65,17 @@ export default class BaseObject {
 		if (!this.animation) return childrenDone;
 
 		const myAnimationDone = this.animation.update(deltaTime);
-		if (myAnimationDone) this.animation = undefined;
+		if (myAnimationDone) {
+			this.animation = undefined;
+			if (this.removeAtEndOfAnimation) this.setParent(undefined);
+		}
 
 		return myAnimationDone && childrenDone;
 	}
 
-	public setAnimation(animation: Animation): void {
+	public setAnimation(animation: Animation, removeAtEndOfAnimation: boolean = false): void {
 		this.animation = animation;
+		this.removeAtEndOfAnimation = removeAtEndOfAnimation;
 	}
 
 	public getAnimation(): Animation {

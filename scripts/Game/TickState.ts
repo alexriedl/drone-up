@@ -28,12 +28,6 @@ export default class TickState {
 		}
 
 		// Remove dead players
-		// TODO: Generilze this. Maybe move it out of here entirely
-		const deadDrones = map.removeCrashedDrones();
-		if (deadDrones && deadDrones.length > 0) {
-			deadDrones.forEach((drone) => {
-				drone.setAnimation(null);
-			});
-		}
+		map.removeCrashedDrones();
 	}
 }
