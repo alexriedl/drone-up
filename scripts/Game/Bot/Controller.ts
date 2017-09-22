@@ -8,7 +8,6 @@ export interface IScanResult {
 
 abstract class Controller {
 	public scanResult: IScanResult[];
-	protected actions: string[];
 	protected readonly randomizer: Random;
 
 	constructor(randomizer: Random) {
@@ -31,10 +30,6 @@ abstract class Controller {
 	protected pullLeft(): string { return 'PullLeft'; }
 	protected pullUp(): string { return 'PullUp'; }
 	protected pullDown(): string { return 'PullDown'; }
-
-	public setActions(actions: string[]) {
-		this.actions = actions;
-	}
 }
 
 export default Controller;
