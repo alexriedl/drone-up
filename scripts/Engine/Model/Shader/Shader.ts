@@ -1,4 +1,4 @@
-import { Register } from '../../Utils';
+import { Register } from 'Engine/Utils';
 
 export function createShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader {
 	const shader: WebGLShader = gl.createShader(type);

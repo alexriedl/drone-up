@@ -1,5 +1,5 @@
-import { initializeGame, Runner, Bot } from './Game';
-import { Random } from './Engine/Utils';
+import { initializeGame, Runner, Bot } from 'DroneUp';
+import { Random } from 'Engine/Utils';
 
 let runner: Runner;
 const options = {

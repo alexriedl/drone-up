@@ -7,7 +7,7 @@
     "skipDefaultLibCheck": true,
     "allowJs": true,
     "outDir": "tsout",
-    "noUnusedLocals": true
+    "baseUrl": "./scripts"
   },
   "exclude": [
       "bin",

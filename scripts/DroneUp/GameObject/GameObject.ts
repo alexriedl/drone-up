@@ -1,8 +1,9 @@
-import { Animation, MoveAnimation, ResizeAnimation } from '../Animations';
-import { Model } from '../../Engine/Model';
-import { vec2, vec3 } from '../../Engine/Math';
-import Entity from '../../Engine/Entity';
+import { Animation, MoveAnimation, ResizeAnimation } from 'DroneUp/Animations';
 import Drone from './Drone';
+
+import { Model } from 'Engine/Model';
+import { vec2, vec3 } from 'Engine/Math';
+import Entity from 'Engine/Entity';
 
 abstract class GameObject extends Entity {
 	protected canBump: boolean;

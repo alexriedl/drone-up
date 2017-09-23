@@ -1,6 +1,6 @@
-import { Buffer } from './Buffer';
-import { mat4 } from '../Math';
-import { Shader } from './Shader';
+import { Buffer } from 'Engine/Model/Buffer';
+import { mat4 } from 'Engine/Math';
+import { Shader } from 'Engine/Model/Shader';
 
 abstract class Model {
 	protected shader: Shader;

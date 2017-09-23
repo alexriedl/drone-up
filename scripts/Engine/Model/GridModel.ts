@@ -1,6 +1,6 @@
-import { Color } from '../Utils';
-import { GridShader } from './Shader';
-import { mat4 } from '../Math';
+import { Color } from 'Engine/Utils';
+import { GridShader } from 'Engine/Model/Shader';
+import { mat4 } from 'Engine/Math';
 import SimpleRectangle from './SimpleRectangle';
 
 export default class GridModel extends SimpleRectangle {

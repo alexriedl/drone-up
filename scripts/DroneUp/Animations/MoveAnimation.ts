@@ -1,4 +1,4 @@
-import { vec3 } from '../../Engine/Math';
+import { vec3 } from 'Engine/Math';
 import Animation from './Animation';
 
 export class MoveAnimation extends Animation<MoveAnimation.MoveType> {

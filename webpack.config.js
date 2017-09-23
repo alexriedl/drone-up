@@ -20,7 +20,9 @@ module.exports = {
 	},
 	resolve: {
 		extensions: ['', '.js', '.jsx', '.ts', '.tsx'],
-		// modules: [ path.resolve('./scripts/Game'), path.resolve('./scripts/Engine'), path.resolve('./node_modules'), ],
+		root: [
+			path.resolve('./scripts')
+		],
 	},
 	output: {
 		path: path.join(__dirname, bundleOutputDir),

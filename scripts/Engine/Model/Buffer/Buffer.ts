@@ -1,4 +1,4 @@
-import { Register } from '../../Utils';
+import { Register } from 'Engine/Utils';
 
 abstract class Buffer {
 	private buffer: WebGLBuffer;

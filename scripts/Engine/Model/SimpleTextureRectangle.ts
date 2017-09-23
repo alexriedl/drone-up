@@ -1,5 +1,5 @@
-import { Color } from '../Utils';
-import { SimpleTextureShader } from './Shader';
+import { Color } from 'Engine/Utils';
+import { SimpleTextureShader } from 'Engine/Model/Shader';
 import SimpleRectangle from './SimpleRectangle';
 
 export default class SimpleTextureRectangle extends SimpleRectangle {

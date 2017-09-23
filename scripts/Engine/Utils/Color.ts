@@ -1,4 +1,4 @@
-import { vec4 } from '../Math';
+import { vec4 } from 'Engine/Math';
 
 export default class Color extends vec4 {
 	public constructor(r: number = 0, g: number = 0, b: number = 0, a: number = 1) {

@@ -1,11 +1,12 @@
-import { Controller, IScanResult } from '../Bot';
-import { MarkList } from '../../Engine/Utils';
-import { Model } from '../../Engine/Model';
-import { MoveAnimation} from '../Animations';
-import { vec2, vec3 } from '../../Engine/Math';
-import Entity from '../../Engine/Entity';
+import { Controller, IScanResult } from 'DroneUp/Bot';
+import { MoveAnimation} from 'DroneUp/Animations';
 import GameObject from './GameObject';
 import ScanObject from './ScanObject';
+
+import { MarkList } from 'Engine/Utils';
+import { Model } from 'Engine/Model';
+import { vec2, vec3 } from 'Engine/Math';
+import Entity from 'Engine/Entity';
 
 export default class Drone extends GameObject {
 	public readonly controller?: Controller;

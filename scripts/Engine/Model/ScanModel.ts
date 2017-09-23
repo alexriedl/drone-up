@@ -1,4 +1,4 @@
-import { ScanShader } from './Shader';
+import { ScanShader } from 'Engine/Model/Shader';
 import SimpleRectangle from './SimpleRectangle';
 
 export default class ScanModel extends SimpleRectangle {

@@ -1,5 +1,5 @@
-import { Random } from '../../Engine/Utils';
-import { vec2 } from '../../Engine/Math';
+import { Random } from 'Engine/Utils';
+import { vec2 } from 'Engine/Math';
 
 export interface IScanResult {
 	position: vec2;

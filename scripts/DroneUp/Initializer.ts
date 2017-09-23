@@ -1,9 +1,10 @@
-import { Controller } from './Bot';
-import { Drone, Spike } from './GameObject';
-import { Random, Color, MarkList } from '../Engine/Utils';
-import { SimpleRectangle } from '../Engine/Model';
-import { vec2, vec3 } from '../Engine/Math';
+import { Controller } from 'DroneUp/Bot';
+import { Drone, Spike } from 'DroneUp/GameObject';
 import Runner from './Runner';
+
+import { Random, Color, MarkList } from 'Engine/Utils';
+import { SimpleRectangle } from 'Engine/Model';
+import { vec2, vec3 } from 'Engine/Math';
 
 const predefinedColors: Color[] = [
 	// new Color(0, 0, 0),

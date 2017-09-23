@@ -1,7 +1,7 @@
-import { Color } from '../Utils';
-import { mat4 } from '../Math';
-import { RectangleBuffer } from './Buffer';
-import { SimpleShader } from './Shader';
+import { Color } from 'Engine/Utils';
+import { mat4 } from 'Engine/Math';
+import { RectangleBuffer } from 'Engine/Model/Buffer';
+import { SimpleShader } from 'Engine/Model/Shader';
 import Model from './Model';
 
 class SimpleRectangle extends Model {

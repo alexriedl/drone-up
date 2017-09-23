@@ -1,4 +1,4 @@
-import { vec3 } from '../Math';
+import { vec3 } from 'Engine/Math';
 
 export default class MarkList {
 	private markedArray: vec3[];

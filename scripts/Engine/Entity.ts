@@ -1,5 +1,5 @@
-import { Model } from './Model';
-import { vec3, mat4 } from './Math';
+import { Model } from 'Engine/Model';
+import { vec3, mat4 } from 'Engine/Math';
 
 export default class BaseObject {
 	private readonly model: Model;

@@ -1,8 +1,7 @@
+import { Color, Register } from 'Engine/Utils';
+import { GridModel, SimpleTextureRectangle } from 'Engine/Model';
+import { vec3, mat4 } from 'Engine/Math';
 import Entity from './Entity';
-import { Color, Register } from './Utils';
-import { vec3, mat4 } from './Math';
-
-import { GridModel, SimpleTextureRectangle } from './Model';
 
 export interface IRenderOptions {
 	povPosition?: vec3;
