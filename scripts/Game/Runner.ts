@@ -5,7 +5,7 @@ import TickState from './TickState';
 
 export interface IRunnerOptions {
 	animationSpeed: number;
-	focusOnPlayerId?: string;
+	focusOnPlayerIndex: number;
 	renderGrid: boolean;
 }
 
@@ -20,7 +20,7 @@ export default class Runner {
 	private static defaultOptions: IRunnerOptions = {
 		renderGrid: true,
 		animationSpeed: 1,
-		focusOnPlayerId: null,
+		focusOnPlayerIndex: -1,
 	};
 
 	private frame: (now: number) => void;
@@ -80,7 +80,7 @@ export default class Runner {
 			tickState.update(effectiveDeltaTime, this.map);
 
 			this.renderer.render(this.map.getGameObjects(), {
-				povPosition: options.focusOnPlayerId ? this.getPlayersPosition(options.focusOnPlayerId) : null,
+				povPosition: this.getPlayersPosition(options.focusOnPlayerIndex),
 				viewSize: Math.min(this.map.xSize, this.map.ySize) / 2,
 				renderGrid: options.renderGrid,
 				tiledRender: false,
@@ -103,12 +103,10 @@ export default class Runner {
 		requestAnimationFrame(this.frame);
 	}
 
-	private getPlayersPosition(ID: string): vec3 {
-		// const player = this.map.getPlayers().find((p) => p.ID === ID);
-		// TODO: Allow user to select which player to watch
-		const players = this.map.getPlayers();
-		const player = players[players.length - 1];
-		return player && player.getPosition();
+	private getPlayersPosition(index: number): vec3 {
+		if (index < 0) return null;
+		const player = this.map.getPlayers()[index];
+		return player.isAlive() ? player.getPosition() : null;
 	}
 
 	private checkGameDone(): void {
