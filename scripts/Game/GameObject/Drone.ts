@@ -2,7 +2,7 @@ import { Controller, IScanResult } from '../Bot';
 import { MarkList } from '../../Utils';
 import { Model } from '../../Model';
 import { MoveAnimation} from '../../Animations';
-import { vec2 } from '../../Math';
+import { vec2, vec3 } from '../../Math';
 import BaseObject from './BaseObject';
 import GameObject from './GameObject';
 import Map from '../Map';
@@ -12,8 +12,8 @@ export default class Drone extends GameObject {
 	public readonly controller?: Controller;
 	public alive: boolean = true;
 
-	public constructor(model: Model,  controller: Controller) {
-		super(model);
+	public constructor(model: Model,  controller: Controller, position: vec3, scale?: vec3) {
+		super(model, position, scale);
 		this.canBump = false;
 		this.controller = controller;
 	}

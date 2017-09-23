@@ -83,7 +83,7 @@ export default class Runner {
 				povPosition: this.getPlayersPosition(options.focusOnPlayerIndex),
 				viewSize: Math.min(this.map.xSize, this.map.ySize) / 2,
 				renderGrid: options.renderGrid,
-				tiledRender: false,
+				tiledRender: true,
 				debugGrid: false,
 			});
 
@@ -93,7 +93,6 @@ export default class Runner {
 
 			if (this.gameDone || this.gamePaused) {
 				then = undefined;
-				console.log('Game is done or is paused!');
 			}
 			else {
 				requestAnimationFrame(this.frame);

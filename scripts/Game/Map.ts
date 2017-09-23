@@ -1,8 +1,5 @@
 import { ResizeAnimation } from '../Animations';
 import { Drone, Spike, GameObject } from './GameObject';
-import { MarkList, Random } from '../Utils';
-import { Model } from '../Model';
-import { vec3 } from '../Math';
 
 export default class Map {
 	public readonly xSize: number;
@@ -10,23 +7,12 @@ export default class Map {
 	private gameObjects: GameObject[];
 	private players: Drone[];
 
-	public constructor(xSize: number, ySize: number) {
+	public constructor(xSize: number, ySize: number, players: Drone[], spikes: Spike[]) {
 		this.xSize = xSize;
 		this.ySize = ySize;
-	}
-
-	public initialize(randomizer: Random, players: Drone[], spikePercent: number,
-		createSpikeModel: () => Model) {
-		const markedList = new MarkList(this.xSize, this.ySize);
-
-		// first, generate all players and mark their "safe space" as invalid for further placements
-		this.generatePlayers(randomizer, players, markedList);
-
-		// then, generate spikes (up to the percentage or 1000 failures, whichever happens first)
-		const spikeArray = this.generateSpikes(randomizer, spikePercent, markedList, createSpikeModel);
 
 		this.players = players;
-		this.gameObjects = spikeArray.concat(players);
+		this.gameObjects = spikes.concat(players);
 	}
 
 	public getGameObjects(): GameObject[] {
@@ -126,71 +112,5 @@ export default class Map {
 
 	public getAllObjectsOnSameX(x: number): GameObject[] {
 		return this.gameObjects.filter((go) => go.position.x === x);
-	}
-
-	private static randomPosition(randomzier: Random, maxX: number, maxY: number): vec3 {
-		const x = randomzier.nextRangeInt(0, maxX);
-		const y = randomzier.nextRangeInt(0, maxY);
-		return new vec3(x, y);
-	}
-
-	private generatePlayers(randomizer: Random, players: Drone[], markedList: MarkList): void {
-		for (const player of players) {
-			let attempts = 0;
-			let validSpot = false;
-
-			while (!validSpot) {
-				// only attempt up to 1000 times to prevent an infinite loop; if we can't place a player, bail out
-				if (attempts > 1000) {
-					alert('player could not be placed after 1000 attempts, aborting');
-					return null;
-				}
-
-				const position = Map.randomPosition(randomizer, this.xSize, this.ySize);
-				const invalidPosition = markedList.isMarked(position);
-
-				if (!invalidPosition) {
-					player.position = position;
-					validSpot = true;
-
-					// add the player's "safe space" (anything a distance of <= 3 tiles away)
-					markedList.mark(position, 3);
-				}
-
-				if (!validSpot) {
-					attempts++;
-				}
-			}
-		}
-	}
-
-	private generateSpikes(randomizer: Random, spikePercent: number, markedList: MarkList,
-		createSpikeModel: () => Model): Spike[] {
-		const spikeArray: Spike[] = [];
-		let spikesGenned = 0;
-		let spikesFailed = 0;
-		const neededSpikes = (this.xSize * this.ySize * spikePercent) / 100;
-
-		while (spikesGenned < neededSpikes && spikesFailed < 1000) {
-			const position = Map.randomPosition(randomizer, this.xSize, this.ySize);
-			const invalidPosition = markedList.isMarked(position);
-
-			if (!invalidPosition) {
-				const model = createSpikeModel();
-				spikeArray.push(new Spike(model, position));
-
-				// spikes only invalidate their tile, they get no "safe space"
-				markedList.mark(position, 0);
-			}
-
-			if (invalidPosition) {
-				spikesFailed++;
-			}
-			else {
-				spikesGenned++;
-			}
-		}
-
-		return spikeArray;
 	}
 }

@@ -2,8 +2,8 @@ import { vec3 } from '../Math';
 
 export default class MarkList {
 	private markedArray: vec3[];
-	private xSize: number;
-	private ySize: number;
+	public readonly xSize: number;
+	public readonly ySize: number;
 
 	public constructor(xSize: number, ySize: number) {
 		this.markedArray = [];
