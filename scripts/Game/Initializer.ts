@@ -19,6 +19,10 @@ const predefinedColors: Color[] = [
 export function initializeGame(randomizer: Random, spikePercent: number, playerControllers: Controller[],
 	xSize: number, ySize: number): Runner {
 
+	// TODO: Support board sizes with odd height/width
+	if (xSize % 2 !== 0) xSize += 1;
+	if (ySize % 2 !== 0) ySize += 1;
+
 	const markedList = new MarkList(xSize, ySize);
 	const players = generatePlayers(randomizer, playerControllers, markedList);
 	const spikes = generateSpikes(randomizer, spikePercent, markedList);
