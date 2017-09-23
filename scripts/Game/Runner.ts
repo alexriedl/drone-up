@@ -1,7 +1,8 @@
-import { Drone, Spike, GameObject, BaseObject } from './GameObject';
-import { ResizeAnimation } from '../Animations';
-import { vec2, vec3 } from '../Math';
-import Renderer from './Renderer';
+import { Drone, Spike, GameObject } from './GameObject';
+import { ResizeAnimation } from './Animations';
+import { vec2, vec3 } from '../Engine/Math';
+import Entity from '../Engine/Entity';
+import Renderer from '../Engine/Renderer';
 
 export interface IRunnerOptions {
 	animationSpeed: number;
@@ -19,7 +20,7 @@ interface ITickState {
 	animating: boolean;
 	players: Drone[];
 	objects: GameObject[];
-	scene: BaseObject;
+	scene: Entity;
 	worldSize: vec2;
 	paused: boolean;
 	gameOver: boolean;
@@ -34,7 +35,7 @@ export default class Runner {
 	public constructor(players: Drone[], spikes: Spike[], worldSize: vec2) {
 		this.renderer = new Renderer('game-canvas', worldSize.x, worldSize.y);
 
-		const scene = new BaseObject(undefined);
+		const scene = new Entity(undefined);
 		const objects = spikes.concat(players);
 		objects.forEach((object) => object.setParent(scene));
 

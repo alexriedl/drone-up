@@ -1,5 +1,5 @@
 import { initializeGame, Runner, Bot } from './Game';
-import { Random } from './Utils';
+import { Random } from './Engine/Utils';
 
 let runner: Runner;
 const options = {

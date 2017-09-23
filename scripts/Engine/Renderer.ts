@@ -1,9 +1,8 @@
-import { BaseObject } from './GameObject';
-import { Color } from '../Utils';
-import { vec3, mat4 } from '../Math';
+import Entity from './Entity';
+import { Color, Register } from './Utils';
+import { vec3, mat4 } from './Math';
 
-import { Register } from '../Utils';
-import { GridModel, SimpleTextureRectangle } from '../Model';
+import { GridModel, SimpleTextureRectangle } from './Model';
 
 export interface IRenderOptions {
 	povPosition?: vec3;
@@ -32,8 +31,8 @@ export default class Renderer {
 	private overflowXTiles: number = 0;
 	private overflowYTiles: number = 0;
 
-	private mapObject: BaseObject;
-	private gridObject: BaseObject;
+	private mapObject: Entity;
+	private gridObject: Entity;
 
 	private static defaultOptions: IRenderOptions = {
 		povPosition: null,
@@ -115,12 +114,12 @@ export default class Renderer {
 		const centerX = this.xSize / 2;
 
 		const gridModel = new GridModel(new Color(1, 0.6, 0), xSize / 1000, xSize, ySize);
-		this.gridObject = new BaseObject(gridModel,
+		this.gridObject = new Entity(gridModel,
 			new vec3(centerX - 0.5, centerY - 0.5, 1),
 			new vec3(xSize, ySize, 1));
 
 		const gameModel = new SimpleTextureRectangle(this.renderTarget.texture);
-		this.mapObject = new BaseObject(gameModel,
+		this.mapObject = new Entity(gameModel,
 			new vec3(centerX, centerY),
 			new vec3(xSize + extra, ySize + extra, 1));
 	}
@@ -131,7 +130,7 @@ export default class Renderer {
 	}
 
 	// TODO: Update this to take the parent render node instead of a list of objects
-	public render(scene: BaseObject, options: IRenderOptions = Renderer.defaultOptions): void {
+	public render(scene: Entity, options: IRenderOptions = Renderer.defaultOptions): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const background = Color.BLACK.lighten(.3);
 
@@ -196,16 +195,16 @@ export default class Renderer {
 			this.mapObject.render(gl, orthoMatrix);
 
 			if (tiledRender) {
-				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(+this.xSize, 0, 0));
-				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(+this.xSize, +this.ySize, 0));
-				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(+this.xSize, -this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.position.addValues(+this.xSize, 0, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.position.addValues(+this.xSize, +this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.position.addValues(+this.xSize, -this.ySize, 0));
 
-				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(-this.xSize, 0, 0));
-				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(-this.xSize, +this.ySize, 0));
-				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(-this.xSize, -this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.position.addValues(-this.xSize, 0, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.position.addValues(-this.xSize, +this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.position.addValues(-this.xSize, -this.ySize, 0));
 
-				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(0, +this.ySize, 0));
-				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(0, -this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.position.addValues(0, +this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.position.addValues(0, -this.ySize, 0));
 			}
 		}
 	}

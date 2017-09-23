@@ -1,5 +1,5 @@
+import { vec3 } from '../../Engine/Math';
 import Animation from './Animation';
-import { vec3 } from '../Math';
 
 export class MoveAnimation extends Animation<MoveAnimation.MoveType> {
 	public position: vec3;

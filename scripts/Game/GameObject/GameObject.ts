@@ -1,16 +1,64 @@
-import { MoveAnimation } from '../../Animations';
-import { Model } from '../../Model';
-import { vec2, vec3 } from '../../Math';
-import BaseObject from './BaseObject';
+import { Animation, MoveAnimation, ResizeAnimation } from '../Animations';
+import { Model } from '../../Engine/Model';
+import { vec2, vec3 } from '../../Engine/Math';
+import Entity from '../../Engine/Entity';
 import Drone from './Drone';
 
-abstract class GameObject extends BaseObject {
+abstract class GameObject extends Entity {
 	protected canBump: boolean;
 	public static PUSH_LIMIT: number = 0;
+
+	private animation?: Animation;
+	private removeAtEndOfAnimation: boolean = false;
 
 	public constructor(model: Model, position?: vec3, scale?: vec3) {
 		super(model, position, scale);
 		this.canBump = true;
+	}
+
+	public setAnimation(animation: Animation, removeAtEndOfAnimation: boolean = false): void {
+		this.animation = animation;
+		this.removeAtEndOfAnimation = removeAtEndOfAnimation;
+	}
+
+	public getAnimation(): Animation {
+		return this.animation;
+	}
+
+	public getPosition(): vec3 {
+		if (this.animation && this.animation instanceof MoveAnimation) {
+			return this.animation.position;
+		}
+		return super.getPosition();
+	}
+
+	public getScale(): vec3 {
+		if (this.animation) {
+			if (this.animation instanceof ResizeAnimation) {
+				const s = this.animation.size;
+				return new vec3(s, s, 1);
+			}
+			else if (this.animation instanceof MoveAnimation) {
+				const bonusSize = this.animation.bonusSize;
+				return this.scale.addValues(bonusSize, bonusSize, 0);
+			}
+		}
+
+		return super.getScale();
+	}
+
+	public update(deltaTime: number): boolean {
+		const childrenAnimating = super.update(deltaTime);
+
+		if (!this.animation) return childrenAnimating;
+
+		const stillAnimating = this.animation.update(deltaTime);
+		if (!stillAnimating) {
+			this.animation = undefined;
+			if (this.removeAtEndOfAnimation) this.setParent(undefined);
+		}
+
+		return stillAnimating || childrenAnimating;
 	}
 
 	public perform(action: string, objects: GameObject[], worldSize: vec2): void {

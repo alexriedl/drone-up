@@ -1,5 +1,5 @@
-import { Model } from '../../Model';
-import { vec3 } from '../../Math';
+import { Model } from '../../Engine/Model';
+import { vec3 } from '../../Engine/Math';
 import GameObject from './GameObject';
 
 export default class Spike extends GameObject {

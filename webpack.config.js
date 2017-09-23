@@ -18,7 +18,10 @@ module.exports = {
 	entry: {
 		'main': './scripts/main.ts'
 	},
-	resolve: { extensions: ['', '.js', '.jsx', '.ts', '.tsx'] },
+	resolve: {
+		extensions: ['', '.js', '.jsx', '.ts', '.tsx'],
+		// modules: [ path.resolve('./scripts/Game'), path.resolve('./scripts/Engine'), path.resolve('./node_modules'), ],
+	},
 	output: {
 		path: path.join(__dirname, bundleOutputDir),
 		filename: '[name].js',
