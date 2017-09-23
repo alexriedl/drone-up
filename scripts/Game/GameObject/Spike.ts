@@ -1,9 +1,9 @@
 import { Model } from '../../Model';
-import { vec2 } from '../../Math';
+import { vec3 } from '../../Math';
 import GameObject from './GameObject';
 
 export default class Spike extends GameObject {
-	public constructor(ID: string, model: Model, position: vec2) {
-		super(ID, model, undefined, position);
+	public constructor(model: Model, position: vec3, scale?: vec3) {
+		super(model, position, scale);
 	}
 }

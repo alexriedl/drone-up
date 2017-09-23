@@ -1,12 +1,12 @@
-import { Color } from '../Utils';
 import { BaseObject } from './GameObject';
-import { vec2, mat4 } from '../Math';
+import { Color } from '../Utils';
+import { vec3, mat4 } from '../Math';
 
 import { Register } from '../Utils';
-import { Model, GridModel, SimpleTextureRectangle } from '../Model';
+import { GridModel, SimpleTextureRectangle } from '../Model';
 
 export interface IRenderOptions {
-	povPosition?: vec2;
+	povPosition?: vec3;
 	renderGrid?: boolean;
 	tiledRender?: boolean;
 	viewSize?: number;
@@ -17,23 +17,23 @@ export interface IRenderOptions {
 export interface IRenderTargetInfo {
 	frameBuffer: WebGLFramebuffer;
 	texture: WebGLTexture;
-	offsetX: number;
-	offsetY: number;
+	offsetXTiles: number;
+	offsetYTiles: number;
 	height: number;
 	width: number;
 }
 
 export default class Renderer {
 	private gl: WebGLRenderingContext;
-	private gridModel: GridModel;
 	private xSize: number;
 	private ySize: number;
 
+	private renderTarget: IRenderTargetInfo;
 	private overflowXTiles: number = 0;
 	private overflowYTiles: number = 0;
 
-	private renderTarget: IRenderTargetInfo;
-	private outputModel: SimpleTextureRectangle;
+	private mapObject: BaseObject;
+	private gridObject: BaseObject;
 
 	private static defaultOptions: IRenderOptions = {
 		povPosition: null,
@@ -106,13 +106,23 @@ export default class Renderer {
 				texture,
 				width: textureWidth,
 				height: textureHeight,
-				offsetX: overdrawWidth / 2,
-				offsetY: overdrawHeight / 2,
+				offsetXTiles: (overdrawWidth / 2) / pixelsPerTile,
+				offsetYTiles: (overdrawHeight / 2) / pixelsPerTile,
 			};
 		}
 
-		this.gridModel = new GridModel(new Color(1, 0.6, 0), xSize / 1000, xSize, ySize);
-		this.outputModel = new SimpleTextureRectangle(this.renderTarget.texture, xSize + extra, ySize + extra);
+		const centerY = this.ySize / 2;
+		const centerX = this.xSize / 2;
+
+		const gridModel = new GridModel(new Color(1, 0.6, 0), xSize / 1000, xSize, ySize);
+		this.gridObject = new BaseObject(gridModel,
+			new vec3(centerX - 0.5, centerY - 0.5, 1),
+			new vec3(xSize, ySize, 1));
+
+		const gameModel = new SimpleTextureRectangle(this.renderTarget.texture);
+		this.mapObject = new BaseObject(gameModel,
+			new vec3(centerX, centerY),
+			new vec3(xSize + extra, ySize + extra, 1));
 	}
 
 	protected static clearScreen(gl: WebGLRenderingContext): void {
@@ -120,7 +130,8 @@ export default class Renderer {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
 
-	public render(objects: BaseObject[], options: IRenderOptions = Renderer.defaultOptions): void {
+	// TODO: Update this to take the parent render node instead of a list of objects
+	public render(scene: BaseObject, options: IRenderOptions = Renderer.defaultOptions): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const background = Color.BLACK.lighten(.3);
 
@@ -135,11 +146,8 @@ export default class Renderer {
 
 		// NOTE: Render to texture first
 		{
-			const canvasWidth = gl.canvas.clientWidth;
-			const canvasHeight = gl.canvas.clientHeight;
-			const pixelsPerTile = Math.min(canvasWidth / this.xSize, canvasHeight / this.ySize);
-			const offsetX = this.renderTarget.offsetX / pixelsPerTile;
-			const offsetY = this.renderTarget.offsetY / pixelsPerTile;
+			const offsetX = this.renderTarget.offsetXTiles;
+			const offsetY = this.renderTarget.offsetYTiles;
 
 			gl.bindFramebuffer(gl.FRAMEBUFFER, this.renderTarget.frameBuffer);
 			gl.viewport(0, 0, this.renderTarget.width, this.renderTarget.height);
@@ -150,8 +158,8 @@ export default class Renderer {
 				-offsetY, this.ySize + offsetY,
 				-1, 1);
 
-			if (renderGrid && !debugGrid) Renderer.renderModel(gl, orthoMatrix, this.gridModel);
-			Renderer.renderObjects(gl, orthoMatrix, objects);
+			if (renderGrid && !debugGrid) this.gridObject.render(gl, orthoMatrix);
+			scene.render(gl, orthoMatrix);
 
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		}
@@ -184,84 +192,21 @@ export default class Renderer {
 					-1, 1);
 			}
 
-			if (debugGrid) Renderer.renderModel(gl, orthoMatrix, this.gridModel);
+			if (debugGrid) this.gridObject.render(gl, orthoMatrix);
+			this.mapObject.render(gl, orthoMatrix);
 
-			// NOTE: This positioning seems odd...
-			const centerY = (this.ySize - 1) / 2;
-			const centerX = (this.xSize - 1) / 2;
-			const rightBorder = centerX + this.xSize;
-			const leftBorder = centerX - this.xSize;
-			const bottomBorder = centerY + this.ySize;
-			const topBorder = centerY - this.ySize;
-			Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(centerX, centerY));
-
-			// TODO: Cleanup how tiling works.
 			if (tiledRender) {
-				if (!position) {
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(rightBorder, centerY));
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(rightBorder, topBorder));
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(rightBorder, bottomBorder));
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(leftBorder, centerY));
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(leftBorder, topBorder));
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(leftBorder, bottomBorder));
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(centerX, topBorder));
-					Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(centerX, bottomBorder));
-				}
-				else {
-					if (position.x > this.xSize / 2) {
-						Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(rightBorder, centerY));
-						if (position.y < this.ySize / 2) {
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(rightBorder, topBorder));
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(centerX, topBorder));
-						}
-						else {
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(rightBorder, bottomBorder));
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(centerX, bottomBorder));
-						}
-					}
-					else {
-						Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(leftBorder, centerY));
-						if (position.y < this.ySize / 2) {
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(leftBorder, topBorder));
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(centerX, topBorder));
-						}
-						else {
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(leftBorder, bottomBorder));
-							Renderer.renderModel(gl, orthoMatrix, this.outputModel, new vec2(centerX, bottomBorder));
-						}
-					}
-				}
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(+this.xSize, 0, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(+this.xSize, +this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(+this.xSize, -this.ySize, 0));
+
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(-this.xSize, 0, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(-this.xSize, +this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(-this.xSize, -this.ySize, 0));
+
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(0, +this.ySize, 0));
+				this.mapObject.render(gl, orthoMatrix, this.mapObject.getPosition().addValues(0, -this.ySize, 0));
 			}
-		}
-	}
-
-	protected static renderModel(gl: WebGLRenderingContext, orthoMatrix: mat4, model: Model,
-		position: vec2 = new vec2()) {
-		model.useShader(gl, orthoMatrix.toFloat32Array());
-		model.render(gl, position);
-	}
-
-	protected static renderObjects(gl: WebGLRenderingContext, orthoMatrix: mat4, objects: BaseObject[]) {
-		// TODO: Sort objects before rendering
-		/*
-		 By:
-			- Distance?
-			- Transparency
-			- Same shader program
-		 */
-		const ortho = orthoMatrix.toFloat32Array();
-
-		let shader;
-		for (const o of objects) {
-			if (!o.canRender()) continue;
-
-			const objectsShader = o.model.getShader();
-			if (shader !== objectsShader) {
-				o.model.useShader(gl, ortho);
-				shader = objectsShader;
-			}
-
-			o.render(gl);
 		}
 	}
 }

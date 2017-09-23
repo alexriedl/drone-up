@@ -41,6 +41,13 @@ export default class vec3 {
 	}
 
 	/**
+	 * Add values to this vector, and return a new vector with the result
+	 */
+	public addValues(x: number, y: number, z: number): vec3 {
+		return new vec3(this.x + x, this.y + y, this.z + z);
+	}
+
+	/**
 	 * Subtract another vector from this vector, and return a new vector with the result
 	 */
 	public subtract(other: vec3): vec3 {

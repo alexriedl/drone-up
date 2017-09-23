@@ -4,8 +4,8 @@ import { Random } from './Utils';
 let runner: Runner;
 const options = {
 	animationSpeed: 1,
-	focusOnPlayerId: 'player5',
-	renderGrid: false,
+	focusOnPlayerIndex: -1,
+	renderGrid: true,
 };
 
 const inputSeedElement = (document.getElementById('seed-input') as HTMLInputElement);
@@ -14,19 +14,19 @@ const pauseResumeButtonElement = (document.getElementById('pause-resume-button')
 const renderGridCheckboxElement = (document.getElementById('render-grid-checkbox') as HTMLInputElement);
 const animationSpeedSliderElement = (document.getElementById('animation-speed-slider') as HTMLInputElement);
 const animationSpeedValueElement = (document.getElementById('animation-speed-value') as HTMLInputElement);
-const focusPlayerIdElement = (document.getElementById('focus-player-id') as HTMLInputElement);
+const focusPlayerElement = (document.getElementById('focus-player-dropdown') as HTMLInputElement);
 
 // NOTE: Initialize option values
 renderGridCheckboxElement.checked = options.renderGrid;
 animationSpeedSliderElement.value = options.animationSpeed.toString();
 animationSpeedValueElement.innerText = options.animationSpeed.toString();
-focusPlayerIdElement.value = options.focusOnPlayerId;
+focusPlayerElement.value = options.focusOnPlayerIndex.toString();
 
 pauseResumeButtonElement.onclick = pauseResumeButtonClick;
 startStopButtonElement.onclick = startStopButtonClick;
 renderGridCheckboxElement.onchange = renderGridChanged;
 animationSpeedSliderElement.onchange = animationSpeedChanged;
-focusPlayerIdElement.onkeyup = focusPlayerIdChange;
+focusPlayerElement.onchange = focusPlayerChange;
 
 function pauseResumeButtonClick(): void {
 	if (!runner || !runner.isStarted()) return;
@@ -63,8 +63,8 @@ function animationSpeedChanged() {
 	animationSpeedValueElement.innerText = animationSpeedSliderElement.value;
 }
 
-function focusPlayerIdChange() {
-	options.focusOnPlayerId = focusPlayerIdElement.value;
+function focusPlayerChange() {
+	options.focusOnPlayerIndex = +focusPlayerElement.value;
 }
 
 function startGame(): void {
@@ -91,7 +91,10 @@ function startGame(): void {
 		new Bot.Shove(randomizer),
 	];
 
-	runner = initializeGame(randomizer, 15, playerControllers, 50, 50);
+	const playerSelectOptions = playerControllers.map((c, i) => `<option value="${i}">${c.constructor.name}</option>`);
+	focusPlayerElement.innerHTML = "<option value='-1'>ALL</option>" + playerSelectOptions.join();
+
+	runner = initializeGame(randomizer, 15, playerControllers, 20, 20);
 	runner.run(options);
 }
 

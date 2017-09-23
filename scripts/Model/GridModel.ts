@@ -1,8 +1,7 @@
-import { Animation } from '../Animations';
 import { Color } from '../Utils';
 import { GridShader } from './Shader';
-import { vec2, vec3, mat4 } from '../Math';
-import SimpleRectangle, { IRenderState } from './SimpleRectangle';
+import { mat4 } from '../Math';
+import SimpleRectangle from './SimpleRectangle';
 
 export default class GridModel extends SimpleRectangle {
 	protected shader: GridShader;
@@ -22,21 +21,10 @@ export default class GridModel extends SimpleRectangle {
 		return GridShader.createShader();
 	}
 
-	protected setupRenderState(position?: vec2, animation?: Animation): IRenderState {
-		return {
-			...super.setupRenderState(position, animation),
-			size: new vec3(this.xSize, this.ySize, 1),
-		};
-	}
-
-	protected updateUniforms(gl: WebGLRenderingContext, renderState: IRenderState): void {
+	protected updateUniforms(gl: WebGLRenderingContext, mvpMatrix: mat4): void {
 		const shader = this.shader;
-		const size = renderState.size;
-		const position = renderState.position;
-		const modelViewMatrix = mat4.fromTranslation(position.toVec3()).scale(size);
+		super.updateUniforms(gl, mvpMatrix);
 
-		gl.uniformMatrix4fv(shader.uniformModelViewMatrixLocation, false, modelViewMatrix.toFloat32Array());
-		gl.uniform4fv(shader.uniformColorLocation, this.color.toFloat32Array());
 		gl.uniform1f(shader.uniformGridThicknessLocation, this.gridThickness);
 		gl.uniform1f(shader.uniformXCountLocation, this.xSize);
 		gl.uniform1f(shader.uniformYCountLocation, this.ySize);

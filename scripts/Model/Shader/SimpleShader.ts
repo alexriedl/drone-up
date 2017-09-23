@@ -2,12 +2,10 @@ import Shader from './Shader';
 
 const vertexShaderSource = `
 attribute vec4 a_position;
-
-uniform mat4 u_model_view;
-uniform mat4 u_projection;
+uniform mat4 u_mvp_matrix;
 
 void main() {
-	gl_Position = u_projection * u_model_view * a_position;
+	gl_Position = u_mvp_matrix * a_position;
 }`;
 
 const fragmentShaderSource = `
@@ -20,7 +18,7 @@ void main() {
 
 export default class SimpleShader extends Shader {
 	public attributePositionLocation: number;
-	public uniformModelViewMatrixLocation: WebGLUniformLocation;
+	public uniformMVPMatrixLocation: WebGLUniformLocation;
 	public uniformProjectionMatrixLocation: WebGLUniformLocation;
 	public uniformColorLocation: WebGLUniformLocation;
 
@@ -28,8 +26,7 @@ export default class SimpleShader extends Shader {
 		super.initialize(gl);
 
 		this.attributePositionLocation = this.getAttributeLocation(gl, 'a_position');
-		this.uniformModelViewMatrixLocation = this.getUniformLocation(gl, 'u_model_view');
-		this.uniformProjectionMatrixLocation = this.getUniformLocation(gl, 'u_projection');
+		this.uniformMVPMatrixLocation = this.getUniformLocation(gl, 'u_mvp_matrix');
 		this.uniformColorLocation = this.getUniformLocation(gl, 'u_color');
 	}
 

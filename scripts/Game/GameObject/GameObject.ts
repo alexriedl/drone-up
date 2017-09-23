@@ -1,137 +1,124 @@
 import { MoveAnimation } from '../../Animations';
-import { Controller } from '../Bot';
 import { Model } from '../../Model';
-import { vec2 } from '../../Math';
+import { vec2, vec3 } from '../../Math';
 import BaseObject from './BaseObject';
 import Drone from './Drone';
-import Map from '../Map';
 
 abstract class GameObject extends BaseObject {
-	public readonly controller?: Controller;
 	protected canBump: boolean;
-	public static PUSH_LIMIT: number = 5;
+	public static PUSH_LIMIT: number = 0;
 
-	public constructor(ID: string, model: Model, controller?: Controller, position?: vec2) {
-		super(ID, position, model);
+	public constructor(model: Model, position?: vec3, scale?: vec3) {
+		super(model, position, scale);
 		this.canBump = true;
-
-		if (controller) {
-			this.controller = controller;
-			this.controller.setActions(['MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight']);
-		}
 	}
 
-	public perform(action: string, map: Map): BaseObject[] {
+	public perform(action: string, objects: GameObject[], worldSize: vec2): void {
 		switch (action) {
 			case 'MoveUp':
-				return this.moveUp(map);
+				return this.moveUp(objects, worldSize);
 			case 'MoveDown':
-				return this.moveDown(map);
+				return this.moveDown(objects, worldSize);
 			case 'MoveLeft':
-				return this.moveLeft(map);
+				return this.moveLeft(objects, worldSize);
 			case 'MoveRight':
-				return this.moveRight(map);
+				return this.moveRight(objects, worldSize);
 		}
-
-		return [];
 	}
 
-	public moveUp(map: Map, moveType?: any): BaseObject[] {
-		return this.move(0, -1, map, moveType);
+	public moveUp(objects: GameObject[], worldSize: vec2, moveType?: MoveAnimation.MoveType): void {
+		return this.move(0, -1, objects, worldSize, moveType);
 	}
 
-	public moveDown(map: Map, moveType?: any): BaseObject[] {
-		return this.move(0, 1, map, moveType);
+	public moveDown(objects: GameObject[], worldSize: vec2, moveType?: MoveAnimation.MoveType): void {
+		return this.move(0, 1, objects, worldSize, moveType);
 	}
 
-	public moveLeft(map: Map, moveType?: any): BaseObject[] {
-		return this.move(-1, 0, map, moveType);
+	public moveLeft(objects: GameObject[], worldSize: vec2, moveType?: MoveAnimation.MoveType): void {
+		return this.move(-1, 0, objects, worldSize, moveType);
 	}
 
-	public moveRight(map: Map, moveType?: any): BaseObject[] {
-		return this.move(1, 0, map, moveType);
+	public moveRight(objects: GameObject[], worldSize: vec2, moveType?: MoveAnimation.MoveType): void {
+		return this.move(1, 0, objects, worldSize, moveType);
 	}
 
 	/**
 	 * Returns an array of affected objects. Assumes a change in either x or y direction, but not both.
 	 * Also assumes either delta is -1, 0, or 1
 	 */
-	protected move(deltaX: number, deltaY: number, map: Map,
-		moveType: MoveAnimation.MoveType = MoveAnimation.MoveType.Basic): BaseObject[] {
-		if (!GameObject.PUSH_LIMIT) return this.internalMove(deltaX, deltaY, map, moveType);
-		else return this.internalMoveLimit(new vec2(deltaX, deltaY), map, GameObject.PUSH_LIMIT, moveType).objects;
+	protected move(deltaX: number, deltaY: number, objects: GameObject[], worldSize: vec2,
+		moveType: MoveAnimation.MoveType = MoveAnimation.MoveType.Basic): void {
+		if (!GameObject.PUSH_LIMIT) this.internalMove(deltaX, deltaY, objects, worldSize, moveType);
+		else this.internalMoveLimit(new vec3(deltaX, deltaY), objects, worldSize, GameObject.PUSH_LIMIT, moveType);
 	}
 
-	private internalMove(deltaX: number, deltaY: number, map: Map, moveType: MoveAnimation.MoveType,
-		possibleAffected?: GameObject[]): BaseObject[] {
+	private internalMove(deltaX: number, deltaY: number, objects: GameObject[], worldSize: vec2,
+		moveType: MoveAnimation.MoveType, possibleAffected?: GameObject[]): void {
 		if (!possibleAffected) {
-			if (deltaX) possibleAffected = map.getAllObjectsOnSameY(this.position.y);
-			if (deltaY) possibleAffected = map.getAllObjectsOnSameX(this.position.x);
+			if (deltaX) possibleAffected = this.getAllObjectsOnSameY(objects);
+			if (deltaY) possibleAffected = this.getAllObjectsOnSameX(objects);
 		}
 
 		const startPos = this.position;
-		this.position = this.position.addValues(deltaX, deltaY);
+		this.position = this.position.addValues(deltaX, deltaY, 0);
 		const endPos = this.position;
-		this.position = GameObject.wrapCoordinates(this.position, map);
+		this.position = GameObject.wrapCoordinates(this.position, worldSize);
 
 		this.setAnimation(new MoveAnimation(startPos, endPos, undefined, moveType));
-		const result: BaseObject[] = [this];
 
 		if (!(this instanceof Drone)) {
-			const collisions = this.findAt(this.position, possibleAffected);
+			const collisions = GameObject.findAt(this, this.position, possibleAffected);
 			for (const go of collisions) {
 				// TODO: This needs to be smarter. Perhaps query that object the response of being bumped into.
 				if (go instanceof Drone) continue;
-				result.push.apply(result, go.internalMove(deltaX, deltaY, map, MoveAnimation.MoveType.Bump, possibleAffected));
+				go.internalMove(deltaX, deltaY, objects, worldSize, MoveAnimation.MoveType.Bump, possibleAffected);
 			}
 		}
-
-		return result;
 	}
 
-	private internalMoveLimit(delta: vec2, map: Map, movesRemaining: number,
-		moveType: any, possibleAffected?: GameObject[]): IMoveResult {
+	private internalMoveLimit(delta: vec3, objects: GameObject[], worldSize: vec2, movesRemaining: number,
+		moveType: MoveAnimation.MoveType, possibleAffected?: GameObject[]): boolean {
+
 		// TODO: If a drone is at the end of a chain, it will prevent the spikes from moving, and survive
-		if (movesRemaining <= 0) return { canMove: false, objects: [] };
+		if (movesRemaining <= 0) return false;
+
 		if (!possibleAffected) {
-			if (delta.x) possibleAffected = map.getAllObjectsOnSameY(this.position.y);
-			if (delta.y) possibleAffected = map.getAllObjectsOnSameX(this.position.x);
+			if (delta.x) possibleAffected = this.getAllObjectsOnSameY(objects);
+			if (delta.y) possibleAffected = this.getAllObjectsOnSameX(objects);
 		}
 
 		const startPos = this.position;
 		let endPos = this.position.add(delta);
-		let newPos = GameObject.wrapCoordinates(endPos, map);
+		let newPos = GameObject.wrapCoordinates(endPos, worldSize);
 
-		const result = { canMove: true, objects: [] };
+		let canMove = true;
 
 		if (this.canBump) {
-			const collisions = this.findAt(newPos, possibleAffected);
+			const collisions = GameObject.findAt(this, newPos, possibleAffected);
 			for (const go of collisions) {
-				const childResult = go.internalMoveLimit(delta, map, movesRemaining - 1,
+				const childCanMove = go.internalMoveLimit(delta, objects, worldSize, movesRemaining - 1,
 					MoveAnimation.MoveType.Bump, possibleAffected);
-				if (!childResult.canMove) result.canMove = false;
-				result.objects = childResult.objects;
+				if (!childCanMove) canMove = false;
 			}
 		}
 
-		if (!result.canMove) {
+		if (!canMove) {
 			endPos = startPos;
 			newPos = startPos;
 		}
 
 		this.setAnimation(new MoveAnimation(startPos, endPos, undefined, moveType));
 		this.position = newPos;
-		result.objects.push(this);
 
-		return result;
+		return canMove;
 	}
 
 	/**
 	 * Clips position to map coordinates. Wraps position to oposite side of map if they are off of the board.
 	 */
-	protected static wrapCoordinates(position: vec2, map: Map): vec2 {
-		const xMax = map.xSize - 1;
-		const yMax = map.ySize - 1;
+	protected static wrapCoordinates(position: vec3, worldSize: vec2): vec3 {
+		const xMax = worldSize.x - 1;
+		const yMax = worldSize.y - 1;
 
 		let x = position.x;
 		let y = position.y;
@@ -142,26 +129,29 @@ abstract class GameObject extends BaseObject {
 		if (y > yMax) y = 0;
 		else if (y < 0) y = yMax;
 
-		return new vec2(x, y);
+		return new vec3(x, y);
 	}
 
-	private findAt(pos: vec2, tests: GameObject[]): GameObject[] {
+	protected getAllObjectsOnSameY(objects: GameObject[]): GameObject[] {
+		return objects.filter((go) => go.position.y === this.position.y);
+	}
+
+	protected getAllObjectsOnSameX(objects: GameObject[]): GameObject[] {
+		return objects.filter((go) => go.position.x === this.position.x);
+	}
+
+	private static findAt(entity: GameObject, pos: vec3, tests: GameObject[]): GameObject[] {
 		const result = [];
 		if (!tests) return result;
 
 		for (const test of tests) {
-			if (this.ID !== test.ID && pos.x === test.position.x && pos.y === test.position.y) {
+			if (entity !== test && pos.x === test.position.x && pos.y === test.position.y) {
 				result.push(test);
 			}
 		}
 
 		return result;
 	}
-}
-
-interface IMoveResult {
-	canMove: boolean;
-	objects: GameObject[];
 }
 
 export default GameObject;

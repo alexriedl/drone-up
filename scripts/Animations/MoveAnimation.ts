@@ -1,14 +1,16 @@
 import Animation from './Animation';
-import { vec2 } from '../Math';
+import { vec3 } from '../Math';
 
 export class MoveAnimation extends Animation<MoveAnimation.MoveType> {
-	public position: vec2;
-	protected startPos: vec2;
-	protected endPos: vec2;
+	public position: vec3;
+	public bonusSize: number;
+	protected startPos: vec3;
+	protected endPos: vec3;
 
-	public constructor(startPos: vec2, endPos: vec2, duration: number = 250, moveType: MoveAnimation.MoveType) {
+	public constructor(startPos: vec3, endPos: vec3, duration: number = 250, moveType: MoveAnimation.MoveType) {
 		super(duration, moveType);
 
+		this.bonusSize = 0;
 		this.position = startPos;
 		this.startPos = startPos;
 		this.endPos = endPos;
@@ -16,10 +18,25 @@ export class MoveAnimation extends Animation<MoveAnimation.MoveType> {
 
 	public update(deltaTimeMs: number): boolean {
 		const p = this.getProgressPercent();
+
 		const x = (1 - p) * this.startPos.x + p * this.endPos.x;
 		const y = (1 - p) * this.startPos.y + p * this.endPos.y;
-		this.position = new vec2(x, y);
+		this.position = new vec3(x, y);
+
+		const bonusSize = this.getAnimationBonusSize();
+		if (p < 0.1) this.bonusSize = 10 * p * bonusSize;
+		else if (p > 0.9) this.bonusSize = 10 * (1 - p) * bonusSize;
+
 		return super.update(deltaTimeMs);
+	}
+
+	protected getAnimationBonusSize(): number {
+		switch (this.extraInfo) {
+			case MoveAnimation.MoveType.Basic: return 0.5;
+			case MoveAnimation.MoveType.Pull: return -0.5;
+			case MoveAnimation.MoveType.Push: return -0.5;
+			default: return 0;
+		}
 	}
 }
 

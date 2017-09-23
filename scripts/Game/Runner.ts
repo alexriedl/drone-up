@@ -1,13 +1,26 @@
-import { GameObject, BaseObject } from './GameObject';
-import { vec2 } from '../Math';
-import Map from './Map';
+import { Drone, Spike, GameObject, BaseObject } from './GameObject';
+import { ResizeAnimation } from '../Animations';
+import { vec2, vec3 } from '../Math';
 import Renderer from './Renderer';
-import TickState from './TickState';
 
 export interface IRunnerOptions {
 	animationSpeed: number;
-	focusOnPlayerId?: string;
+	focusOnPlayerIndex: number;
 	renderGrid: boolean;
+}
+const defaultOptions: IRunnerOptions = {
+	renderGrid: true,
+	animationSpeed: 1,
+	focusOnPlayerIndex: -1,
+};
+
+interface ITickState {
+	loopPosition: number;
+	animating: boolean;
+	players: Drone[];
+	objects: GameObject[];
+	scene: BaseObject;
+	worldSize: vec2;
 }
 
 export default class Runner {
@@ -15,23 +28,29 @@ export default class Runner {
 	private gamePaused: boolean;
 	private gameStarted: boolean;
 
-	private map: Map;
-	private renderer: Renderer;
-
-	private static defaultOptions: IRunnerOptions = {
-		renderGrid: true,
-		animationSpeed: 1,
-		focusOnPlayerId: null,
-	};
+	private readonly renderer: Renderer;
+	private readonly tickState: ITickState;
 
 	private frame: (now: number) => void;
 
-	public constructor(map: Map) {
-		this.renderer = new Renderer('game-canvas', map.xSize, map.ySize);
+	public constructor(players: Drone[], spikes: Spike[], worldSize: vec2) {
+		this.renderer = new Renderer('game-canvas', worldSize.x, worldSize.y);
 		this.gameDone = false;
 		this.gamePaused = false;
 		this.gameStarted = false;
-		this.map = map;
+
+		const scene = new BaseObject(undefined);
+		const objects = spikes.concat(players);
+		objects.forEach((object) => object.setParent(scene));
+
+		this.tickState = {
+			animating: false,
+			loopPosition: 0,
+			objects,
+			scene,
+			players,
+			worldSize,
+		};
 	}
 
 	public pause(): void {
@@ -57,7 +76,6 @@ export default class Runner {
 	}
 
 	public run(options: IRunnerOptions) {
-		const tickState = new TickState();
 		this.gameStarted = true;
 		let then;
 
@@ -75,23 +93,22 @@ export default class Runner {
 				}
 			}
 
-			options = options || Runner.defaultOptions;
+			const state = this.tickState;
+			options = options || defaultOptions;
 
 			const effectiveDeltaTime = deltaTime * options.animationSpeed;
-			const transientObjects = tickState.update(effectiveDeltaTime, this.map);
-			const gameObjects = this.map.getGameObjects();
+			update(effectiveDeltaTime, this.tickState);
 
-			const renderObjects = this.combineLists(gameObjects, transientObjects);
-
-			this.renderer.render(renderObjects, {
-				povPosition: options.focusOnPlayerId ? this.getPlayersPosition(options.focusOnPlayerId) : null,
+			this.renderer.render(state.scene, {
+				povPosition: getPlayersPosition(state, options.focusOnPlayerIndex),
+				viewSize: Math.min(state.worldSize.x, state.worldSize.y) / 2,
 				renderGrid: options.renderGrid,
 				tiledRender: true,
-				viewSize: Math.max(this.map.xSize, this.map.ySize) / 2,
+				debugGrid: false,
 			});
 
-			if (!tickState.isAnimating()) {
-				this.checkGameDone();
+			if (!state.animating) {
+				this.checkGameDone(state);
 			}
 
 			if (this.gameDone || this.gamePaused) {
@@ -105,22 +122,66 @@ export default class Runner {
 		requestAnimationFrame(this.frame);
 	}
 
-	private getPlayersPosition(ID: string): vec2 {
-		const player = this.map.getPlayers().find((p) => p.ID === ID);
-		return player && player.getPosition();
+	private checkGameDone(state: ITickState): void {
+		this.gameDone = this.gameDone || state.players.filter((p) => p.isAlive()).length <= 1;
+	}
+}
+
+function getPlayersPosition(state: ITickState, index: number): vec3 {
+	if (index < 0) return null;
+	const player = state.players[index];
+	return player.isAlive() ? player.getPosition() : null;
+}
+
+function update(deltaTime: number, state: ITickState) {
+	// Get next animation
+	if (!state.animating) {
+		const player = findNextLivingDrone(state.players, state);
+		const action = player.controller.getAction();
+		player.perform(action, state.objects, state.worldSize);
 	}
 
-	private combineLists(gameObjects: GameObject[], transientObjects: BaseObject[]): BaseObject[] {
-		if (!transientObjects) return [...gameObjects];
-		if (!gameObjects) return [...transientObjects];
+	// Update all objects
+	state.animating = state.scene.update(deltaTime);
 
-		const removed: BaseObject[] = gameObjects.
-			filter((go) => transientObjects.find((to) => go.ID === to.ID) === undefined);
+	// Remove dead players
+	if (!state.animating) {
+		state.animating = removeCrashedDrones(state.players, state.objects);
+	}
+}
 
-		return removed.concat(transientObjects);
+function removeCrashedDrones(players: Drone[], objects: GameObject[]): boolean {
+	const crashed: Drone[] = [];
+
+	for (const player of players.filter((p) => p.isAlive())) {
+		for (const object of objects) {
+			if (player !== object && player.position.exactEquals(object.position)) {
+				crashed.push(player);
+			}
+		}
 	}
 
-	private checkGameDone(): void {
-		this.gameDone = this.gameDone || this.map.getPlayers().length <= 1;
+	let someoneIsAnimating = false;
+	for (const dead of crashed) {
+		const gameObjectsIndex = objects.indexOf(dead);
+		if (gameObjectsIndex > -1) {
+			objects.splice(gameObjectsIndex, 1);
+		}
+
+		dead.setAnimation(new ResizeAnimation(1, 7, 500), true);
+		someoneIsAnimating = true;
 	}
+
+	return someoneIsAnimating;
+}
+
+function findNextLivingDrone(players: Drone[], state: ITickState): Drone {
+	const starting = state.loopPosition;
+	let player;
+	do {
+		state.loopPosition = (state.loopPosition + 1) % players.length;
+		player = players[state.loopPosition];
+		if (starting === state.loopPosition) return player;
+	} while (!player || !player.isAlive());
+	return player;
 }
