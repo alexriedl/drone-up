@@ -8,12 +8,11 @@ export default class BaseObject {
 	private animation?: Animation;
 	private removeAtEndOfAnimation: boolean = false;
 
-	// TODO: This should not be public
-	public position: vec3;
-	protected scale: vec3;
+	private position: vec3;
+	private scale: vec3;
 
 	private parent?: BaseObject;
-	private children?: BaseObject[] = [];
+	private readonly children?: BaseObject[] = [];
 
 	public constructor(model: Model, position: vec3 = new vec3(), scale: vec3 = new vec3(1, 1, 1)) {
 		this.position = position;

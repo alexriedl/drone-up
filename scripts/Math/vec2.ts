@@ -84,14 +84,16 @@ export default class vec2 {
 	 * Math.min the components of this vector, and return a new vector with the result
 	 */
 	public min(): vec2 {
-		return new vec2(Math.min(this.x), Math.min(this.y));
+		const o = Math.min(this.x, this.y);
+		return new vec2(o, o);
 	}
 
 	/**
 	 * Math.max the components of this vector, and return a new vector with the result
 	 */
 	public max(): vec2 {
-		return new vec2(Math.max(this.x), Math.max(this.y));
+		const o = Math.max(this.x, this.y);
+		return new vec2(o, o);
 	}
 
 	/**

@@ -18,10 +18,7 @@ export class MoveAnimation extends Animation<MoveAnimation.MoveType> {
 
 	public update(deltaTimeMs: number): boolean {
 		const p = this.getProgressPercent();
-
-		const x = (1 - p) * this.startPos.x + p * this.endPos.x;
-		const y = (1 - p) * this.startPos.y + p * this.endPos.y;
-		this.position = new vec3(x, y);
+		this.position = this.startPos.lerp(this.endPos, p);
 
 		const bonusSize = this.getAnimationBonusSize();
 		if (p < 0.1) this.bonusSize = 10 * p * bonusSize;

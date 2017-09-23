@@ -86,14 +86,16 @@ export default class vec3 {
 	 * Math.min the components of this vector, and return a new vector with the result
 	 */
 	public min(): vec3 {
-		return new vec3(Math.min(this.x), Math.min(this.y), Math.min(this.z));
+		const o = Math.min(this.x, this.y, this.z);
+		return new vec3(o, o, o);
 	}
 
 	/**
 	 * Math.max the components of this vector, and return a new vector with the result
 	 */
 	public max(): vec3 {
-		return new vec3(Math.max(this.x), Math.max(this.y), Math.max(this.z));
+		const o = Math.max(this.x, this.y, this.z);
+		return new vec3(o, o, o);
 	}
 
 	/**

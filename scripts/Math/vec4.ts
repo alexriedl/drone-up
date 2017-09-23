@@ -46,6 +46,13 @@ export default class vec4 {
 	}
 
 	/**
+	 * Add values to this vector, and return a new vector with the result
+	 */
+	public addValues(x: number, y: number, z: number, w: number): vec4 {
+		return new vec4(this.x + x, this.y + y, this.z + z, this.w + w);
+	}
+
+	/**
 	 * Subtract another vector from this vector, and return a new vector with the result
 	 */
 	public subtract(other: vec4): vec4 {
@@ -84,14 +91,16 @@ export default class vec4 {
 	 * Math.min the components of this vector, and return a new vector with the result
 	 */
 	public min(): vec4 {
-		return new vec4(Math.min(this.x), Math.min(this.y), Math.min(this.z), Math.min(this.w));
+		const o = Math.min(this.x, this.y, this.z);
+		return new vec4(o, o, o);
 	}
 
 	/**
 	 * Math.max the components of this vector, and return a new vector with the result
 	 */
 	public max(): vec4 {
-		return new vec4(Math.max(this.x), Math.max(this.y), Math.max(this.z), Math.max(this.w));
+		const o = Math.max(this.x, this.y, this.z);
+		return new vec4(o, o, o);
 	}
 
 	/**
