@@ -1,5 +1,5 @@
-import { vec3 } from '../Math';
-import Map from './Map';
+import { Drone, Spike, GameObject } from './GameObject';
+import { vec2, vec3 } from '../Math';
 import Renderer from './Renderer';
 import TickState from './TickState';
 
@@ -14,8 +14,11 @@ export default class Runner {
 	private gamePaused: boolean;
 	private gameStarted: boolean;
 
-	private map: Map;
-	private renderer: Renderer;
+	private readonly worldSize: vec2;
+	private readonly objects: GameObject[];
+	private readonly players: Drone[];
+
+	private readonly renderer: Renderer;
 
 	private static defaultOptions: IRunnerOptions = {
 		renderGrid: true,
@@ -25,12 +28,14 @@ export default class Runner {
 
 	private frame: (now: number) => void;
 
-	public constructor(map: Map) {
-		this.renderer = new Renderer('game-canvas', map.xSize, map.ySize);
+	public constructor(players: Drone[], spikes: Spike[], worldSize: vec2) {
+		this.renderer = new Renderer('game-canvas', worldSize.x, worldSize.y);
+		this.players = players;
+		this.objects = spikes.concat(players);
+		this.worldSize = worldSize;
 		this.gameDone = false;
 		this.gamePaused = false;
 		this.gameStarted = false;
-		this.map = map;
 	}
 
 	public pause(): void {
@@ -77,11 +82,11 @@ export default class Runner {
 			options = options || Runner.defaultOptions;
 
 			const effectiveDeltaTime = deltaTime * options.animationSpeed;
-			tickState.update(effectiveDeltaTime, this.map);
+			tickState.update(effectiveDeltaTime, this.players, this.objects, this.worldSize);
 
-			this.renderer.render(this.map.getGameObjects(), {
+			this.renderer.render(this.objects, {
 				povPosition: this.getPlayersPosition(options.focusOnPlayerIndex),
-				viewSize: Math.min(this.map.xSize, this.map.ySize) / 2,
+				viewSize: Math.min(this.worldSize.x, this.worldSize.y) / 2,
 				renderGrid: options.renderGrid,
 				tiledRender: true,
 				debugGrid: false,
@@ -104,11 +109,11 @@ export default class Runner {
 
 	private getPlayersPosition(index: number): vec3 {
 		if (index < 0) return null;
-		const player = this.map.getPlayers()[index];
+		const player = this.players[index];
 		return player.isAlive() ? player.getPosition() : null;
 	}
 
 	private checkGameDone(): void {
-		this.gameDone = this.gameDone || this.map.getPlayers().filter((p) => p.isAlive()).length <= 1;
+		this.gameDone = this.gameDone || this.players.filter((p) => p.isAlive()).length <= 1;
 	}
 }

@@ -5,7 +5,6 @@ import { MoveAnimation} from '../../Animations';
 import { vec2, vec3 } from '../../Math';
 import BaseObject from './BaseObject';
 import GameObject from './GameObject';
-import Map from '../Map';
 import ScanObject from './ScanObject';
 
 export default class Drone extends GameObject {
@@ -27,77 +26,77 @@ export default class Drone extends GameObject {
 		return this.alive;
 	}
 
-	public perform(action: string, map: Map): void {
+	public perform(action: string, objects: GameObject[], worldSize: vec2): void {
 		switch (action) {
-			case 'PullUp': return this.pullUp(map);
-			case 'PullDown': return this.pullDown(map);
-			case 'PullLeft': return this.pullLeft(map);
-			case 'PullRight': return this.pullRight(map);
-			case 'PushUp': return this.pushUp(map);
-			case 'PushDown': return this.pushDown(map);
-			case 'PushLeft': return this.pushLeft(map);
-			case 'PushRight': return this.pushRight(map);
-			case 'Scan': return this.scan(map);
+			case 'PullUp': return this.pullUp(objects, worldSize);
+			case 'PullDown': return this.pullDown(objects, worldSize);
+			case 'PullLeft': return this.pullLeft(objects, worldSize);
+			case 'PullRight': return this.pullRight(objects, worldSize);
+			case 'PushUp': return this.pushUp(objects, worldSize);
+			case 'PushDown': return this.pushDown(objects, worldSize);
+			case 'PushLeft': return this.pushLeft(objects, worldSize);
+			case 'PushRight': return this.pushRight(objects, worldSize);
+			case 'Scan': return this.scan(objects, worldSize);
 			default:
-				return super.perform(action, map);
+				return super.perform(action, objects, worldSize);
 		}
 	}
 
-	protected scan(map: Map): void {
-		this.controller.scanResult = Drone.scanMap(map, this);
+	protected scan(objects: GameObject[], worldSize: vec2): void {
+		this.controller.scanResult = Drone.scanMap(objects, this, worldSize);
 
 		// tslint:disable-next-line:no-unused-expression
 		new ScanObject(this);
 	}
 
-	protected pullUp(map: Map): void {
-		const toPull = map.getNextObjectUpFrom(this);
-		return toPull.moveDown(map, MoveAnimation.MoveType.Pull);
+	protected pullUp(objects: GameObject[], worldSize: vec2): void {
+		const toPull = this.getNextObjectUpFrom(objects);
+		return toPull.moveDown(objects, worldSize, MoveAnimation.MoveType.Pull);
 	}
 
-	protected pullDown(map: Map): void {
-		const toPull = map.getNextObjectDownFrom(this);
-		return toPull.moveUp(map, MoveAnimation.MoveType.Pull);
+	protected pullDown(objects: GameObject[], worldSize: vec2): void {
+		const toPull = this.getNextObjectDownFrom(objects);
+		return toPull.moveUp(objects, worldSize, MoveAnimation.MoveType.Pull);
 	}
 
-	protected pullLeft(map: Map): void {
-		const toPull = map.getNextObjectLeftFrom(this);
-		return toPull.moveRight(map, MoveAnimation.MoveType.Pull);
+	protected pullLeft(objects: GameObject[], worldSize: vec2): void {
+		const toPull = this.getNextObjectLeftFrom(objects);
+		return toPull.moveRight(objects, worldSize, MoveAnimation.MoveType.Pull);
 	}
 
-	protected pullRight(map: Map): void {
-		const toPull = map.getNextObjectRightFrom(this);
-		return toPull.moveLeft(map, MoveAnimation.MoveType.Pull);
+	protected pullRight(objects: GameObject[], worldSize: vec2): void {
+		const toPull = this.getNextObjectRightFrom(objects);
+		return toPull.moveLeft(objects, worldSize, MoveAnimation.MoveType.Pull);
 	}
 
-	protected pushUp(map: Map): void {
-		const toPush = map.getNextObjectUpFrom(this);
-		return toPush.moveUp(map, MoveAnimation.MoveType.Push);
+	protected pushUp(objects: GameObject[], worldSize: vec2): void {
+		const toPush = this.getNextObjectUpFrom(objects);
+		return toPush.moveUp(objects, worldSize, MoveAnimation.MoveType.Push);
 	}
 
-	protected pushDown(map: Map): void {
-		const toPush = map.getNextObjectDownFrom(this);
-		return toPush.moveDown(map, MoveAnimation.MoveType.Push);
+	protected pushDown(objects: GameObject[], worldSize: vec2): void {
+		const toPush = this.getNextObjectDownFrom(objects);
+		return toPush.moveDown(objects, worldSize, MoveAnimation.MoveType.Push);
 	}
 
-	protected pushLeft(map: Map): void {
-		const toPush = map.getNextObjectLeftFrom(this);
-		return toPush.moveLeft(map, MoveAnimation.MoveType.Push);
+	protected pushLeft(objects: GameObject[], worldSize: vec2): void {
+		const toPush = this.getNextObjectLeftFrom(objects);
+		return toPush.moveLeft(objects, worldSize, MoveAnimation.MoveType.Push);
 	}
 
-	protected pushRight(map: Map): void {
-		const toPush = map.getNextObjectRightFrom(this);
-		return toPush.moveRight(map, MoveAnimation.MoveType.Push);
+	protected pushRight(objects: GameObject[], worldSize: vec2): void {
+		const toPush = this.getNextObjectRightFrom(objects);
+		return toPush.moveRight(objects, worldSize, MoveAnimation.MoveType.Push);
 	}
 
-	protected static scanMap(map: Map, entity: Drone): IScanResult[] {
-		const scanDistance = Math.ceil(.33 * Math.min(map.xSize, map.ySize, 15));
+	protected static scanMap(objects: GameObject[], entity: Drone, worldSize: vec2): IScanResult[] {
+		const scanDistance = Math.ceil(.33 * Math.min(worldSize.x, worldSize.y, 15));
 		const gameObjectsInRange: GameObject[] = [];
-		const markList = new MarkList(map.xSize, map.ySize);
+		const markList = new MarkList(worldSize.x, worldSize.y);
 
 		markList.mark(entity.position, scanDistance);
 
-		for (const scanned of map.getGameObjects()) {
+		for (const scanned of objects) {
 			if (markList.isMarked(scanned.position)) {
 				gameObjectsInRange.push(scanned);
 			}
@@ -109,5 +108,61 @@ export default class Drone extends GameObject {
 			const y = gameObject.position.y - entity.position.y;
 			return { type, position: new vec2(x, y) };
 		});
+	}
+
+	private getNextObjectUpFrom(objects: GameObject[]): GameObject {
+		const lineObjects = this.getAllObjectsOnSameX(objects);
+
+		const sortedObjects = lineObjects.sort((a, b) => {
+			return b.position.y - a.position.y;
+		});
+
+		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
+			if (sortedObjects[k] === this) {
+				return sortedObjects[(k + 1) % sortedObjects.length];
+			}
+		}
+	}
+
+	private getNextObjectDownFrom(objects: GameObject[]): GameObject {
+		const lineObjects = this.getAllObjectsOnSameX(objects);
+
+		const sortedObjects = lineObjects.sort((a, b) => {
+			return a.position.y - b.position.y;
+		});
+
+		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
+			if (sortedObjects[k] === this) {
+				return sortedObjects[(k + 1) % sortedObjects.length];
+			}
+		}
+	}
+
+	private getNextObjectLeftFrom(objects: GameObject[]): GameObject {
+		const lineObjects = this.getAllObjectsOnSameY(objects);
+
+		const sortedObjects = lineObjects.sort((a, b) => {
+			return b.position.x - a.position.x;
+		});
+
+		for (let k = 0; k < sortedObjects.length; k++) {
+			if (sortedObjects[k] === this) {
+				return sortedObjects[(k + 1) % sortedObjects.length];
+			}
+		}
+	}
+
+	private getNextObjectRightFrom(objects: GameObject[]): GameObject {
+		const lineObjects = this.getAllObjectsOnSameY(objects);
+
+		const sortedObjects = lineObjects.sort((a, b) => {
+			return a.position.x - b.position.x;
+		});
+
+		for (let k = 0, objectCount = sortedObjects.length; k < objectCount; k++) {
+			if (sortedObjects[k] === this) {
+				return sortedObjects[(k + 1) % sortedObjects.length];
+			}
+		}
 	}
 }

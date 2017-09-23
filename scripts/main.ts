@@ -92,7 +92,6 @@ function startGame(): void {
 	];
 
 	const playerSelectOptions = playerControllers.map((c, i) => `<option value="${i}">${c.constructor.name}</option>`);
-	console.log(playerSelectOptions);
 	focusPlayerElement.innerHTML = "<option value='-1'>ALL</option>" + playerSelectOptions.join();
 
 	runner = initializeGame(randomizer, 15, playerControllers, 20, 20);

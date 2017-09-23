@@ -2,8 +2,7 @@ import { Controller } from './Bot';
 import { Drone, Spike } from './GameObject';
 import { Random, Color, MarkList } from '../Utils';
 import { SimpleRectangle } from '../Model';
-import { vec3 } from '../Math';
-import Map from './Map';
+import { vec2, vec3 } from '../Math';
 import Runner from './Runner';
 
 const predefinedColors: Color[] = [
@@ -24,9 +23,7 @@ export function initializeGame(randomizer: Random, spikePercent: number, playerC
 	const players = generatePlayers(randomizer, playerControllers, markedList);
 	const spikes = generateSpikes(randomizer, spikePercent, markedList);
 
-	const map = new Map(xSize, ySize, players, spikes);
-
-	return new Runner(map);
+	return new Runner(players, spikes, new vec2(xSize, ySize));
 }
 
 function generatePlayers(randomizer: Random, controllers: Controller[], markedList: MarkList): Drone[] {
