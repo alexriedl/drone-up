@@ -1,4 +1,7 @@
-import { initializeGame, Runner, Bot } from 'DroneUp';
+import { initializeGame } from 'DroneUp/Utils';
+import * as Bot from 'DroneUp/Bot';
+import Runner from 'DroneUp/Runner';
+
 import { Random } from 'Engine/Utils';
 
 let runner: Runner;
@@ -107,10 +110,4 @@ function pauseGame(): void {
 function resumeGame(): void {
 	pauseResumeButtonElement.innerHTML = 'Pause Game';
 	runner.resume();
-}
-
-// Allow Hot Module Reloading
-declare var module: any;
-if (module.hot) {
-	module.hot.accept();
 }
