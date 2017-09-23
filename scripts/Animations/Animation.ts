@@ -12,7 +12,7 @@ export default class Animation<T = any> {
 		let effectiveDeltaTime = deltaTimeMs;
 		if (effectiveDeltaTime > this.remainingDurationMs) effectiveDeltaTime = this.remainingDurationMs;
 		this.remainingDurationMs -= effectiveDeltaTime;
-		return this.isFinished();
+		return this.continueing();
 	}
 
 	public getProgressPercent(): number {
@@ -20,7 +20,7 @@ export default class Animation<T = any> {
 		return 1 - (this.remainingDurationMs / this.originalDurationMs);
 	}
 
-	public isFinished(): boolean {
-		return this.remainingDurationMs <= 0;
+	public continueing(): boolean {
+		return this.remainingDurationMs > 0;
 	}
 }

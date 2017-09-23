@@ -18,7 +18,7 @@ export default class Drone extends GameObject {
 	}
 
 	public setParent(parent: BaseObject): void {
-		this.setParent(parent);
+		super.setParent(parent);
 		if (!parent) this.alive = false;
 	}
 

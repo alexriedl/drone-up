@@ -131,7 +131,7 @@ export default class Renderer {
 	}
 
 	// TODO: Update this to take the parent render node instead of a list of objects
-	public render(objects: BaseObject[], options: IRenderOptions = Renderer.defaultOptions): void {
+	public render(scene: BaseObject, options: IRenderOptions = Renderer.defaultOptions): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const background = Color.BLACK.lighten(.3);
 
@@ -159,10 +159,7 @@ export default class Renderer {
 				-1, 1);
 
 			if (renderGrid && !debugGrid) this.gridObject.render(gl, orthoMatrix);
-
-			for (const o of objects) {
-				o.render(gl, orthoMatrix);
-			}
+			scene.render(gl, orthoMatrix);
 
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		}

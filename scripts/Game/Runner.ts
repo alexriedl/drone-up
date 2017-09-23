@@ -1,4 +1,4 @@
-import { Drone, Spike, GameObject } from './GameObject';
+import { Drone, Spike, GameObject, BaseObject } from './GameObject';
 import { ResizeAnimation } from '../Animations';
 import { vec2, vec3 } from '../Math';
 import Renderer from './Renderer';
@@ -19,6 +19,7 @@ interface ITickState {
 	animating: boolean;
 	players: Drone[];
 	objects: GameObject[];
+	scene: BaseObject;
 	worldSize: vec2;
 }
 
@@ -38,10 +39,15 @@ export default class Runner {
 		this.gamePaused = false;
 		this.gameStarted = false;
 
+		const scene = new BaseObject(undefined);
+		const objects = spikes.concat(players);
+		objects.forEach((object) => object.setParent(scene));
+
 		this.tickState = {
 			animating: false,
 			loopPosition: 0,
-			objects: spikes.concat(players),
+			objects,
+			scene,
 			players,
 			worldSize,
 		};
@@ -93,7 +99,7 @@ export default class Runner {
 			const effectiveDeltaTime = deltaTime * options.animationSpeed;
 			update(effectiveDeltaTime, this.tickState);
 
-			this.renderer.render(state.objects, {
+			this.renderer.render(state.scene, {
 				povPosition: getPlayersPosition(state, options.focusOnPlayerIndex),
 				viewSize: Math.min(state.worldSize.x, state.worldSize.y) / 2,
 				renderGrid: options.renderGrid,
@@ -136,11 +142,7 @@ function update(deltaTime: number, state: ITickState) {
 	}
 
 	// Update all objects
-	state.animating = false;
-	for (const object of state.objects) {
-		const finished = object.update(deltaTime);
-		if (!finished) state.animating = true;
-	}
+	state.animating = state.scene.update(deltaTime);
 
 	// Remove dead players
 	if (!state.animating) {
@@ -166,9 +168,7 @@ function removeCrashedDrones(players: Drone[], objects: GameObject[]): boolean {
 			objects.splice(gameObjectsIndex, 1);
 		}
 
-		// TODO: Dont mark drone dead here once map is a scene graph
-		dead.alive = false;
-		dead.setAnimation(new ResizeAnimation(1, 5, 200), true);
+		dead.setAnimation(new ResizeAnimation(1, 7, 500), true);
 		someoneIsAnimating = true;
 	}
 

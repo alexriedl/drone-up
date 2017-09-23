@@ -37,8 +37,6 @@ export default class BaseObject {
 	}
 
 	public render(gl: WebGLRenderingContext, vpMatrix: mat4, overridePosition?: vec3, overrideScale?: vec3): void {
-		if (!this.model) return;
-
 		const scale = overrideScale || this.getScale();
 		const position = overridePosition || this.getPosition();
 
@@ -47,8 +45,10 @@ export default class BaseObject {
 		const modelMatrix = mat4.fromTranslation(position.add(offset)).scale(scale);
 		const mvpMatrix = modelMatrix.mul(vpMatrix);
 
-		this.model.useShader(gl);
-		this.model.render(gl, mvpMatrix);
+		if (this.model) {
+			this.model.useShader(gl);
+			this.model.render(gl, mvpMatrix);
+		}
 
 		this.children.forEach((c) => {
 			c.render(gl, mvpMatrix);
@@ -56,21 +56,21 @@ export default class BaseObject {
 	}
 
 	public update(deltaTime: number): boolean {
-		let childrenDone = true;
+		let childrenAnimating = false;
 		for (const child of this.children) {
-			const childDone = child.update(deltaTime);
-			if (!childDone) childrenDone = false;
+			const childAnimating = child.update(deltaTime);
+			if (childAnimating) childrenAnimating = true;
 		}
 
-		if (!this.animation) return childrenDone;
+		if (!this.animation) return childrenAnimating;
 
-		const myAnimationDone = this.animation.update(deltaTime);
-		if (myAnimationDone) {
+		const stillAnimating = this.animation.update(deltaTime);
+		if (!stillAnimating) {
 			this.animation = undefined;
 			if (this.removeAtEndOfAnimation) this.setParent(undefined);
 		}
 
-		return myAnimationDone && childrenDone;
+		return stillAnimating || childrenAnimating;
 	}
 
 	public setAnimation(animation: Animation, removeAtEndOfAnimation: boolean = false): void {
