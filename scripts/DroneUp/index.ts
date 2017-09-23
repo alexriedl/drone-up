@@ -1,11 +1,9 @@
-import { Drone } from './GameObject';
-import { initializeGame } from './Initializer';
-import * as Bot from './Bot';
+import { initializeGame } from 'DroneUp/Utils';
+import * as Bot from 'DroneUp/Bot';
 import Runner from './Runner';
 
 export {
 	Bot,
-	Drone,
 	initializeGame,
 	Runner,
 };

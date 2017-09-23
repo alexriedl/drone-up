@@ -1,8 +1,9 @@
 import { Controller } from 'DroneUp/Bot';
 import { Drone, Spike } from 'DroneUp/GameObject';
-import Runner from './Runner';
+import { MarkList } from 'DroneUp/Utils';
+import { Runner } from 'DroneUp';
 
-import { Random, Color, MarkList } from 'Engine/Utils';
+import { Random, Color } from 'Engine/Utils';
 import { SimpleRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 

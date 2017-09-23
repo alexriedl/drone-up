@@ -1,5 +1,4 @@
-import Shader from './Shader';
-import SimpleShader from './SimpleShader';
+import { Shader, SimpleShader } from 'Engine/Model/Shader';
 
 const vertexShaderSource = `
 attribute vec4 a_position;

@@ -1,8 +1,8 @@
 import { ResizeAnimation } from 'DroneUp/Animations';
+import { ScanModel } from 'DroneUp/Model';
 import GameObject from './GameObject';
 
 import { Color } from 'Engine/Utils';
-import { ScanModel } from 'Engine/Model';
 
 // NOTE: This is intentionally very basic. Probably could be used for more than just scan
 export default class ScanObject extends GameObject {
