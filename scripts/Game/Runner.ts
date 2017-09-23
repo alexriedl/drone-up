@@ -21,13 +21,11 @@ interface ITickState {
 	objects: GameObject[];
 	scene: BaseObject;
 	worldSize: vec2;
+	paused: boolean;
+	gameOver: boolean;
 }
 
 export default class Runner {
-	private gameDone: boolean;
-	private gamePaused: boolean;
-	private gameStarted: boolean;
-
 	private readonly renderer: Renderer;
 	private readonly tickState: ITickState;
 
@@ -35,9 +33,6 @@ export default class Runner {
 
 	public constructor(players: Drone[], spikes: Spike[], worldSize: vec2) {
 		this.renderer = new Renderer('game-canvas', worldSize.x, worldSize.y);
-		this.gameDone = false;
-		this.gamePaused = false;
-		this.gameStarted = false;
 
 		const scene = new BaseObject(undefined);
 		const objects = spikes.concat(players);
@@ -50,33 +45,32 @@ export default class Runner {
 			scene,
 			players,
 			worldSize,
+			paused: false,
+			gameOver: false,
 		};
 	}
 
 	public pause(): void {
-		this.gamePaused = true;
+		this.tickState.paused = true;
 	}
 
 	public resume(): void {
 		if (!this.isPaused()) return;
-		this.gamePaused = false;
+		this.tickState.paused = false;
 		requestAnimationFrame(this.frame);
 	}
 
 	public isPaused(): boolean {
-		return this.gamePaused;
-	}
-
-	public isStarted(): boolean {
-		return this.gameStarted;
+		return this.tickState.paused;
 	}
 
 	public kill(): void {
-		this.gameDone = true;
+		this.tickState.gameOver = true;
 	}
 
 	public run(options: IRunnerOptions) {
-		this.gameStarted = true;
+		options = options || defaultOptions;
+		const state = this.tickState;
 		let then;
 
 		this.frame = (now: number) => {
@@ -93,25 +87,17 @@ export default class Runner {
 				}
 			}
 
-			const state = this.tickState;
-			options = options || defaultOptions;
-
-			const effectiveDeltaTime = deltaTime * options.animationSpeed;
-			update(effectiveDeltaTime, this.tickState);
-
-			this.renderer.render(state.scene, {
-				povPosition: getPlayersPosition(state, options.focusOnPlayerIndex),
-				viewSize: Math.min(state.worldSize.x, state.worldSize.y) / 2,
-				renderGrid: options.renderGrid,
-				tiledRender: true,
-				debugGrid: false,
-			});
+			if (!state.gameOver) {
+				const effectiveDeltaTime = deltaTime * options.animationSpeed;
+				update(effectiveDeltaTime, state);
+			}
+			render(this.renderer, state, options);
 
 			if (!state.animating) {
 				this.checkGameDone(state);
 			}
 
-			if (this.gameDone || this.gamePaused) {
+			if (this.isPaused()) {
 				then = undefined;
 			}
 			else {
@@ -123,14 +109,24 @@ export default class Runner {
 	}
 
 	private checkGameDone(state: ITickState): void {
-		this.gameDone = this.gameDone || state.players.filter((p) => p.isAlive()).length <= 1;
+		state.gameOver = state.gameOver || state.players.filter((p) => p.isAlive()).length <= 1;
 	}
 }
 
 function getPlayersPosition(state: ITickState, index: number): vec3 {
-	if (index < 0) return null;
+	if (index < 0 || state.gameOver) return null;
 	const player = state.players[index];
 	return player.isAlive() ? player.getPosition() : null;
+}
+
+function render(renderer: Renderer, state: ITickState, options: IRunnerOptions) {
+	renderer.render(state.scene, {
+		povPosition: getPlayersPosition(state, options.focusOnPlayerIndex),
+		viewSize: Math.min(state.worldSize.x, state.worldSize.y) / 2,
+		renderGrid: options.renderGrid,
+		tiledRender: true,
+		debugGrid: false,
+	});
 }
 
 function update(deltaTime: number, state: ITickState) {

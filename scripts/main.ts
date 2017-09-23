@@ -29,14 +29,14 @@ animationSpeedSliderElement.onchange = animationSpeedChanged;
 focusPlayerElement.onchange = focusPlayerChange;
 
 function pauseResumeButtonClick(): void {
-	if (!runner || !runner.isStarted()) return;
+	if (!runner) return;
 
 	if (runner.isPaused()) resumeGame();
 	else pauseGame();
 }
 
 function startStopButtonClick(): void {
-	if (runner && runner.isStarted()) stopGame();
+	if (runner) stopGame();
 	else startGame();
 }
 
