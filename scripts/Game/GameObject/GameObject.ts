@@ -7,7 +7,7 @@ import Map from '../Map';
 
 abstract class GameObject extends BaseObject {
 	protected canBump: boolean;
-	public static PUSH_LIMIT: number = 5;
+	public static PUSH_LIMIT: number = 0;
 
 	public constructor(model: Model, position?: vec3, scale?: vec3) {
 		super(model, position, scale);

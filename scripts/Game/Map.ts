@@ -37,27 +37,31 @@ export default class Map {
 		return this.players;
 	}
 
-	public removeCrashedDrones(): void {
+	public removeCrashedDrones(): boolean {
 		const crashed: Drone[] = [];
 
-		for (let i = 0, playerCount = this.players.length; i < playerCount; i++) {
-			for (const otherObject of this.gameObjects) {
-				const player = this.players[i];
-
-				if (player !== otherObject && player.position.exactEquals(otherObject.position)) {
+		for (const player of this.players.filter((p) => p.isAlive())) {
+			for (const object of this.gameObjects) {
+				if (player !== object && player.position.exactEquals(object.position)) {
 					crashed.push(player);
 				}
 			}
 		}
 
+		let someoneIsAnimating = false;
 		for (const dead of crashed) {
 			const gameObjectsIndex = this.gameObjects.indexOf(dead);
 			if (gameObjectsIndex > -1) {
 				this.gameObjects.splice(gameObjectsIndex, 1);
 			}
 
+			// TODO: Dont mark drone dead here once map is a scene graph
+			dead.alive = false;
 			dead.setAnimation(new ResizeAnimation(1, 5, 200), true);
+			someoneIsAnimating = true;
 		}
+
+		return someoneIsAnimating;
 	}
 
 	public getNextObjectUpFrom(entity: GameObject): GameObject {

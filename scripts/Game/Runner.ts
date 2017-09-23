@@ -83,11 +83,11 @@ export default class Runner {
 				povPosition: options.focusOnPlayerId ? this.getPlayersPosition(options.focusOnPlayerId) : null,
 				viewSize: Math.min(this.map.xSize, this.map.ySize) / 2,
 				renderGrid: options.renderGrid,
-				tiledRender: true,
+				tiledRender: false,
 				debugGrid: false,
 			});
 
-			if (!tickState.isAnimating()) {
+			if (!tickState.isAnimating) {
 				this.checkGameDone();
 			}
 
@@ -112,6 +112,6 @@ export default class Runner {
 	}
 
 	private checkGameDone(): void {
-		this.gameDone = this.gameDone || this.map.getPlayers().length <= 1;
+		this.gameDone = this.gameDone || this.map.getPlayers().filter((p) => p.isAlive()).length <= 1;
 	}
 }

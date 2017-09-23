@@ -25,7 +25,7 @@ export default class BaseObject {
 		if (this.parent) {
 			const index = this.parent.children.indexOf(this);
 			if (index >= 0) {
-				this.children.splice(index, 1);
+				this.parent.children.splice(index, 1);
 			}
 		}
 

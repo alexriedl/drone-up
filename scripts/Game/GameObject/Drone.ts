@@ -3,17 +3,28 @@ import { MarkList } from '../../Utils';
 import { Model } from '../../Model';
 import { MoveAnimation} from '../../Animations';
 import { vec2 } from '../../Math';
+import BaseObject from './BaseObject';
 import GameObject from './GameObject';
 import Map from '../Map';
 import ScanObject from './ScanObject';
 
 export default class Drone extends GameObject {
 	public readonly controller?: Controller;
+	public alive: boolean = true;
 
 	public constructor(model: Model,  controller: Controller) {
 		super(model);
 		this.canBump = false;
 		this.controller = controller;
+	}
+
+	public setParent(parent: BaseObject): void {
+		this.setParent(parent);
+		if (!parent) this.alive = false;
+	}
+
+	public isAlive(): boolean {
+		return this.alive;
 	}
 
 	public perform(action: string, map: Map): void {
