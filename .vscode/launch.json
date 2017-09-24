@@ -46,7 +46,7 @@
             "name": "Chrome Debug",
             "type": "chrome",
             "request": "launch",
-            "url": "http://localhost:5000",
+            "url": "http://localhost:5000/pacman",
             "sourceMapPathOverrides": {
                 "webpack:///./scripts/*": "${workspaceRoot}/scripts/*",
                 "webpack:///*": "*",

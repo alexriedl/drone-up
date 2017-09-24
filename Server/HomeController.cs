@@ -20,6 +20,12 @@ namespace Server
 			return View();
 		}
 
+		[HttpGet("pacman")]
+		public IActionResult Pacman()
+		{
+			return View("Pacman");
+		}
+
 		[HttpPost("/api/upload")]
 		public IActionResult UploadDroneScript(string droneName, string droneScriptContent)
 		{

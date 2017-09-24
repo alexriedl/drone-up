@@ -16,7 +16,8 @@ var babelSettings = {
 module.exports = {
 	devtool: isDevBuild ? 'source-map' : null,
 	entry: {
-		'main': './scripts/main.ts'
+		'main': './scripts/main.ts',
+		'pacman': './scripts/pacman.ts'
 	},
 	resolve: {
 		extensions: ['', '.js', '.jsx', '.ts', '.tsx'],

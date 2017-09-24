@@ -25,7 +25,7 @@ export interface IRenderTargetInfo {
 }
 
 export default class Renderer {
-	private gl: WebGLRenderingContext;
+	public gl: WebGLRenderingContext;
 	private xSize: number;
 	private ySize: number;
 
@@ -129,6 +129,22 @@ export default class Renderer {
 	protected static clearScreen(gl: WebGLRenderingContext): void {
 		// tslint:disable-next-line:no-bitwise
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	}
+
+	public simpleRender(scene: Entity, background: Color = Color.BLACK.lighten(0.3)): void {
+		const gl: WebGLRenderingContext = this.gl;
+
+		Register.initializeGLItems(gl);
+
+		const width = gl.canvas.clientWidth;
+		const height = gl.canvas.clientHeight;
+
+		gl.viewport(0, 0, width, height);
+		gl.clearColor(background.r, background.g, background.b, 1.0);
+		Renderer.clearScreen(gl);
+		const orthoMatrix = mat4.ortho(0, this.xSize, this.ySize, 0, -1, 1);
+
+		scene.render(gl, orthoMatrix);
 	}
 
 	// TODO: Update this to take the parent render node instead of a list of objects
