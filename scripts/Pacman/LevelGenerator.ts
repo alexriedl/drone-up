@@ -36,10 +36,24 @@ enum MI {
 	PSW, // Pen South West
 	PSE, // Pen South East
 
-	___, // Empty
-	FFF, // Full
+	INW, // Inner North West
+	INE, // Inner North East
+	ISW, // Inner South West
+	ISE, // Inner South East
+
+	NNW, // North (barrior) North West
+	NNE, // North (barrior) North East
+
+	ENE, // East (barrior) North East
+	ESE, // East (barrior) South East
+
+	WNW, // West (barrior) North West
+	WSW, // West (barrior) South West
+
 	_p_, // Pac
 	_E_, // Energizer
+	FFF, // Full
+	___, // Empty
 }
 
 const smallDemo = [
@@ -53,18 +67,18 @@ const smallDemo = [
 ];
 
 // tslint:disable:max-line-length
-const top = [
-	[MI.DNW, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DNE, MI.DNW, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DNE],
+const original = [
+	[MI.DNW, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.NNE, MI.NNW, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DNE],
 	[MI.DW_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.SE_, MI.SW_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.DE_],
 	[MI.DW_, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.DE_],
 	[MI.DW_, MI._E_, MI.SE_, MI.___, MI.___, MI.SW_, MI._p_, MI.SE_, MI.___, MI.___, MI.___, MI.SW_, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SE_, MI.___, MI.___, MI.___, MI.SW_, MI._p_, MI.SE_, MI.___, MI.___, MI.SW_, MI._E_, MI.DE_],
 	[MI.DW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SNE, MI.SNW, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.DE_],
 	[MI.DW_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.DE_],
 	[MI.DW_, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SSE, MI.SSW, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SSE, MI.SSW, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.DE_],
-	[MI.DW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.___, MI.___, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.DE_],
+	[MI.DW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.INE, MI.INW, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.DE_],
 	[MI.DW_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.SE_, MI.SW_, MI._p_, MI._p_, MI._p_, MI._p_, MI.SE_, MI.SW_, MI._p_, MI._p_, MI._p_, MI._p_, MI.SE_, MI.SW_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.DE_],
-	[MI.DSW, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.SSW, MI._p_, MI.SE_, MI.___, MI.SS_, MI.SS_, MI.SSW, MI.___, MI.SE_, MI.SW_, MI.___, MI.SSE, MI.SS_, MI.SS_, MI.___, MI.SW_, MI._p_, MI.SSE, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DSE],
-	[MI.___, MI.___, MI.___, MI.___, MI.___, MI.DW_, MI._p_, MI.SE_, MI.___, MI.SN_, MI.SN_, MI.SNW, MI.___, MI.SNE, MI.SNW, MI.___, MI.SNE, MI.SN_, MI.SN_, MI.___, MI.SW_, MI._p_, MI.DE_, MI.___, MI.___, MI.___, MI.___, MI.___],
+	[MI.DSW, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.SSW, MI._p_, MI.SE_, MI.ISW, MI.SS_, MI.SS_, MI.SSW, MI.___, MI.SE_, MI.SW_, MI.___, MI.SSE, MI.SS_, MI.SS_, MI.ISE, MI.SW_, MI._p_, MI.SSE, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DSE],
+	[MI.___, MI.___, MI.___, MI.___, MI.___, MI.DW_, MI._p_, MI.SE_, MI.INW, MI.SN_, MI.SN_, MI.SNW, MI.___, MI.SNE, MI.SNW, MI.___, MI.SNE, MI.SN_, MI.SN_, MI.INE, MI.SW_, MI._p_, MI.DE_, MI.___, MI.___, MI.___, MI.___, MI.___],
 	[MI.___, MI.___, MI.___, MI.___, MI.___, MI.DW_, MI._p_, MI.SE_, MI.SW_, MI.___, MI.___, MI.___, MI.___, MI.___, MI.___, MI.___, MI.___, MI.___, MI.___, MI.SE_, MI.SW_, MI._p_, MI.DE_, MI.___, MI.___, MI.___, MI.___, MI.___],
 	[MI.___, MI.___, MI.___, MI.___, MI.___, MI.DW_, MI._p_, MI.SE_, MI.SW_, MI.___, MI.PSE, MI.DS_, MI.PEW, MI.GGG, MI.GGG, MI.PEE, MI.DS_, MI.PSW, MI.___, MI.SE_, MI.SW_, MI._p_, MI.DE_, MI.___, MI.___, MI.___, MI.___, MI.___],
 	[MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.SNW, MI._p_, MI.SNE, MI.SNW, MI.___, MI.DE_, MI.___, MI.___, MI.___, MI.___, MI.___, MI.___, MI.DW_, MI.___, MI.SNE, MI.SNW, MI._p_, MI.SNE, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_],
@@ -73,29 +87,27 @@ const top = [
 	[MI.___, MI.___, MI.___, MI.___, MI.___, MI.DW_, MI._p_, MI.SE_, MI.SW_, MI.___, MI.PNE, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.PNW, MI.___, MI.SE_, MI.SW_, MI._p_, MI.DE_, MI.___, MI.___, MI.___, MI.___, MI.___],
 	[MI.___, MI.___, MI.___, MI.___, MI.___, MI.DW_, MI._p_, MI.SE_, MI.SW_, MI.___, MI.___, MI.___, MI.___, MI.___, MI.___, MI.___, MI.___, MI.___, MI.___, MI.SE_, MI.SW_, MI._p_, MI.DE_, MI.___, MI.___, MI.___, MI.___, MI.___],
 	[MI.___, MI.___, MI.___, MI.___, MI.___, MI.DW_, MI._p_, MI.SE_, MI.SW_, MI.___, MI.SSE, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SSW, MI.___, MI.SE_, MI.SW_, MI._p_, MI.DE_, MI.___, MI.___, MI.___, MI.___, MI.___],
-	[MI.DNW, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.SNW, MI._p_, MI.SNE, MI.SNW, MI.___, MI.SNE, MI.SN_, MI.SN_, MI.___, MI.___, MI.SN_, MI.SN_, MI.SNW, MI.___, MI.SNE, MI.SNW, MI._p_, MI.SNE, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DNE],
+	[MI.DNW, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.SNW, MI._p_, MI.SNE, MI.SNW, MI.___, MI.SNE, MI.SN_, MI.SN_, MI.INE, MI.INW, MI.SN_, MI.SN_, MI.SNW, MI.___, MI.SNE, MI.SNW, MI._p_, MI.SNE, MI.DN_, MI.DN_, MI.DN_, MI.DN_, MI.DNE],
 	[MI.DW_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.SE_, MI.SW_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.DE_],
 	[MI.DW_, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.DE_],
-	[MI.DW_, MI._p_, MI.SNE, MI.SN_, MI.___, MI.SW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SNE, MI.SNW, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SE_, MI.___, MI.SN_, MI.SNW, MI._p_, MI.DE_],
+	[MI.DW_, MI._p_, MI.SNE, MI.SN_, MI.INE, MI.SW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SNE, MI.SNW, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SE_, MI.INW, MI.SN_, MI.SNW, MI._p_, MI.DE_],
 	[MI.DW_, MI._E_, MI._p_, MI._p_, MI.SE_, MI.SW_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.___, MI.___, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.SE_, MI.SW_, MI._p_, MI._p_, MI._E_, MI.DE_],
-	[MI.DSW, MI.SS_, MI.SSW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SSE, MI.SSW, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SSE, MI.SSW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SSE, MI.SS_, MI.DSE],
-	[MI.DNW, MI.SN_, MI.SNW, MI._p_, MI.SNE, MI.SNW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.___, MI.___, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SNE, MI.SNW, MI._p_, MI.SNE, MI.SN_, MI.DNE],
+	[MI.WSW, MI.SS_, MI.SSW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SSE, MI.SSW, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SSE, MI.SSW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SSE, MI.SS_, MI.ESE],
+	[MI.WNW, MI.SN_, MI.SNW, MI._p_, MI.SNE, MI.SNW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.INE, MI.INW, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SNE, MI.SNW, MI._p_, MI.SNE, MI.SN_, MI.ENE],
 	[MI.DW_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.SE_, MI.SW_, MI._p_, MI._p_, MI._p_, MI._p_, MI.SE_, MI.SW_, MI._p_, MI._p_, MI._p_, MI._p_, MI.SE_, MI.SW_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.DE_],
-	[MI.DW_, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.___, MI.___, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.___, MI.___, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.DE_],
+	[MI.DW_, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.ISE, MI.ISW, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.SE_, MI.SW_, MI._p_, MI.SSE, MI.SS_, MI.SS_, MI.ISE, MI.ISW, MI.SS_, MI.SS_, MI.SS_, MI.SS_, MI.SSW, MI._p_, MI.DE_],
 	[MI.DW_, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SN_, MI.SN_, MI.SN_, MI.SN_, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.SNE, MI.SNW, MI._p_, MI.SNE, MI.SN_, MI.SN_, MI.SN_, MI.SN_, MI.SN_, MI.SN_, MI.SN_, MI.SN_, MI.SNW, MI._p_, MI.DE_],
 	[MI.DW_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI._p_, MI.DE_],
 	[MI.DSW, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DS_, MI.DSE],
 ];
 
-const tiles = top;
+const tiles = original;
 
 const BORDER = [0x21, 0x21, 0xFF, 0xFF];
 const PAC = [0xFF, 0xFF, 0xFF, 0xFF];
 const GATE = [0xFF, 0xB8, 0xFF, 0xFF];
 const EMPTY = [0x00, 0x00, 0x00, 0x00];
 
-// const width = 28;
-// const height = 36;
 const boardWidth = tiles[0].length;
 const boardHeight = tiles.length;
 const TILE_WIDTH = 8;
@@ -136,12 +148,23 @@ function getTileValue(tile: MI): number[] {
 		case MI.PSW: return [0x00, 0x00, 0x00, 0x00, 0xF0, 0x10, 0x10, 0x90];
 		case MI.PSE: return [0x00, 0x00, 0x00, 0x00, 0x0F, 0x08, 0x08, 0x09];
 
+		case MI.INW: return [0x00, 0x00, 0x00, 0x07, 0x08, 0x10, 0x10, 0x10];
+		case MI.INE: return [0x00, 0x00, 0x00, 0xE0, 0x10, 0x08, 0x08, 0x08];
+		case MI.ISW: return [0x10, 0x10, 0x10, 0x08, 0x07, 0x00, 0x00, 0x00];
+		case MI.ISE: return [0x08, 0x08, 0x08, 0x10, 0xE0, 0x00, 0x00, 0x00];
+
+		case MI.NNW: return [0xFF, 0x00, 0x00, 0x07, 0x08, 0x10, 0x10, 0x10];
+		case MI.NNE: return [0xFF, 0x00, 0x00, 0xE0, 0x10, 0x08, 0x08, 0x08];
+		case MI.ENE: return [0x01, 0x01, 0x01, 0xE1, 0x11, 0x09, 0x09, 0x09];
+		case MI.ESE: return [0x09, 0x09, 0x09, 0x11, 0xE1, 0x01, 0x01, 0x01];
+		case MI.WNW: return [0x80, 0x80, 0x80, 0x87, 0x88, 0x90, 0x90, 0x90];
+		case MI.WSW: return [0x90, 0x90, 0x90, 0x88, 0x87, 0x80, 0x80, 0x80];
+
 		case MI._p_: return [0x00, 0x00, 0x00, 0x18, 0x18, 0x00, 0x00, 0x00];
 		case MI._E_: return [0x3C, 0x7E, 0xFF, 0xFF, 0xFF, 0xFF, 0x7E, 0x3C];
 
 		case MI.FFF: return [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
 		case MI.___: default: return [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
-
 	}
 }
 
