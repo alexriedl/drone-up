@@ -8,7 +8,7 @@ varying lowp vec2 v_uv;
 
 void main() {
 	gl_Position = u_mvp_matrix * a_position;
-	v_uv = a_position.xy;
+	v_uv = a_position.xy + vec2(0.5);
 }`;
 
 const fragmentShaderSource = `

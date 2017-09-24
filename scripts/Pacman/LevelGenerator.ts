@@ -229,7 +229,7 @@ function createLevel(gl: WebGLRenderingContext): Entity {
 }
 
 function start(): void {
-	const renderer = new Renderer('game-canvas', boardWidth + 1, boardHeight + 1);
+	const renderer = new Renderer('game-canvas', boardWidth, boardHeight);
 	const level = createLevel(renderer.gl);
 	const background = Color.BLACK;
 	let then;

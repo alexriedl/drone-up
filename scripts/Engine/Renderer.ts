@@ -117,7 +117,7 @@ export default class Renderer {
 
 		const gridModel = new GridModel(new Color(1, 0.6, 0), xSize / 1000, xSize, ySize);
 		this.gridObject = new Entity(gridModel,
-			new vec3(centerX - 0.5, centerY - 0.5, 1),
+			new vec3(centerX - 0.5, centerY - 0.5, -1),
 			new vec3(xSize, ySize, 1));
 
 		const gameModel = new SimpleTextureRectangle(this.renderTarget.texture);
