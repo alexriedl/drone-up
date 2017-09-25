@@ -1,7 +1,7 @@
 import { Color, Register } from 'Engine/Utils';
+import { Entity } from 'Engine/Entity';
 import { SimpleTextureRectangle } from 'Engine/Model';
 import { vec3, mat4 } from 'Engine/Math';
-import Entity from './Entity';
 
 // TODO: Engine should not reference game code
 import { GridModel } from 'DroneUp/Model';

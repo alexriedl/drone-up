@@ -1,30 +1,30 @@
 import { Model } from 'Engine/Model';
 import { vec3, mat4 } from 'Engine/Math';
 
-export default class BaseObject {
+export default class Entity {
 	private readonly model: Model;
+
+	private parent?: Entity;
+	private readonly children?: Entity[] = [];
 
 	public position: vec3;
 	public scale: vec3;
 
-	private parent?: BaseObject;
-	private readonly children?: BaseObject[] = [];
-
-	public constructor(model: Model, position: vec3 = new vec3(), scale: vec3 = new vec3(1, 1, 1)) {
+	public constructor(model?: Model, position: vec3 = new vec3(), scale: vec3 = new vec3(1, 1, 1)) {
+		this.model = model;
 		this.position = position;
 		this.scale = scale;
-		this.model = model;
 	}
 
-	public getPosition(): vec3 {
+	public getRenderingPosition(): vec3 {
 		return this.position;
 	}
 
-	public getScale(): vec3 {
+	public getRenderingScale(): vec3 {
 		return this.scale;
 	}
 
-	public setParent(parent: BaseObject): void {
+	public setParent(parent: Entity): void {
 		if (this.parent) {
 			const index = this.parent.children.indexOf(this);
 			if (index >= 0) {
@@ -40,8 +40,8 @@ export default class BaseObject {
 	}
 
 	public render(gl: WebGLRenderingContext, vpMatrix: mat4, overridePosition?: vec3, overrideScale?: vec3): void {
-		const scale = overrideScale || this.getScale();
-		const position = overridePosition || this.getPosition();
+		const scale = overrideScale || this.getRenderingScale();
+		const position = overridePosition || this.getRenderingPosition();
 
 		const modelMatrix = mat4.fromTranslation(position).scale(scale);
 		const mvpMatrix = modelMatrix.mul(vpMatrix);

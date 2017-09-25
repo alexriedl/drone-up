@@ -226,4 +226,11 @@ export default class vec3 {
 	public toFloat64Array(): Float64Array {
 		return new Float64Array([this.x, this.y, this.z]);
 	}
+
+	/**
+	 * Returns a new vec3 from the values of an array
+	 */
+	public static fromArray(values: number[]): vec3 {
+		return new vec3(values[0], values[1], values[2]);
+	}
 }

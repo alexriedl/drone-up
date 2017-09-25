@@ -224,4 +224,11 @@ export default class vec4 {
 	public toFloat64Array(): Float64Array {
 		return new Float64Array([this.x, this.y, this.z, this.w]);
 	}
+
+	/**
+	 * Returns a new vec4 from the values of an array
+	 */
+	public static fromArray(values: number[]): vec4 {
+		return new vec4(values[0], values[1], values[2], values[3]);
+	}
 }

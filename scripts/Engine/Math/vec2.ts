@@ -219,4 +219,11 @@ export default class vec2 {
 	public toFloat64Array(): Float64Array {
 		return new Float64Array([this.x, this.y]);
 	}
+
+	/**
+	 * Returns a new vec2 from the values of an array
+	 */
+	public static fromArray(values: number[]): vec2 {
+		return new vec2(values[0], values[1]);
+	}
 }
