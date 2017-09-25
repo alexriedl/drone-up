@@ -1,4 +1,4 @@
-import { OriginalMap } from 'Pacman/Map';
+import { Map, OriginalMap } from 'Pacman/Map';
 import { PacEntity } from 'Pacman/Entity';
 
 import { Color } from 'Engine/Utils';
@@ -6,7 +6,7 @@ import { Game, Renderer } from 'Engine/Game';
 import { vec2 } from 'Engine/Math';
 
 export default class PacmanGame extends Game {
-	public map: OriginalMap;
+	public map: Map;
 	private static readonly background = Color.BLACK;
 
 	public constructor(canvasId: string) {
@@ -17,9 +17,11 @@ export default class PacmanGame extends Game {
 
 	protected initialize(gl: WebGLRenderingContext): void {
 		this.map.initialize(gl);
+		this.addEntityToMap(new PacEntity(this.map, new vec2(1, 4)));
+	}
 
-		const test = new PacEntity(this.map, new vec2(1, 4))
-			.setParent(this.map);
+	protected addEntityToMap(entity: PacEntity): void {
+		entity.setParent(this.map);
 	}
 
 	protected update(deltaTime: number): void {
