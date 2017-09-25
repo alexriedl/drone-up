@@ -2,7 +2,7 @@ import { Model } from 'Engine/Model';
 import { vec3, mat4 } from 'Engine/Math';
 
 export default class Entity {
-	private readonly model: Model;
+	protected model: Model;
 
 	private parent?: Entity;
 	private readonly children?: Entity[] = [];

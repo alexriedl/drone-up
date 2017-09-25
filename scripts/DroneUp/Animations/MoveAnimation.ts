@@ -38,8 +38,7 @@ export class MoveAnimation extends Animation<MoveAnimation.MoveType> {
 }
 
 // tslint:disable-next-line:no-namespace
-// tslint:disable-next-line:no-internal-module
-export module MoveAnimation {
+export namespace MoveAnimation {
 	export enum MoveType {
 		Basic, // Move on entity's own
 		Bump, // Get physically pushed
