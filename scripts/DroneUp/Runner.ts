@@ -1,8 +1,8 @@
 import { Drone, Spike, GameObject } from 'DroneUp/GameObject';
 import { ResizeAnimation } from 'DroneUp/Animations';
 
+import { Entity } from 'Engine/Entity';
 import { vec2, vec3 } from 'Engine/Math';
-import Entity from 'Engine/Entity';
 import Renderer from 'Engine/Renderer';
 
 export interface IRunnerOptions {
@@ -36,7 +36,7 @@ export default class Runner {
 	public constructor(players: Drone[], spikes: Spike[], worldSize: vec2) {
 		this.renderer = new Renderer('game-canvas', worldSize.x, worldSize.y);
 
-		const scene = new Entity(undefined);
+		const scene = new Entity();
 		const objects = spikes.concat(players);
 		objects.forEach((object) => object.setParent(scene));
 
@@ -118,7 +118,7 @@ export default class Runner {
 function getPlayersPosition(state: ITickState, index: number): vec3 {
 	if (index < 0 || state.gameOver) return null;
 	const player = state.players[index];
-	return player.isAlive() ? player.getPosition() : null;
+	return player.isAlive() ? player.getRenderingPosition() : null;
 }
 
 function render(renderer: Renderer, state: ITickState, options: IRunnerOptions) {

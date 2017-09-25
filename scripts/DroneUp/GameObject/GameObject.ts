@@ -3,16 +3,16 @@ import Drone from './Drone';
 
 import { Model } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
-import Entity from 'Engine/Entity';
+import { Entity } from 'Engine/Entity';
 
-abstract class GameObject extends Entity {
+export default abstract class GameObject extends Entity {
 	protected canBump: boolean;
 	public static PUSH_LIMIT: number = 0;
 
 	private animation?: Animation;
 	private removeAtEndOfAnimation: boolean = false;
 
-	public constructor(model: Model, position?: vec3, scale?: vec3) {
+	public constructor(model: Model, position: vec3 = new vec3(), scale: vec3 = new vec3(1, 1, 1)) {
 		super(model, position, scale);
 		this.canBump = true;
 	}
@@ -26,14 +26,14 @@ abstract class GameObject extends Entity {
 		return this.animation;
 	}
 
-	public getPosition(): vec3 {
+	public getRenderingPosition(): vec3 {
 		if (this.animation && this.animation instanceof MoveAnimation) {
 			return this.animation.position;
 		}
-		return super.getPosition();
+		return super.getRenderingPosition();
 	}
 
-	public getScale(): vec3 {
+	public getRenderingScale(): vec3 {
 		if (this.animation) {
 			if (this.animation instanceof ResizeAnimation) {
 				const s = this.animation.size;
@@ -41,11 +41,11 @@ abstract class GameObject extends Entity {
 			}
 			else if (this.animation instanceof MoveAnimation) {
 				const bonusSize = this.animation.bonusSize;
-				return this.scale.addValues(bonusSize, bonusSize, 0);
+				return super.getRenderingScale().addValues(bonusSize, bonusSize, 0);
 			}
 		}
 
-		return super.getScale();
+		return super.getRenderingScale();
 	}
 
 	public update(deltaTime: number): boolean {
@@ -202,5 +202,3 @@ abstract class GameObject extends Entity {
 		return result;
 	}
 }
-
-export default GameObject;
