@@ -1,7 +1,7 @@
 import MT from './MapTile';
 import Map from './Map';
 
-export default class Original extends Map {
+export default class OriginalMap extends Map {
 	public constructor() {
 		super(tiles);
 	}

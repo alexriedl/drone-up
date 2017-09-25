@@ -1,4 +1,4 @@
-import { MT, Map, Original } from 'Pacman/Maps';
+import { MT, Map, OriginalMap } from 'Pacman/Map';
 
 import { Color } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';

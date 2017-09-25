@@ -1,9 +1,9 @@
 import Map from './Map';
 import MT from './MapTile';
-import Original from './Original';
+import OriginalMap from './Original';
 
 export {
 	Map,
 	MT,
-	Original,
+	OriginalMap,
 };
