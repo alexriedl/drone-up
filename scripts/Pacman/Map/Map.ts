@@ -60,13 +60,11 @@ export abstract class Map extends Entity {
 
 	protected generateLevelTextureData(): Uint8Array {
 		const data = [];
-		for (let tileY = 0; tileY < this.numYTiles; tileY++) {
-			const tileRow = this.tiles[tileY];
+		for (const tileRow of this.tiles) {
 			for (let pixelY = 0; pixelY < Map.PIXELS_PER_TILE; pixelY++) {
-				for (let tileX = 0; tileX < this.numXTiles; tileX++) {
-					const tileEnum = tileRow[tileX];
-					const tile = Map.getTileValue(tileEnum);
+				for (const tileEnum of tileRow) {
 					const color = Map.getTileColor(tileEnum);
+					const tile = Map.getTileValue(tileEnum);
 					const pixelRow = tile[pixelY];
 
 					for (let pixelX = Map.PIXELS_PER_TILE - 1; pixelX >= 0; pixelX--) {
@@ -91,7 +89,7 @@ export namespace Map {
 	export const COLOR = {
 		BORDER: new Color(0x21, 0x21, 0xFF, 0xFF).rgba,
 		GATE: new Color(0xFF, 0xB8, 0xFF, 0xFF).rgba,
-		EMPTY: Color.BLACK.scale(255).rgba,
+		EMPTY: new Color(0x00, 0x00, 0x00, 0xFF).rgba,
 		PAC: new Color(0xFF, 0xDE, 0xD2, 0xFF).rgba,
 		PACMAN: new Color(0xFF, 0xCC, 0x00, 0xFF).rgba,
 		BLINKY: new Color(0xFF, 0x00, 0x00, 0xFF).rgba,

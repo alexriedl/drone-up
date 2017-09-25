@@ -18,9 +18,8 @@ export default class PacmanGame extends Game {
 	protected initialize(gl: WebGLRenderingContext): void {
 		this.map.initialize(gl);
 
-		// TODO: This 2 line statement is common. Make it easier to do it in one?
-		const test = new PacEntity(this.map, new vec2(1, 4));
-		test.setParent(this.map);
+		const test = new PacEntity(this.map, new vec2(1, 4))
+			.setParent(this.map);
 	}
 
 	protected update(deltaTime: number): void {

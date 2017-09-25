@@ -13,6 +13,8 @@ export default abstract class Game {
 	}
 
 	protected abstract initialize(gl: WebGLRenderingContext): void;
+
+	// TODO: Update default update/render to use a scene property on the game
 	protected abstract update(deltaTime: number): void;
 	protected abstract render(renderer: Renderer): void;
 
@@ -44,6 +46,7 @@ export default abstract class Game {
 		}
 
 		this.update(deltaTime);
+		// TODO: Update renderer to be more generic and the full renderer does not need to be passed to the render function
 		this.render(this.renderer);
 
 		requestAnimationFrame(this.frame);

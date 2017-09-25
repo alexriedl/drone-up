@@ -24,7 +24,7 @@ export default class Entity {
 		return this.scale;
 	}
 
-	public setParent(parent: Entity): void {
+	public setParent(parent: Entity): Entity {
 		if (this.parent) {
 			const index = this.parent.children.indexOf(this);
 			if (index >= 0) {
@@ -37,6 +37,7 @@ export default class Entity {
 		}
 
 		this.parent = parent;
+		return this;
 	}
 
 	public render(gl: WebGLRenderingContext, vpMatrix: mat4, overridePosition?: vec3, overrideScale?: vec3): void {

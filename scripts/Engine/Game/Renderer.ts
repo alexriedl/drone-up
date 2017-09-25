@@ -147,7 +147,6 @@ export default class Renderer {
 		scene.render(gl, orthoMatrix);
 	}
 
-	// TODO: Update this to take the parent render node instead of a list of objects
 	public render(scene: Entity, options: IRenderOptions = Renderer.defaultOptions): void {
 		const gl: WebGLRenderingContext = this.gl;
 		const background = Color.BLACK.lighten(.3);
