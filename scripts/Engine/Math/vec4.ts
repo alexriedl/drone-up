@@ -74,6 +74,13 @@ export default class vec4 {
 	}
 
 	/**
+	 * Mod divide each componenet by a value
+	 */
+	public mod(value: number): vec4 {
+		return new vec4(this.x % value, this.y % value, this.z % value, this.w % value);
+	}
+
+	/**
 	 * Math.ceil the components of this vector, and return a new vector with the result
 	 */
 	public ceil(): vec4 {

@@ -17,7 +17,8 @@ export default class PacmanGame extends Game {
 
 	protected initialize(gl: WebGLRenderingContext): void {
 		this.map.initialize(gl);
-		this.addEntityToMap(new PacEntity(this.map, new vec2(1, 4)));
+		const startingPositions = this.map.startingPositions;
+		this.addEntityToMap(new PacEntity(this.map, startingPositions.pacman, new vec2(-1, 0)));
 	}
 
 	protected addEntityToMap(entity: PacEntity): void {

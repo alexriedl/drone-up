@@ -67,6 +67,13 @@ export default class vec2 {
 	}
 
 	/**
+	 * Mod divide each componenet by a value
+	 */
+	public mod(value: number): vec2 {
+		return new vec2(this.x % value, this.y % value);
+	}
+
+	/**
 	 * Math.ceil the components of this vector, and return a new vector with the result
 	 */
 	public ceil(): vec2 {

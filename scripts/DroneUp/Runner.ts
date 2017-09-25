@@ -2,8 +2,8 @@ import { Drone, Spike, GameObject } from 'DroneUp/GameObject';
 import { ResizeAnimation } from 'DroneUp/Animations';
 
 import { Entity } from 'Engine/Entity';
+import { Renderer } from 'Engine/Game';
 import { vec2, vec3 } from 'Engine/Math';
-import Renderer from 'Engine/Renderer';
 
 export interface IRunnerOptions {
 	animationSpeed: number;

@@ -1,20 +1,34 @@
 import { Color } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';
 import { Model, SimpleTextureRectangle } from 'Engine/Model';
-import { vec3 } from 'Engine/Math';
+import { vec2, vec3 } from 'Engine/Math';
 
 import MapTile from './MapTile';
 
+interface IMapMetaData {
+	staticContentTextureData: Uint8Array;
+	startingPositions: IStartingPosition;
+}
+
+export interface IStartingPosition {
+	pacman: vec2;
+	blinky: vec2;
+	pinky: vec2;
+	inky: vec2;
+	clyde: vec2;
+}
+
 export abstract class Map extends Entity {
-
-	// TODO: Tiles should not be public
-	public tiles: MapTile[][];
-
 	public readonly numXTiles: number;
 	public readonly numYTiles: number;
 
 	public readonly width: number;
 	public readonly height: number;
+
+	// TODO: Tiles should not be public
+	public tiles: MapTile[][];
+
+	public startingPositions: IStartingPosition;
 
 	public constructor(tiles: MapTile[][]) {
 		const numXTiles = tiles[0].length;
@@ -34,20 +48,62 @@ export abstract class Map extends Entity {
 	}
 
 	public initialize(gl: WebGLRenderingContext): void {
-		this.model = this.generateModel(gl);
+		const metadata = Map.parseMapInfo(this.tiles);
+		const texture = Map.generateLevelTexture(gl, metadata.staticContentTextureData, this.width, this.height);
+		this.model = new SimpleTextureRectangle(texture);
+		this.startingPositions = metadata.startingPositions;
+	}
+}
+
+// tslint:disable-next-line:no-namespace
+export namespace Map {
+	export function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
+		const numYTiles = tiles.length;
+		const numXTiles = tiles[0].length;
+		const textureData = [];
+		const startingPositions = {
+			pacman: undefined,
+			blinky: undefined,
+			pinky: undefined,
+			inky: undefined,
+			clyde: undefined,
+		};
+		for (let tileY = 0; tileY < numYTiles; tileY++) {
+			const tileRow = tiles[tileY];
+			for (let pixelY = 0; pixelY < Map.PIXELS_PER_TILE; pixelY++) {
+				for (let tileX = 0; tileX < numXTiles; tileX++) {
+					const tileEnum = tileRow[tileX];
+					const color = Map.getTileColor(tileEnum);
+					const pixelInfo = Map.getTilePixelInfo(tileEnum);
+					const pixelRow = pixelInfo[pixelY];
+					switch (tileEnum) {
+						case MapTile._PS: startingPositions.pacman = new vec2(tileX, tileY);
+						case MapTile.GSB: startingPositions.blinky = new vec2(tileX, tileY);
+						case MapTile.GSP: startingPositions.pinky = new vec2(tileX, tileY);
+						case MapTile.GSI: startingPositions.inky = new vec2(tileX, tileY);
+						case MapTile.GSC: startingPositions.clyde = new vec2(tileX, tileY);
+					}
+
+					for (let pixelX = Map.PIXELS_PER_TILE - 1; pixelX >= 0; pixelX--) {
+						const pixel = Map.isBitSet(pixelX, pixelRow);
+						textureData.push.apply(textureData, pixel ? color : Map.COLOR.EMPTY);
+					}
+				}
+			}
+		}
+
+		return {
+			staticContentTextureData: new Uint8Array(textureData),
+			startingPositions,
+		};
 	}
 
-	protected generateModel(gl: WebGLRenderingContext): Model {
-		const texture = this.generateLevelTexture(gl);
-		return new SimpleTextureRectangle(texture);
-	}
-
-	protected generateLevelTexture(gl: WebGLRenderingContext): WebGLTexture {
+	export function generateLevelTexture(gl: WebGLRenderingContext, data: Uint8Array,
+		width: number, height: number): WebGLTexture {
 		const texture = gl.createTexture();
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width, this.height, 0,
-			gl.RGBA, gl.UNSIGNED_BYTE, this.generateLevelTextureData());
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
 
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -57,30 +113,6 @@ export abstract class Map extends Entity {
 		gl.bindTexture(gl.TEXTURE_2D, null);
 		return texture;
 	}
-
-	protected generateLevelTextureData(): Uint8Array {
-		const data = [];
-		for (const tileRow of this.tiles) {
-			for (let pixelY = 0; pixelY < Map.PIXELS_PER_TILE; pixelY++) {
-				for (const tileEnum of tileRow) {
-					const color = Map.getTileColor(tileEnum);
-					const tile = Map.getTileValue(tileEnum);
-					const pixelRow = tile[pixelY];
-
-					for (let pixelX = Map.PIXELS_PER_TILE - 1; pixelX >= 0; pixelX--) {
-						const pixel = Map.isBitSet(pixelX, pixelRow);
-						data.push.apply(data, pixel ? color : Map.COLOR.EMPTY);
-					}
-				}
-			}
-		}
-
-		return new Uint8Array(data);
-	}
-}
-
-// tslint:disable-next-line:no-namespace
-export namespace Map {
 
 	// NOTE: This is a constant. If this needs to change, all of the hand drawn
 	// tiles would need to be updated
@@ -128,7 +160,7 @@ export namespace Map {
 	 * tile. Each bit in each element indicates which pixels are lite. Bit 0, is x
 	 * 0.
 	 */
-	export function getTileValue(tile: MapTile): number[] {
+	export function getTilePixelInfo(tile: MapTile): number[] {
 		switch (tile) {
 			case MapTile.DNW: return [0x07, 0x18, 0x20, 0x47, 0x48, 0x90, 0x90, 0x90];
 			case MapTile.DNE: return [0xE0, 0x18, 0x04, 0xE2, 0x12, 0x09, 0x09, 0x09];

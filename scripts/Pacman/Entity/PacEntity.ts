@@ -1,89 +1,91 @@
-import { MT, Map, OriginalMap } from 'Pacman/Map';
+import { MapTile, Map, OriginalMap } from 'Pacman/Map';
 
 import { Color } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';
 import { SimpleTextureRectangle, SimpleRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
-export default class PacEntity extends Entity {
-	private facing: vec2;
+export enum Direction { RIGHT, LEFT, UP, DOWN }
+vec2.prototype.add = function(this: vec2, other: vec2 | Direction): vec2 {
+	if (other instanceof vec2) return new vec2(this.x + other.x, this.y + other.y);
 
-	public position: vec3;
-	public scale: vec3;
+	switch (other) {
+		case Direction.RIGHT: return new vec2(this.x + 1, this.y + 0);
+		case Direction.LEFT: return new vec2(this.x - 1, this.y + 0);
+		case Direction.UP: return new vec2(this.x + 0, this.y + 1);
+		case Direction.DOWN: return new vec2(this.x + 0, this.y + 1);
+	}
+};
+
+export default class PacEntity extends Entity {
+	private facing: Direction;
+	private tilePosition: vec2;
+	private pixelPosition: vec2;
 
 	public map: Map;
 
 	// TODO: Map should not need to be passed into entity
-	public constructor(map: Map, startTile: vec2, size: vec2 = new vec2(16, 16)) {
+	public constructor(map: Map, startTile: vec2, facingDirection: Direction) {
 		super(new SimpleRectangle(Color.YELLOW));
 
 		// TODO: Conversion between tiles and pixels in entity is strange...
-		this.position = new vec3((startTile.x + 0.5) * Map.PIXELS_PER_TILE, (startTile.y + 0.5) * Map.PIXELS_PER_TILE);
-		this.scale = size.toVec3(1);
-		this.facing = new vec2(0, 1);
+		this.tilePosition = startTile;
+		this.pixelPosition = new vec2(Map.PIXELS_PER_TILE, Map.PIXELS_PER_TILE);
+		this.scale = new vec3(16, 16, 1);
+		this.facing = facingDirection;
 		this.map = map;
 	}
 
-	public get currentTile(): vec2 {
-		return new vec2();
+	public get position(): vec3 {
+		return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(1);
 	}
 
-	public get currentPixel(): vec2 {
-		return new vec2();
-	}
-
-	/**
-	 * Get which tile this entity is currently on. Tile (0, 0) is the upper left most tile
-	 */
-	public getMapCoords(): vec2 {
-		return PacEntity.getMapCoords(vec2.fromArray(this.position.xy));
-	}
-
-	/**
-	 * Get which pixel within a tile this entity is currently on. Pixel (0, 0) is the upper left most pixel within a tile
-	 */
-	public getTileCoords(): vec2 {
-		return PacEntity.getTileCoords(vec2.fromArray(this.position.xy));
-	}
-
-	public getNextTile(): MT {
-		const coords = this.getMapCoords().add(this.facing);
-		return this.map.tiles[coords.y][coords.x];
-	}
-
+	// TODO: Perhaps limit max deltaTime to be a reasonable value to avoid some strange large frame problems
 	public update(deltaTime: number): boolean {
-		deltaTime /= 5;
-		const newPos = this.position.addValues(this.facing.x * deltaTime, this.facing.y * deltaTime, 0);
-		const newMapPos = PacEntity.getMapCoords(vec2.fromArray(newPos.xy));
-		const tile = this.map.tiles[newMapPos.y][newMapPos.x];
-		const canMove = this.canWalkOnTile(tile);
-		if (canMove) this.position = newPos;
+		// TODO: Build a speed into the update based on deltaTime
+		// TODO: Does multiple updates per frame need to be supported?
+		// If based on the speed this entity wants to move more than one pixel, put this logic in a loop.
+		// Iterate over all update logic so no entity moves multiple pixels per update and clips through
+		// walls or causes other issues
+		const nextTile = this.tilePosition.add(this.facing);
+		const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
+		const canMove = this.canWalkOnTile(tileEnum);
+
+		if (canMove) {
+			this.pixelPosition = this.pixelPosition.add(this.facing);
+			// NOTE: Ensure pixel position is valid
+			if (this.pixelPosition.x >= Map.PIXELS_PER_TILE || this.pixelPosition.x < 0 ||
+				this.pixelPosition.y >= Map.PIXELS_PER_TILE || this.pixelPosition.y < 0) {
+				this.tilePosition = this.tilePosition.add(this.facing);
+				this.pixelPosition = this.pixelPosition.mod(Map.PIXELS_PER_TILE);
+			}
+		}
 		else this.facing = PacEntity.randomDirection();
 
 		return super.update(deltaTime);
 	}
 
-	protected canWalkOnTile(tile: MT): boolean {
+	protected canWalkOnTile(tile: MapTile): boolean {
 		switch (tile) {
-			case MT._PS:
-			case MT._FS:
-			case MT.GSB:
-			case MT.GSP:
-			case MT.GSI:
-			case MT.GSC:
+			case MapTile._PS:
+			case MapTile._FS:
+			case MapTile.GSB:
+			case MapTile.GSP:
+			case MapTile.GSI:
+			case MapTile.GSC:
 
-			case MT._p_:
-			case MT._E_:
+			case MapTile._p_:
+			case MapTile._E_:
 
-			case MT._s_:
-			case MT.RU_:
-			case MT.RR_:
-			case MT.RUp:
+			case MapTile._s_:
+			case MapTile.RU_:
+			case MapTile.RR_:
+			case MapTile.RUp:
 
-			case MT.GTB:
-			case MT.GTP:
-			case MT.GTI:
-			case MT.GTC:
+			case MapTile.GTB:
+			case MapTile.GTP:
+			case MapTile.GTI:
+			case MapTile.GTC:
 				return true;
 			default: return false;
 		}
