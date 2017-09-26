@@ -41,7 +41,7 @@ export default class Random {
 	}
 
 	/**
-	 * Returns an int between 'start' and 'end'
+	 * Returns an int between 'start' and 'end'. [start...end)
 	 */
 	public nextRangeInt(start: number, end: number): number {
 		const rangeSize = end - start;
