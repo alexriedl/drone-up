@@ -1,3 +1,7 @@
+function mod(n: number, m: number): number {
+	return ((n % m) + m) % m;
+}
+
 // tslint:disable-next-line:class-name
 export default class vec3 {
 	public readonly x: number;
@@ -73,6 +77,13 @@ export default class vec3 {
 	 */
 	public mod(value: number): vec3 {
 		return new vec3(this.x % value, this.y % value, this.z % value);
+	}
+
+	/**
+	 * Mod divide each componenet by a value using a better than default mod function
+	 */
+	public cmod(value: number): vec3 {
+		return new vec3(mod(this.x, value), mod(this.y, value), mod(this.z, value));
 	}
 
 	/**
