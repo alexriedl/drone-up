@@ -15,6 +15,7 @@ class PacEntity extends Entity {
 	public map: Map;
 
 	private burn: number = 0;
+	private showDesired: Entity;
 
 	// TODO: Map should not need to be passed into entity
 	public constructor(startTile: vec2, facingDirection: PacEntity.Direction, map: Map, randomizer: Random) {
@@ -28,6 +29,10 @@ class PacEntity extends Entity {
 		this.desired = facingDirection;
 		this.map = map;
 		this.randomizer = randomizer;
+
+		const sdModel = new SimpleRectangle(Color.RED);
+		this.showDesired = new Entity(sdModel, new vec3(), new vec3(1 / 16, 1 / 16, 1));
+		this.showDesired.setParent(this);
 	}
 
 	public get position(): vec3 { return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(0); }
@@ -35,6 +40,7 @@ class PacEntity extends Entity {
 
 	public setDesiredDirection(direction: PacEntity.Direction): void {
 		this.desired = direction;
+		this.showDesired.position = PacEntity.move(new vec2(), direction).scale(1 / 4).toVec3(0);
 	}
 
 	// TODO: Perhaps limit max deltaTime to be a reasonable value to avoid some strange large frame problems
@@ -54,23 +60,8 @@ class PacEntity extends Entity {
 			return;
 		}
 
-		/*
-			- If DESIRED direction is same as FACING direction:
-				- Update pixel position based on FACING direction
-				- If new pixel is passed half way, check next tile
-					- If next tile is solid, deny movement
-			- IF DESIRED direction is OPPOSITE of FACING direction:
-				- Update pixel position based on DESIRED direction
-				- Always accept movement
-			- ELSE
-				- Update pixel position based on DESIRED direction and "towards center of tile" direction
-				- Always check next tile
-					- If next tile is solid, deny movement
-			- Re-orient pixel + tile positions
-		*/
-
 		let nextTile;
-		if (this.desired !== this.facing && !PacEntity.isOpposite(this.desired, this.facing)) {
+		if (this.desired !== this.facing) {
 			nextTile = PacEntity.move(this.tilePosition, this.desired);
 			const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
 			const canMove = this.canWalkOnTile(tileEnum);
@@ -84,6 +75,7 @@ class PacEntity extends Entity {
 				}
 				const newPixelPos = PacEntity.move(this.pixelPosition, this.desired);
 				this.pixelPosition = newPixelPos.add(adjust);
+				this.facing = this.desired;
 			}
 			else {
 				nextTile = undefined;
@@ -91,28 +83,19 @@ class PacEntity extends Entity {
 		}
 
 		if (!nextTile) {
-			if (PacEntity.isOpposite(this.desired, this.facing)) {
-				this.facing = this.desired;
-				this.pixelPosition = PacEntity.move(this.pixelPosition, this.facing);
-				// NOTE: We just came from here, so it should be good
+			const tryTwo = PacEntity.move(this.pixelPosition, this.facing);
+			if ((this.facing === PacEntity.Direction.LEFT && tryTwo.x < 3) ||
+				(this.facing === PacEntity.Direction.RIGHT && tryTwo.x > 3) ||
+				(this.facing === PacEntity.Direction.UP && tryTwo.y > 4) ||
+				(this.facing === PacEntity.Direction.DOWN && tryTwo.y > 4)) {
 				nextTile = PacEntity.move(this.tilePosition, this.facing);
+				const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
+				const canMove = this.canWalkOnTile(tileEnum);
+				if (canMove) this.pixelPosition = tryTwo;
 			}
 			else {
-				const tryTwo = PacEntity.move(this.pixelPosition, this.facing);
-				if ((this.facing === PacEntity.Direction.LEFT && tryTwo.x < 3) ||
-					(this.facing === PacEntity.Direction.RIGHT && tryTwo.x > 3) ||
-					(this.facing === PacEntity.Direction.UP && tryTwo.y > 4) ||
-					(this.facing === PacEntity.Direction.DOWN && tryTwo.y > 4)) {
-					nextTile = PacEntity.move(this.tilePosition, this.facing);
-					const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
-					const canMove = this.canWalkOnTile(tileEnum);
-					if (canMove) this.pixelPosition = tryTwo;
-					// else this.desired = PacEntity.randomDirection(this.randomizer);
-				}
-				else {
-					nextTile = this.tilePosition;
-					this.pixelPosition = tryTwo;
-				}
+				nextTile = this.tilePosition;
+				this.pixelPosition = tryTwo;
 			}
 		}
 
@@ -161,19 +144,8 @@ namespace PacEntity {
 		switch (direction) {
 			case Direction.RIGHT: return new vec2(pos.x + 1, pos.y + 0);
 			case Direction.LEFT: return new vec2(pos.x - 1, pos.y + 0);
-			case Direction.UP: return new vec2(pos.x + 0, pos.y + 1);
+			case Direction.UP: return new vec2(pos.x + 0, pos.y - 1);
 			case Direction.DOWN: return new vec2(pos.x + 0, pos.y + 1);
-		}
-	}
-
-	export function randomDirection(randomizer: Random): PacEntity.Direction {
-		const r = randomizer.nextRangeInt(0, 4);
-		switch (r) {
-			case 0: return PacEntity.Direction.RIGHT;
-			case 1: return PacEntity.Direction.LEFT;
-			case 2: return PacEntity.Direction.UP;
-			default: console.log('Unknown random direction selected...', r);
-			case 3: return PacEntity.Direction.DOWN;
 		}
 	}
 

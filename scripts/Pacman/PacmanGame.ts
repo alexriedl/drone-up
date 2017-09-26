@@ -38,17 +38,23 @@ export default class PacmanGame extends Game {
 	}
 
 	public onkeydown(event: KeyboardEvent): boolean {
-		if (String.fromCharCode(event.keyCode) === 'A') { this.left = true; return false; }
-		if (String.fromCharCode(event.keyCode) === 'D') { this.right = true; return false; }
-		if (String.fromCharCode(event.keyCode) === 'S') { this.down = true; return false; }
-		if (String.fromCharCode(event.keyCode) === 'W') { this.up = true; return false; }
+		const stringCode = String.fromCharCode(event.keyCode);
+		switch (stringCode) {
+			case 'A': case '%': this.left = true; return false;
+			case 'D': case "'": this.right = true; return false;
+			case 'S': case '(': this.down = true; return false;
+			case 'W': case '&': this.up = true; return false;
+		}
 	}
 
 	public onkeyup(event: KeyboardEvent) {
-		if (String.fromCharCode(event.keyCode) === 'A') { this.left = false; return false; }
-		if (String.fromCharCode(event.keyCode) === 'D') { this.right = false; return false; }
-		if (String.fromCharCode(event.keyCode) === 'S') { this.down = false; return false; }
-		if (String.fromCharCode(event.keyCode) === 'W') { this.up = false; return false; }
+		const stringCode = String.fromCharCode(event.keyCode);
+		switch (stringCode) {
+			case 'A': case '%': this.left = false; return false;
+			case 'D': case "'": this.right = false; return false;
+			case 'S': case '(': this.down = false; return false;
+			case 'W': case '&': this.up = false; return false;
+		}
 	}
 
 	protected update(deltaTime: number): void {
@@ -57,7 +63,9 @@ export default class PacmanGame extends Game {
 		if (this.right) d = PacEntity.Direction.RIGHT;
 		if (this.up) d = PacEntity.Direction.UP;
 		if (this.down) d = PacEntity.Direction.DOWN;
-		if (d) this.pacman.setDesiredDirection(d);
+		if (d !== undefined) {
+			this.pacman.setDesiredDirection(d);
+		}
 
 		this.scene.update(deltaTime);
 	}
