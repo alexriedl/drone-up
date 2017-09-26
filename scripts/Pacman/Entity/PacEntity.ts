@@ -70,8 +70,7 @@ class PacEntity extends Entity {
 					Math.abs(this.pixelPosition.x - xCenter) <= roundingSize)) {
 
 				nextTile = PacEntity.move(this.tilePosition, this.desired);
-				const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
-				const canMove = this.canWalkOnTile(tileEnum);
+				const canMove = this.map.canMoveToTile(nextTile);
 				if (canMove) {
 					this.facing = this.desired;
 					this.pixelPosition = PacEntity.move(this.pixelPosition, this.facing);
@@ -89,8 +88,7 @@ class PacEntity extends Entity {
 				(this.facing === PacEntity.Direction.UP && nextPixel.y < yCenter) ||
 				(this.facing === PacEntity.Direction.DOWN && nextPixel.y > yCenter)) {
 				nextTile = PacEntity.move(this.tilePosition, this.facing);
-				const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
-				const canMove = this.canWalkOnTile(tileEnum);
+				const canMove = this.map.canMoveToTile(nextTile);
 				if (canMove) this.pixelPosition = nextPixel;
 			}
 			else {
@@ -108,38 +106,12 @@ class PacEntity extends Entity {
 		}
 		if (adjust.x || adjust.y) this.pixelPosition = this.pixelPosition.add(adjust);
 
+		// TODO: Need to support wrapping
 		// NOTE: Ensure pixel position is valid
 		if (this.pixelPosition.x >= Map.PIXELS_PER_TILE || this.pixelPosition.x < 0 ||
 			this.pixelPosition.y >= Map.PIXELS_PER_TILE || this.pixelPosition.y < 0) {
 			this.tilePosition = nextTile;
 			this.pixelPosition = this.pixelPosition.cmod(Map.PIXELS_PER_TILE);
-		}
-	}
-
-	protected canWalkOnTile(tile: MapTile): boolean {
-		switch (tile) {
-			case MapTile._PS:
-			case MapTile._FS:
-			case MapTile.GSB:
-			case MapTile.GSP:
-			case MapTile.GSI:
-			case MapTile.GSC:
-
-			case MapTile.___:
-			case MapTile._p_:
-			case MapTile._E_:
-
-			case MapTile._s_:
-			case MapTile.RU_:
-			case MapTile.RR_:
-			case MapTile.RUp:
-
-			case MapTile.GTB:
-			case MapTile.GTP:
-			case MapTile.GTI:
-			case MapTile.GTC:
-				return true;
-			default: return false;
 		}
 	}
 }

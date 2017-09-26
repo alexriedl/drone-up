@@ -20,7 +20,7 @@ export default class PacmanGame extends Game {
 
 	public constructor(canvasId: string) {
 		const map = new OriginalMap();
-		super(canvasId, map.dimensions);
+		super(canvasId, map.pixelDimensions);
 		this.scene = new Entity();
 		this.map = map;
 
