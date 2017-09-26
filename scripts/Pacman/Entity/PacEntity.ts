@@ -66,15 +66,7 @@ class PacEntity extends Entity {
 			const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
 			const canMove = this.canWalkOnTile(tileEnum);
 			if (canMove) {
-				let adjust;
-				if (this.desired === PacEntity.Direction.UP || this.desired === PacEntity.Direction.DOWN) {
-					adjust = new vec2(Math.sign(3 - this.pixelPosition.x), 0);
-				}
-				else {
-					adjust = new vec2(0, Math.sign(4 - this.pixelPosition.y));
-				}
-				const newPixelPos = PacEntity.move(this.pixelPosition, this.desired);
-				this.pixelPosition = newPixelPos.add(adjust);
+				this.pixelPosition = PacEntity.move(this.pixelPosition, this.desired);
 				this.facing = this.desired;
 			}
 			else {
@@ -86,7 +78,7 @@ class PacEntity extends Entity {
 			const tryTwo = PacEntity.move(this.pixelPosition, this.facing);
 			if ((this.facing === PacEntity.Direction.LEFT && tryTwo.x < 3) ||
 				(this.facing === PacEntity.Direction.RIGHT && tryTwo.x > 3) ||
-				(this.facing === PacEntity.Direction.UP && tryTwo.y > 4) ||
+				(this.facing === PacEntity.Direction.UP && tryTwo.y < 4) ||
 				(this.facing === PacEntity.Direction.DOWN && tryTwo.y > 4)) {
 				nextTile = PacEntity.move(this.tilePosition, this.facing);
 				const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
@@ -98,6 +90,15 @@ class PacEntity extends Entity {
 				this.pixelPosition = tryTwo;
 			}
 		}
+
+		let adjust;
+		if (this.facing === PacEntity.Direction.UP || this.facing === PacEntity.Direction.DOWN) {
+			adjust = new vec2(Math.sign(3 - this.pixelPosition.x), 0);
+		}
+		else {
+			adjust = new vec2(0, Math.sign(4 - this.pixelPosition.y));
+		}
+		if (adjust.x || adjust.y) this.pixelPosition = this.pixelPosition.add(adjust);
 
 		// NOTE: Ensure pixel position is valid
 		if (this.pixelPosition.x >= Map.PIXELS_PER_TILE || this.pixelPosition.x < 0 ||
