@@ -45,21 +45,18 @@ class PacEntity extends Entity {
 
 	// TODO: Perhaps limit max deltaTime to be a reasonable value to avoid some strange large frame problems
 	public update(deltaTime: number): boolean {
-		// TODO: Build a speed into the update based on deltaTime
-		// TODO: Does multiple updates per frame need to be supported?
-		// If based on the speed this entity wants to move more than one pixel, put this logic in a loop.
-		// Iterate over all update logic so no entity moves multiple pixels per update and clips through
-		// walls or causes other issues
-
 		this.burn += deltaTime;
 		const step = 100;
-		if (this.burn > step) {
+
+		while (this.burn >= step) {
 			this.burn -= step;
-		}
-		else {
-			return;
+			this.tick();
 		}
 
+		return super.update(deltaTime);
+	}
+
+	private tick(): void {
 		const xCenter = 4; // NOTE: Original game used 3. Rendering off by one...
 		const yCenter = 4;
 		const roundingSize = 4;
@@ -76,8 +73,8 @@ class PacEntity extends Entity {
 				const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
 				const canMove = this.canWalkOnTile(tileEnum);
 				if (canMove) {
-					this.pixelPosition = PacEntity.move(this.pixelPosition, this.desired);
 					this.facing = this.desired;
+					this.pixelPosition = PacEntity.move(this.pixelPosition, this.facing);
 				}
 				else {
 					nextTile = undefined;
@@ -117,8 +114,6 @@ class PacEntity extends Entity {
 			this.tilePosition = nextTile;
 			this.pixelPosition = this.pixelPosition.cmod(Map.PIXELS_PER_TILE);
 		}
-
-		return super.update(deltaTime);
 	}
 
 	protected canWalkOnTile(tile: MapTile): boolean {
