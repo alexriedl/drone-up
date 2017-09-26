@@ -31,7 +31,7 @@ class PacEntity extends Entity {
 		this.randomizer = randomizer;
 
 		const sdModel = new SimpleRectangle(Color.RED);
-		this.showDesired = new Entity(sdModel, new vec3(), new vec3(1 / 16, 1 / 16, 1));
+		this.showDesired = new Entity(sdModel, new vec3(), new vec3(1 / 8, 1 / 8, 1));
 		this.showDesired.setParent(this);
 	}
 
@@ -40,7 +40,7 @@ class PacEntity extends Entity {
 
 	public setDesiredDirection(direction: PacEntity.Direction): void {
 		this.desired = direction;
-		this.showDesired.position = PacEntity.move(new vec2(), direction).scale(1 / 4).toVec3(0);
+		this.showDesired.position = PacEntity.move(new vec2(), direction).scale(0.6).toVec3(0);
 	}
 
 	// TODO: Perhaps limit max deltaTime to be a reasonable value to avoid some strange large frame problems
@@ -60,43 +60,54 @@ class PacEntity extends Entity {
 			return;
 		}
 
+		const xCenter = 4; // NOTE: Original game used 3. Rendering off by one...
+		const yCenter = 4;
+		const roundingSize = 4;
+
 		let nextTile;
 		if (this.desired !== this.facing) {
-			nextTile = PacEntity.move(this.tilePosition, this.desired);
-			const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
-			const canMove = this.canWalkOnTile(tileEnum);
-			if (canMove) {
-				this.pixelPosition = PacEntity.move(this.pixelPosition, this.desired);
-				this.facing = this.desired;
-			}
-			else {
-				nextTile = undefined;
+			if (
+				((this.desired === PacEntity.Direction.LEFT || this.desired === PacEntity.Direction.RIGHT) &&
+					Math.abs(this.pixelPosition.y - yCenter) <= roundingSize) ||
+				((this.desired === PacEntity.Direction.UP || this.desired === PacEntity.Direction.DOWN) &&
+					Math.abs(this.pixelPosition.x - xCenter) <= roundingSize)) {
+
+				nextTile = PacEntity.move(this.tilePosition, this.desired);
+				const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
+				const canMove = this.canWalkOnTile(tileEnum);
+				if (canMove) {
+					this.pixelPosition = PacEntity.move(this.pixelPosition, this.desired);
+					this.facing = this.desired;
+				}
+				else {
+					nextTile = undefined;
+				}
 			}
 		}
 
 		if (!nextTile) {
-			const tryTwo = PacEntity.move(this.pixelPosition, this.facing);
-			if ((this.facing === PacEntity.Direction.LEFT && tryTwo.x < 3) ||
-				(this.facing === PacEntity.Direction.RIGHT && tryTwo.x > 3) ||
-				(this.facing === PacEntity.Direction.UP && tryTwo.y < 4) ||
-				(this.facing === PacEntity.Direction.DOWN && tryTwo.y > 4)) {
+			const nextPixel = PacEntity.move(this.pixelPosition, this.facing);
+			if ((this.facing === PacEntity.Direction.LEFT && nextPixel.x < xCenter) ||
+				(this.facing === PacEntity.Direction.RIGHT && nextPixel.x > xCenter) ||
+				(this.facing === PacEntity.Direction.UP && nextPixel.y < yCenter) ||
+				(this.facing === PacEntity.Direction.DOWN && nextPixel.y > yCenter)) {
 				nextTile = PacEntity.move(this.tilePosition, this.facing);
 				const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
 				const canMove = this.canWalkOnTile(tileEnum);
-				if (canMove) this.pixelPosition = tryTwo;
+				if (canMove) this.pixelPosition = nextPixel;
 			}
 			else {
 				nextTile = this.tilePosition;
-				this.pixelPosition = tryTwo;
+				this.pixelPosition = nextPixel;
 			}
 		}
 
 		let adjust;
 		if (this.facing === PacEntity.Direction.UP || this.facing === PacEntity.Direction.DOWN) {
-			adjust = new vec2(Math.sign(3 - this.pixelPosition.x), 0);
+			adjust = new vec2(Math.sign(xCenter - this.pixelPosition.x), 0);
 		}
 		else {
-			adjust = new vec2(0, Math.sign(4 - this.pixelPosition.y));
+			adjust = new vec2(0, Math.sign(yCenter - this.pixelPosition.y));
 		}
 		if (adjust.x || adjust.y) this.pixelPosition = this.pixelPosition.add(adjust);
 
@@ -119,6 +130,7 @@ class PacEntity extends Entity {
 			case MapTile.GSI:
 			case MapTile.GSC:
 
+			case MapTile.___:
 			case MapTile._p_:
 			case MapTile._E_:
 
