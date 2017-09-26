@@ -1,11 +1,7 @@
 import MT from './MapTile';
 import Map from './Map';
 
-export default class OriginalMap extends Map {
-	public constructor() {
-		super(tiles);
-	}
-}
+import { vec2 } from 'Engine/Math';
 
 // tslint:disable:max-line-length
 const tiles = [
@@ -46,3 +42,9 @@ const tiles = [
 	[MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___],
 	[MT.GTC, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.GTI],
 ];
+
+export default class OriginalMap extends Map {
+	public constructor() {
+		super(tiles);
+	}
+}

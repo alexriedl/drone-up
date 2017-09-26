@@ -22,8 +22,7 @@ export abstract class Map extends Entity {
 	public readonly numXTiles: number;
 	public readonly numYTiles: number;
 
-	public readonly width: number;
-	public readonly height: number;
+	public readonly dimensions: vec2;
 
 	// TODO: Tiles should not be public
 	public tiles: MapTile[][];
@@ -43,13 +42,12 @@ export abstract class Map extends Entity {
 		this.tiles = tiles;
 		this.numXTiles = numXTiles;
 		this.numYTiles = numYTiles;
-		this.width = width;
-		this.height = height;
+		this.dimensions = new vec2(width, height);
 	}
 
 	public initialize(gl: WebGLRenderingContext): void {
 		const metadata = Map.parseMapInfo(this.tiles);
-		const texture = Map.generateLevelTexture(gl, metadata.staticContentTextureData, this.width, this.height);
+		const texture = Map.generateLevelTexture(gl, metadata.staticContentTextureData, this.dimensions);
 		this.model = new SimpleTextureRectangle(texture);
 		this.startingPositions = metadata.startingPositions;
 	}
@@ -99,11 +97,11 @@ export namespace Map {
 	}
 
 	export function generateLevelTexture(gl: WebGLRenderingContext, data: Uint8Array,
-		width: number, height: number): WebGLTexture {
+		dimensions: vec2): WebGLTexture {
 		const texture = gl.createTexture();
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, dimensions.x, dimensions.y, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
 
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);

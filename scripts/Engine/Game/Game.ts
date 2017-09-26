@@ -6,10 +6,10 @@ export default abstract class Game {
 
 	private then: number;
 	private running: boolean = false;
+	private initialized: boolean = false;
 
 	public constructor(canvasId: string, rendererDimensions: vec2) {
 		this.renderer = new Renderer(canvasId, rendererDimensions.x, rendererDimensions.y);
-		this.initialize(this.renderer.gl);
 	}
 
 	protected abstract initialize(gl: WebGLRenderingContext): void;
@@ -19,6 +19,10 @@ export default abstract class Game {
 	protected abstract render(renderer: Renderer): void;
 
 	public start(): void {
+		if (!this.initialized) {
+			this.initialize(this.renderer.gl);
+			this.initialized = true;
+		}
 		if (this.running) return;
 		this.running = true;
 		requestAnimationFrame(this.frame);
