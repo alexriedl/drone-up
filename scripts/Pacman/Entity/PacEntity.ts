@@ -33,6 +33,20 @@ class PacEntity extends Entity {
 		const sdModel = new SimpleRectangle(Color.RED);
 		this.showDesired = new Entity(sdModel, new vec3(), new vec3(1 / 8, 1 / 8, 1));
 		this.showDesired.setParent(this);
+
+		/*
+		Expected things that will need to be passed to each PacEntity are listed below. It is expected
+		each type of entity would extend this class and pass the obvious requirements down directly.
+
+		- Model
+			- Models per direction?
+			- Models per animation frame?
+		- Movement behavior
+		- ?? How does ghost modes work? directly to behavior, and that passes the differences down, or
+		change the behavior to the new mode when it needs to.
+		- ?? How to show ghost vs frightened?
+		- ?? How to entity speeds get updated for different levels / or within a single level?
+		*/
 	}
 
 	public get position(): vec3 { return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(0); }
@@ -43,7 +57,7 @@ class PacEntity extends Entity {
 		this.showDesired.position = PacEntity.move(new vec2(), direction).scale(0.6).toVec3(0);
 	}
 
-	// TODO: Perhaps limit max deltaTime to be a reasonable value to avoid some strange large frame problems
+	// TODO: Limit max deltaTime to be a reasonable value to avoid some strange large frame problems?
 	public update(deltaTime: number): boolean {
 		this.burn += deltaTime;
 		const step = 100;
@@ -61,7 +75,7 @@ class PacEntity extends Entity {
 		const yCenter = 4;
 		const roundingSize = 4;
 
-		let nextTile;
+		let nextTile: vec2;
 		if (this.desired !== this.facing) {
 			if (
 				((this.desired === PacEntity.Direction.LEFT || this.desired === PacEntity.Direction.RIGHT) &&
@@ -110,7 +124,7 @@ class PacEntity extends Entity {
 		// NOTE: Ensure pixel position is valid
 		if (this.pixelPosition.x >= Map.PIXELS_PER_TILE || this.pixelPosition.x < 0 ||
 			this.pixelPosition.y >= Map.PIXELS_PER_TILE || this.pixelPosition.y < 0) {
-			this.tilePosition = nextTile;
+			this.tilePosition = this.tilePosition.exactEquals(nextTile) ? nextTile : this.map.orientCoords(nextTile);
 			this.pixelPosition = this.pixelPosition.cmod(Map.PIXELS_PER_TILE);
 		}
 	}
@@ -119,6 +133,17 @@ class PacEntity extends Entity {
 // tslint:disable-next-line:no-namespace
 namespace PacEntity {
 	export enum Direction { RIGHT, LEFT, UP, DOWN }
+	export namespace Direction {
+		export function isOpposite(d1: Direction, d2: Direction): boolean {
+			switch (d1) {
+				case Direction.RIGHT: return d2 === Direction.LEFT;
+				case Direction.LEFT: return d2 === Direction.RIGHT;
+				case Direction.UP: return d2 === Direction.DOWN;
+				case Direction.DOWN: return d2 === Direction.UP;
+				default: return false;
+			}
+		}
+	}
 
 	export function move(pos: vec2, direction: Direction): vec2 {
 		switch (direction) {
@@ -127,32 +152,6 @@ namespace PacEntity {
 			case Direction.UP: return new vec2(pos.x + 0, pos.y - 1);
 			case Direction.DOWN: return new vec2(pos.x + 0, pos.y + 1);
 		}
-	}
-
-	export function isOpposite(d1: Direction, d2: Direction): boolean {
-		switch (d1) {
-			case Direction.RIGHT: return d2 === Direction.LEFT;
-			case Direction.LEFT: return d2 === Direction.RIGHT;
-			case Direction.UP: return d2 === Direction.DOWN;
-			case Direction.DOWN: return d2 === Direction.UP;
-			default: return false;
-		}
-	}
-
-	/**
-	 * Get which tile this entity is currently on. Tile (0, 0) is the upper left most tile
-	 */
-	export function getMapCoords(position: vec2): vec2 {
-		return position.scale(1 / Map.PIXELS_PER_TILE).floor();
-	}
-
-	/**
-	 * Get which pixel within a tile this entity is currently on. Pixel (0, 0) is the upper left most pixel within a tile
-	 */
-	export function getTileCoords(position: vec2): vec2 {
-		const x = position.x % Map.PIXELS_PER_TILE;
-		const y = position.y % Map.PIXELS_PER_TILE;
-		return new vec2(x, y);
 	}
 }
 

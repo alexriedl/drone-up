@@ -69,6 +69,23 @@ export default abstract class Map extends Entity {
 		const tile = this.tiles[coords.y][coords.x];
 		return canWalkOnTile(tile);
 	}
+
+	/**
+		* Wrap coords to other side of board if they are off of the edge. NOTE: This logic will snap the
+		* coords to the last tile within the map
+	 */
+	public orientCoords(tileCoords: vec2): vec2 {
+		let x = tileCoords.x;
+		let y = tileCoords.y;
+
+		if (x >= this.tileDimensions.x) x = 0;
+		else if (x < 0) x = this.tileDimensions.x - 1;
+
+		if (y >= this.tileDimensions.y) y = 0;
+		else if (y < 0) y = this.tileDimensions.y - 1;
+
+		return new vec2(x, y);
+	}
 }
 
 function canWalkOnTile(tile: MapTile): boolean {
