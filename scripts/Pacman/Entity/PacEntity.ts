@@ -30,11 +30,11 @@ class PacEntity extends Entity {
 		this.randomizer = randomizer;
 	}
 
-	public get position(): vec3 {
-		return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(0);
-	}
-	public set position(value: vec3) {
-		console.log("Ignoring direct set of PacEntity's position value");
+	public get position(): vec3 { return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(0); }
+	public set position(value: vec3) { console.log("Ignoring direct set of PacEntity's position value"); }
+
+	public setDesiredDirection(direction: PacEntity.Direction): void {
+		this.desired = direction;
 	}
 
 	// TODO: Perhaps limit max deltaTime to be a reasonable value to avoid some strange large frame problems
@@ -107,7 +107,7 @@ class PacEntity extends Entity {
 					const tileEnum = this.map.tiles[nextTile.y][nextTile.x];
 					const canMove = this.canWalkOnTile(tileEnum);
 					if (canMove) this.pixelPosition = tryTwo;
-					else this.desired = PacEntity.randomDirection(this.randomizer);
+					// else this.desired = PacEntity.randomDirection(this.randomizer);
 				}
 				else {
 					nextTile = this.tilePosition;

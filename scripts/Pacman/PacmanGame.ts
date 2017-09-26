@@ -7,10 +7,16 @@ import { Game, Renderer } from 'Engine/Game';
 import { vec2 } from 'Engine/Math';
 
 export default class PacmanGame extends Game {
-	public map: Map;
-	private scene: Entity;
-	private randomizer: Random;
 	private static readonly background = Color.BLACK;
+	private randomizer: Random;
+	private scene: Entity;
+	private pacman: PacEntity;
+	public map: Map;
+
+	protected left: boolean;
+	protected right: boolean;
+	protected up: boolean;
+	protected down: boolean;
 
 	public constructor(canvasId: string) {
 		const map = new OriginalMap();
@@ -27,11 +33,32 @@ export default class PacmanGame extends Game {
 		this.map.setParent(this.scene);
 
 		const startingPositions = this.map.startingPositions;
-		const pacman = new PacEntity(startingPositions.pacman, PacEntity.Direction.LEFT, this.map, this.randomizer);
-		pacman.setParent(this.scene);
+		this.pacman = new PacEntity(startingPositions.pacman, PacEntity.Direction.LEFT, this.map, this.randomizer);
+		this.pacman.setParent(this.scene);
+	}
+
+	public onkeydown(event: KeyboardEvent): boolean {
+		if (String.fromCharCode(event.keyCode) === 'A') { this.left = true; return false; }
+		if (String.fromCharCode(event.keyCode) === 'D') { this.right = true; return false; }
+		if (String.fromCharCode(event.keyCode) === 'S') { this.down = true; return false; }
+		if (String.fromCharCode(event.keyCode) === 'W') { this.up = true; return false; }
+	}
+
+	public onkeyup(event: KeyboardEvent) {
+		if (String.fromCharCode(event.keyCode) === 'A') { this.left = false; return false; }
+		if (String.fromCharCode(event.keyCode) === 'D') { this.right = false; return false; }
+		if (String.fromCharCode(event.keyCode) === 'S') { this.down = false; return false; }
+		if (String.fromCharCode(event.keyCode) === 'W') { this.up = false; return false; }
 	}
 
 	protected update(deltaTime: number): void {
+		let d;
+		if (this.left) d = PacEntity.Direction.LEFT;
+		if (this.right) d = PacEntity.Direction.RIGHT;
+		if (this.up) d = PacEntity.Direction.UP;
+		if (this.down) d = PacEntity.Direction.DOWN;
+		if (d) this.pacman.setDesiredDirection(d);
+
 		this.scene.update(deltaTime);
 	}
 
