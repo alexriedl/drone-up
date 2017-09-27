@@ -64,8 +64,8 @@ export default abstract class Map extends Entity {
 	}
 
 	public canMoveToTile(coords: vec2): boolean {
-		if (coords.x < 0 || coords.x >= this.tileDimensions.x ||
-			coords.y < 0 || coords.y >= this.tileDimensions.y) return false;
+		if (coords.x < 0 || coords.x >= this.tileDimensions.x
+			|| coords.y < 0 || coords.y >= this.tileDimensions.y) return true;
 		const tile = this.tiles[coords.y][coords.x];
 		return canWalkOnTile(tile);
 	}

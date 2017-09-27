@@ -120,8 +120,7 @@ class PacEntity extends Entity {
 		}
 		if (adjust.x || adjust.y) this.pixelPosition = this.pixelPosition.add(adjust);
 
-		// TODO: Need to support wrapping
-		// NOTE: Ensure pixel position is valid
+		// NOTE: Ensure pixel and tile position is valid, and re-orient if not.
 		if (this.pixelPosition.x >= Map.PIXELS_PER_TILE || this.pixelPosition.x < 0 ||
 			this.pixelPosition.y >= Map.PIXELS_PER_TILE || this.pixelPosition.y < 0) {
 			this.tilePosition = this.tilePosition.exactEquals(nextTile) ? nextTile : this.map.orientCoords(nextTile);
