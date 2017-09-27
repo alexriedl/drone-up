@@ -1,22 +1,47 @@
+import { Color } from 'Engine/Utils';
+import { Entity } from 'Engine/Entity';
 import { vec2 } from 'Engine/Math';
 import Renderer from './Renderer';
 
 export default abstract class Game {
 	protected readonly renderer: Renderer;
 
+	// TODO: Perhaps extend entity to make a real scene? Allow a color to be set
+	private scene: Entity;
+	public backgroundColor: Color;
+
 	private then: number;
 	private running: boolean = false;
 	private initialized: boolean = false;
 
-	public constructor(canvasId: string, rendererDimensions: vec2) {
+	public constructor(canvasId: string, rendererDimensions: vec2, scene: Entity = new Entity()) {
 		this.renderer = new Renderer(canvasId, rendererDimensions.x, rendererDimensions.y);
+		this.scene = scene;
 	}
 
 	protected abstract initialize(gl: WebGLRenderingContext): void;
 
-	// TODO: Update default update/render to use a scene property on the game
-	protected abstract update(deltaTime: number): void;
-	protected abstract render(renderer: Renderer): void;
+	/**
+	 * Set the scene for the game. The default update/render functions redirect logic to this scene.
+	 * The old scene will be returned
+	 */
+	public setScene(scene: Entity): Entity {
+		const old = this.scene;
+		this.scene = scene;
+		return old;
+	}
+
+	public addToScene(entity: Entity): void {
+		if (this.scene) entity.setParent(this.scene);
+	}
+
+	protected update(deltaTime: number): void {
+		if (this.scene) this.scene.update(deltaTime);
+	}
+
+	protected render(renderer: Renderer): void {
+		renderer.simpleRender(this.scene, this.backgroundColor);
+	}
 
 	public start(): void {
 		if (!this.initialized) {

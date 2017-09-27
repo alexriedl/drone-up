@@ -4,8 +4,8 @@ import { vec3, mat4 } from 'Engine/Math';
 export default class Entity {
 	protected model: Model;
 
-	private parent?: Entity;
-	private readonly children?: Entity[] = [];
+	protected parent?: Entity;
+	protected readonly children?: Entity[] = [];
 
 	public position: vec3;
 	public scale: vec3;

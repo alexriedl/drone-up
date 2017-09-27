@@ -9,46 +9,26 @@ abstract class GhostEntity extends PacEntity {
 	protected nextDesiredDirection: PacEntity.Direction;
 
 	public ghostMode: GhostEntity.GhostMode;
-	protected ghostModeDuration: number;
 
 	public constructor(startTile: vec2, facingDirection: PacEntity.Direction, color: Color,
 		map: Map, pacmanTarget: PacEntity) {
 		super(startTile, facingDirection, color, map);
 		this.pacmanTarget = pacmanTarget;
-		this.setGhostMode(GhostEntity.GhostMode.SCATTER, 14 * 1000, false);
 	}
 
 	protected get roundingSize(): number { return 0; }
 
 	public abstract getTargetTile(): vec2;
 
-	public setGhostMode(newMode: GhostEntity.GhostMode, duration: number, reverse: boolean = true) {
+	public setGhostMode(newMode: GhostEntity.GhostMode, reverse: boolean = true) {
 		console.log(`Changing ghost mode for ${this.constructor.name} to be ${newMode}`);
 		this.ghostMode = newMode;
-		this.ghostModeDuration = duration;
 		if (reverse) {
 			this.facing = PacEntity.Direction.getOpposite(this.facing);
 			this.nextDesiredDirection = undefined;
 			this.desired = this.facing;
 			this.updateDesiredDirection();
 		}
-	}
-
-	public update(deltaTime: number): boolean {
-		// TODO: Change ghost update. This could cause timing issues with ghost modes the way it works
-		// It is possible to run more than a single tick per update, and updating mode time is only
-		// happening once per udpate
-		const result = super.update(deltaTime);
-
-		this.ghostModeDuration -= deltaTime;
-		if (this.ghostModeDuration <= 0) {
-			// TODO: Need a better way to get next modes duration
-			this.setGhostMode(
-				this.ghostMode === GhostEntity.GhostMode.SCATTER ? GhostEntity.GhostMode.CHASE : GhostEntity.GhostMode.SCATTER,
-				this.ghostModeDuration = 7 * 1000);
-		}
-
-		return result;
 	}
 
 	protected tick(): void {

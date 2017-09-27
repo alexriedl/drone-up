@@ -6,16 +6,54 @@ import { Entity } from 'Engine/Entity';
 import { Game, Renderer } from 'Engine/Game';
 import { vec2 } from 'Engine/Math';
 
+class GhostParent extends Entity {
+	protected readonly children?: GhostEntity[] = [];
+	private static nextModeDuration: number = 7 * 1000;
+	private currentGhostMode: GhostEntity.GhostMode;
+	private ghostModeDuration: number = 0;
+
+	// TODO: Change ghost update. This could cause timing issues with ghost modes the way it works It
+	// is possible to run more than a single tick per update, and updating mode time is only
+	// happening once per update. The issue could be that the mode should change after the first
+	// tick, but before the second tick for the ghosts
+	public update(deltaTime: number): boolean {
+		this.ghostModeDuration -= deltaTime;
+		if (this.ghostModeDuration <= 0) {
+			this.currentGhostMode = this.currentGhostMode === GhostEntity.GhostMode.SCATTER ?
+				GhostEntity.GhostMode.CHASE : GhostEntity.GhostMode.SCATTER;
+			this.ghostModeDuration += GhostParent.nextModeDuration;
+
+			this.children.forEach((child) => {
+				child.setGhostMode(this.currentGhostMode, false);
+			});
+		}
+
+		return super.update(deltaTime);
+	}
+
+	public setupGhosts(map: Map, pacman: Pacman): void {
+		const blinky = new Blinky(map, pacman);
+		blinky.setParent(this);
+
+		const pinky = new Pinky(map, pacman);
+		pinky.setParent(this);
+
+		const inky = new Inky(map, pacman);
+		inky.setParent(this);
+
+		const clyde = new Clyde(map, pacman);
+		clyde.setParent(this);
+
+		// NOTE: Used to force set all ghosts modes to the same value specified by the ghost parent
+		this.update(0);
+	}
+}
+
+// tslint:disable-next-line:max-classes-per-file
 export default class PacmanGame extends Game {
-	private static readonly background = Color.BLACK;
 	public map: Map;
 
-	private scene: Entity;
-	private pacman: PacEntity;
-	private blinky: Blinky;
-	private pinky: Pinky;
-	private inky: Inky;
-	private clyde: Clyde;
+	private pacman: Pacman;
 
 	protected left: boolean;
 	protected right: boolean;
@@ -25,28 +63,20 @@ export default class PacmanGame extends Game {
 	public constructor(canvasId: string) {
 		const map = new OriginalMap();
 		super(canvasId, map.pixelDimensions);
-		this.scene = new Entity();
 		this.map = map;
+		this.backgroundColor = Color.BLACK;
 	}
 
 	protected initialize(gl: WebGLRenderingContext): void {
 		this.map.initialize(gl);
-		this.map.setParent(this.scene);
+		this.addToScene(this.map);
 
 		this.pacman = new Pacman(this.map);
-		this.pacman.setParent(this.scene);
+		this.addToScene(this.pacman);
 
-		this.blinky = new Blinky(this.map, this.pacman);
-		this.blinky.setParent(this.scene);
-
-		this.pinky = new Pinky(this.map, this.pacman);
-		this.pinky.setParent(this.scene);
-
-		this.inky = new Inky(this.map, this.pacman);
-		this.inky.setParent(this.scene);
-
-		this.clyde = new Clyde(this.map, this.pacman);
-		this.clyde.setParent(this.scene);
+		const ghostParent = new GhostParent();
+		ghostParent.setupGhosts(this.map, this.pacman);
+		this.addToScene(ghostParent);
 	}
 
 	public onkeydown(event: KeyboardEvent): boolean {
@@ -79,10 +109,6 @@ export default class PacmanGame extends Game {
 			this.pacman.setDesiredDirection(d);
 		}
 
-		this.scene.update(deltaTime);
-	}
-
-	protected render(renderer: Renderer): void {
-		renderer.simpleRender(this.scene, PacmanGame.background);
+		super.update(deltaTime);
 	}
 }
