@@ -6,10 +6,10 @@ import { SimpleTextureRectangle, SimpleRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
 class PacEntity extends Entity {
-	private facing: PacEntity.Direction;
-	private desired: PacEntity.Direction;
-	private tilePosition: vec2;
-	private pixelPosition: vec2;
+	protected facing: PacEntity.Direction;
+	protected desired: PacEntity.Direction;
+	public tilePosition: vec2;
+	public pixelPosition: vec2;
 
 	private randomizer: Random;
 	public map: Map;
@@ -18,8 +18,8 @@ class PacEntity extends Entity {
 	private showDesired: Entity;
 
 	// TODO: Map should not need to be passed into entity
-	public constructor(startTile: vec2, facingDirection: PacEntity.Direction, map: Map, randomizer: Random) {
-		super(new SimpleRectangle(Color.YELLOW));
+	public constructor(startTile: vec2, facingDirection: PacEntity.Direction, color: Color, map: Map, randomizer: Random) {
+		super(new SimpleRectangle(color));
 
 		// TODO: Conversion between tiles and pixels in entity is strange...
 		this.tilePosition = startTile;
@@ -70,7 +70,7 @@ class PacEntity extends Entity {
 		return super.update(deltaTime);
 	}
 
-	private tick(): void {
+	protected tick(): void {
 		const xCenter = 4; // NOTE: Original game used 3. Rendering off by one...
 		const yCenter = 4;
 		const roundingSize = 4;
@@ -133,14 +133,17 @@ class PacEntity extends Entity {
 namespace PacEntity {
 	export enum Direction { RIGHT, LEFT, UP, DOWN }
 	export namespace Direction {
-		export function isOpposite(d1: Direction, d2: Direction): boolean {
-			switch (d1) {
-				case Direction.RIGHT: return d2 === Direction.LEFT;
-				case Direction.LEFT: return d2 === Direction.RIGHT;
-				case Direction.UP: return d2 === Direction.DOWN;
-				case Direction.DOWN: return d2 === Direction.UP;
-				default: return false;
+		export function getOpposite(d: Direction): Direction {
+			switch (d) {
+				case Direction.RIGHT: return Direction.LEFT;
+				case Direction.LEFT: return Direction.RIGHT;
+				case Direction.UP: return Direction.DOWN;
+				case Direction.DOWN: return Direction.UP;
 			}
+		}
+
+		export function isOpposite(d1: Direction, d2: Direction): boolean {
+			return PacEntity.Direction.getOpposite(d1) === d2;
 		}
 	}
 

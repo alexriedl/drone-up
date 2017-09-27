@@ -1,5 +1,5 @@
 import { Map, OriginalMap } from 'Pacman/Map';
-import { PacEntity } from 'Pacman/Entity';
+import { PacEntity, GhostEntity } from 'Pacman/Entity';
 
 import { Color, Random } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';
@@ -9,9 +9,11 @@ import { vec2 } from 'Engine/Math';
 export default class PacmanGame extends Game {
 	private static readonly background = Color.BLACK;
 	private randomizer: Random;
+	public map: Map;
+
 	private scene: Entity;
 	private pacman: PacEntity;
-	public map: Map;
+	private blinky: GhostEntity;
 
 	protected left: boolean;
 	protected right: boolean;
@@ -33,8 +35,13 @@ export default class PacmanGame extends Game {
 		this.map.setParent(this.scene);
 
 		const startingPositions = this.map.startingPositions;
-		this.pacman = new PacEntity(startingPositions.pacman, PacEntity.Direction.LEFT, this.map, this.randomizer);
+		this.pacman = new PacEntity(startingPositions.pacman, PacEntity.Direction.LEFT, Color.YELLOW,
+			this.map, this.randomizer);
 		this.pacman.setParent(this.scene);
+
+		this.blinky = new GhostEntity(startingPositions.blinky, PacEntity.Direction.LEFT, Color.RED,
+			this.map, this.randomizer, this.pacman);
+		this.blinky.setParent(this.scene);
 	}
 
 	public onkeydown(event: KeyboardEvent): boolean {
