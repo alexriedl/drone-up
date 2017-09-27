@@ -39,4 +39,11 @@ export default class Color extends vec4 {
 		const b = Math.max(0, this.b - 1 * percent);
 		return new Color(r, g, b, this.a);
 	}
+
+	/**
+	 * Assumes this color was specified as 0-255. Divides each componenet by 255
+	 */
+	public normalize(): Color {
+		return new Color(this.x / 255, this.y / 255, this.z / 255, this.w / 255);
+	}
 }

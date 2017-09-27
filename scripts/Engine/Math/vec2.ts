@@ -178,7 +178,7 @@ export default class vec2 {
 	/**
 	 * Normalizes this vector, and returns a new vector with the result
 	 */
-	public normalize() {
+	public normalize(): vec2 {
 		const sqLen = this.squaredLength();
 		if (sqLen <= 0) return this;
 		const len = 1 / Math.sqrt(sqLen);

@@ -7,7 +7,7 @@ import { Color, Random } from 'Engine/Utils';
 
 export default class Blinky extends GhostEntity {
 	public constructor(map: Map, pacmanTarget: PacEntity) {
-		super(map.metadata.startingTiles.blinky, PacEntity.Direction.LEFT, Color.RED, map, pacmanTarget);
+		super(map.metadata.startingTiles.blinky, PacEntity.Direction.LEFT, Map.COLOR.BLINKY.normalize(), map, pacmanTarget);
 	}
 
 	public getTargetTile(): vec2 {

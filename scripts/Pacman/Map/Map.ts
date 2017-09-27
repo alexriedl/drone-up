@@ -24,15 +24,15 @@ export default abstract class Map extends Entity {
 	// tiles would need to be updated
 	public static readonly PIXELS_PER_TILE = 8;
 	public static readonly COLOR = {
-		BORDER: new Color(0x21, 0x21, 0xFF, 0xFF).rgba,
-		GATE: new Color(0xFF, 0xB8, 0xFF, 0xFF).rgba,
-		EMPTY: new Color(0x00, 0x00, 0x00, 0xFF).rgba,
-		PAC: new Color(0xFF, 0xDE, 0xD2, 0xFF).rgba,
-		PACMAN: new Color(0xFF, 0xCC, 0x00, 0xFF).rgba,
-		BLINKY: new Color(0xFF, 0x00, 0x00, 0xFF).rgba,
-		PINKY: new Color(0xFF, 0xB8, 0xFF, 0xFF).rgba,
-		INKY: new Color(0x00, 0xFF, 0xFF, 0xFF).rgba,
-		CLYDE: new Color(0xFF, 0xB8, 0x51, 0xFF).rgba,
+		BORDER: new Color(0x21, 0x21, 0xFF, 0xFF),
+		GATE: new Color(0xFF, 0xB8, 0xFF, 0xFF),
+		EMPTY: new Color(0x00, 0x00, 0x00, 0xFF),
+		PAC: new Color(0xFF, 0xDE, 0xD2, 0xFF),
+		PACMAN: new Color(0xFF, 0xCC, 0x00, 0xFF),
+		BLINKY: new Color(0xFF, 0x00, 0x00, 0xFF),
+		PINKY: new Color(0xFF, 0xB8, 0xFF, 0xFF),
+		INKY: new Color(0x00, 0xFF, 0xFF, 0xFF),
+		CLYDE: new Color(0xFF, 0xB8, 0x51, 0xFF),
 	};
 
 	public readonly pixelDimensions: vec2;
@@ -144,7 +144,7 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 
 				for (let pixelX = Map.PIXELS_PER_TILE - 1; pixelX >= 0; pixelX--) {
 					const pixel = isBitSet(pixelX, pixelRow);
-					textureData.push.apply(textureData, pixel ? color : Map.COLOR.EMPTY);
+					textureData.push.apply(textureData, pixel ? color : Map.COLOR.EMPTY.rgba);
 				}
 			}
 		}
@@ -174,15 +174,15 @@ function generateLevelTexture(gl: WebGLRenderingContext, data: Uint8Array, dimen
 
 function getTileColor(tile: MapTile): number[] {
 	switch (tile) {
-		case MapTile.___: return Map.COLOR.EMPTY;
-		case MapTile.RUp: case MapTile._p_: case MapTile._E_: return Map.COLOR.PAC;
-		case MapTile.GGG: return Map.COLOR.GATE;
-		case MapTile._PS: return Map.COLOR.PACMAN;
-		case MapTile.GSB: case MapTile.GTB: return Map.COLOR.BLINKY;
-		case MapTile.GSP: case MapTile.GTP: return Map.COLOR.PINKY;
-		case MapTile.GSI: case MapTile.GTI: return Map.COLOR.INKY;
-		case MapTile.GSC: case MapTile.GTC: return Map.COLOR.CLYDE;
-		default: return Map.COLOR.BORDER;
+		case MapTile.___: return Map.COLOR.EMPTY.rgba;
+		case MapTile.RUp: case MapTile._p_: case MapTile._E_: return Map.COLOR.PAC.rgba;
+		case MapTile.GGG: return Map.COLOR.GATE.rgba;
+		case MapTile._PS: return Map.COLOR.PACMAN.rgba;
+		case MapTile.GSB: case MapTile.GTB: return Map.COLOR.BLINKY.rgba;
+		case MapTile.GSP: case MapTile.GTP: return Map.COLOR.PINKY.rgba;
+		case MapTile.GSI: case MapTile.GTI: return Map.COLOR.INKY.rgba;
+		case MapTile.GSC: case MapTile.GTC: return Map.COLOR.CLYDE.rgba;
+		default: return Map.COLOR.BORDER.rgba;
 	}
 }
 

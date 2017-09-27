@@ -6,8 +6,8 @@ import { SimpleTextureRectangle, SimpleRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
 abstract class PacEntity extends Entity {
-	protected facing: PacEntity.Direction;
-	protected desired: PacEntity.Direction;
+	public facing: PacEntity.Direction;
+	public desired: PacEntity.Direction;
 	public tilePosition: vec2;
 	public pixelPosition: vec2;
 
@@ -142,15 +142,19 @@ namespace PacEntity {
 		export function isOpposite(d1: Direction, d2: Direction): boolean {
 			return PacEntity.Direction.getOpposite(d1) === d2;
 		}
+
+		export function getVector(d: Direction): vec2 {
+			switch (d) {
+				case Direction.RIGHT: return new vec2(+1, +0);
+				case Direction.LEFT:  return new vec2(-1, +0);
+				case Direction.UP:    return new vec2(+0, -1);
+				case Direction.DOWN:  return new vec2(+0, +1);
+			}
+		}
 	}
 
 	export function move(pos: vec2, direction: Direction): vec2 {
-		switch (direction) {
-			case Direction.RIGHT: return new vec2(pos.x + 1, pos.y + 0);
-			case Direction.LEFT: return new vec2(pos.x - 1, pos.y + 0);
-			case Direction.UP: return new vec2(pos.x + 0, pos.y - 1);
-			case Direction.DOWN: return new vec2(pos.x + 0, pos.y + 1);
-		}
+		return pos.add(PacEntity.Direction.getVector(direction));
 	}
 }
 

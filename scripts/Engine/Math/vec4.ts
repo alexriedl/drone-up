@@ -189,7 +189,7 @@ export default class vec4 {
 	/**
 	 * Normalizes this vector, and returns a new vector with the result
 	 */
-	public normalize() {
+	public normalize(): vec4 {
 		const sqLen = this.squaredLength();
 		if (sqLen <= 0) return this;
 		const len = 1 / Math.sqrt(sqLen);
