@@ -7,10 +7,14 @@ import { Color, Random } from 'Engine/Utils';
 
 export default class Blinky extends GhostEntity {
 	public constructor(map: Map, pacmanTarget: PacEntity) {
-		super(map.startingPositions.blinky, PacEntity.Direction.LEFT, Color.RED, map, pacmanTarget);
+		super(map.metadata.startingTiles.blinky, PacEntity.Direction.LEFT, Color.RED, map, pacmanTarget);
 	}
 
 	public getTargetTile(): vec2 {
-		return this.pacmanTarget.tilePosition;
+		switch (this.ghostMode) {
+			case GhostEntity.GhostMode.CHASE: return this.pacmanTarget.tilePosition;
+			case GhostEntity.GhostMode.SCATTER: return this.map.metadata.scatterTargets.blinky;
+			// TODO: Add logic to get frightened target tile, or change the logic to not use target tiles during that mode
+		}
 	}
 }

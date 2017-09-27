@@ -56,7 +56,6 @@ abstract class PacEntity extends Entity {
 		this.showDesired.position = PacEntity.move(new vec2(), direction).scale(0.6).toVec3(0);
 	}
 
-	// TODO: Limit max deltaTime to be a reasonable value to avoid some strange large frame problems?
 	public update(deltaTime: number): boolean {
 		this.burn += deltaTime;
 		const step = 100;

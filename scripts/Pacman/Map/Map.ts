@@ -7,10 +7,11 @@ import MapTile from './MapTile';
 
 interface IMapMetaData {
 	staticContentTextureData: Uint8Array;
-	startingPositions: IStartingPosition;
+	startingTiles: IEntityPositions;
+	scatterTargets: IEntityPositions;
 }
 
-export interface IStartingPosition {
+interface IEntityPositions {
 	pacman: vec2;
 	blinky: vec2;
 	pinky: vec2;
@@ -39,7 +40,7 @@ export default abstract class Map extends Entity {
 
 	private tiles: MapTile[][];
 
-	public startingPositions: IStartingPosition;
+	public metadata: IMapMetaData;
 
 	public constructor(tiles: MapTile[][]) {
 		const numXTiles = tiles[0].length;
@@ -57,10 +58,9 @@ export default abstract class Map extends Entity {
 	}
 
 	public initialize(gl: WebGLRenderingContext): void {
-		const metadata = parseMapInfo(this.tiles);
-		const texture = generateLevelTexture(gl, metadata.staticContentTextureData, this.pixelDimensions);
+		this.metadata = parseMapInfo(this.tiles);
+		const texture = generateLevelTexture(gl, this.metadata.staticContentTextureData, this.pixelDimensions);
 		this.model = new SimpleTextureRectangle(texture);
-		this.startingPositions = metadata.startingPositions;
 	}
 
 	public canMoveToTile(coords: vec2): boolean {
@@ -119,13 +119,8 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 	const numYTiles = tiles.length;
 	const numXTiles = tiles[0].length;
 	const textureData = [];
-	const startingPositions = {
-		pacman: undefined,
-		blinky: undefined,
-		pinky: undefined,
-		inky: undefined,
-		clyde: undefined,
-	};
+	const scatterTargets = { pacman: undefined, blinky: undefined, pinky: undefined, inky: undefined, clyde: undefined };
+	const startingTiles = { pacman: undefined, blinky: undefined, pinky: undefined, inky: undefined, clyde: undefined };
 	for (let tileY = 0; tileY < numYTiles; tileY++) {
 		const tileRow = tiles[tileY];
 		for (let pixelY = 0; pixelY < Map.PIXELS_PER_TILE; pixelY++) {
@@ -135,11 +130,16 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 				const pixelInfo = MapTile.getPixelInfo(tileEnum);
 				const pixelRow = pixelInfo[pixelY];
 				switch (tileEnum) {
-					case MapTile._PS: startingPositions.pacman = new vec2(tileX, tileY); break;
-					case MapTile.GSB: startingPositions.blinky = new vec2(tileX, tileY); break;
-					case MapTile.GSP: startingPositions.pinky = new vec2(tileX, tileY); break;
-					case MapTile.GSI: startingPositions.inky = new vec2(tileX, tileY); break;
-					case MapTile.GSC: startingPositions.clyde = new vec2(tileX, tileY); break;
+					case MapTile._PS: startingTiles.pacman = new vec2(tileX, tileY); break;
+					case MapTile.GSB: startingTiles.blinky = new vec2(tileX, tileY); break;
+					case MapTile.GSP: startingTiles.pinky = new vec2(tileX, tileY); break;
+					case MapTile.GSI: startingTiles.inky = new vec2(tileX, tileY); break;
+					case MapTile.GSC: startingTiles.clyde = new vec2(tileX, tileY); break;
+
+					case MapTile.GTB: scatterTargets.blinky = new vec2(tileX, tileY); break;
+					case MapTile.GTP: scatterTargets.pinky = new vec2(tileX, tileY); break;
+					case MapTile.GTI: scatterTargets.inky = new vec2(tileX, tileY); break;
+					case MapTile.GTC: scatterTargets.clyde = new vec2(tileX, tileY); break;
 				}
 
 				for (let pixelX = Map.PIXELS_PER_TILE - 1; pixelX >= 0; pixelX--) {
@@ -152,7 +152,8 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 
 	return {
 		staticContentTextureData: new Uint8Array(textureData),
-		startingPositions,
+		startingTiles,
+		scatterTargets,
 	};
 }
 
