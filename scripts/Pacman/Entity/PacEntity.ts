@@ -51,6 +51,7 @@ class PacEntity extends Entity {
 
 	public get position(): vec3 { return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(0); }
 	public set position(value: vec3) { console.log("Ignoring direct set of PacEntity's position value"); }
+	protected get roundingSize(): number { return 4; }
 
 	public setDesiredDirection(direction: PacEntity.Direction): void {
 		this.desired = direction;
@@ -73,15 +74,14 @@ class PacEntity extends Entity {
 	protected tick(): void {
 		const xCenter = 4; // NOTE: Original game used 3. Rendering off by one...
 		const yCenter = 4;
-		const roundingSize = 4;
 
 		let nextTile: vec2;
 		if (this.desired !== this.facing) {
 			if (
 				((this.desired === PacEntity.Direction.LEFT || this.desired === PacEntity.Direction.RIGHT) &&
-					Math.abs(this.pixelPosition.y - yCenter) <= roundingSize) ||
+					Math.abs(this.pixelPosition.y - yCenter) <= this.roundingSize) ||
 				((this.desired === PacEntity.Direction.UP || this.desired === PacEntity.Direction.DOWN) &&
-					Math.abs(this.pixelPosition.x - xCenter) <= roundingSize)) {
+					Math.abs(this.pixelPosition.x - xCenter) <= this.roundingSize)) {
 
 				nextTile = PacEntity.move(this.tilePosition, this.desired);
 				const canMove = this.map.canMoveToTile(nextTile);
@@ -131,7 +131,7 @@ class PacEntity extends Entity {
 
 // tslint:disable-next-line:no-namespace
 namespace PacEntity {
-	export enum Direction { RIGHT, LEFT, UP, DOWN }
+	export enum Direction { RIGHT = 'RIGHT', LEFT = 'LEFT', UP = 'UP', DOWN = 'DOWN' }
 	export namespace Direction {
 		export function getOpposite(d: Direction): Direction {
 			switch (d) {

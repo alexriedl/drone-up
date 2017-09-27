@@ -13,12 +13,10 @@ export default class GhostEntity extends PacEntity {
 		super(startTile, facingDirection, color, map, randomizer);
 
 		this.pacmanTarget = pacmanTarget;
-		this.nextDesiredDirection = PacEntity.Direction.LEFT;
 	}
 
-	public get targetTile(): vec2 {
-		return this.pacmanTarget.tilePosition;
-	}
+	public get targetTile(): vec2 { return this.pacmanTarget.tilePosition; }
+	protected get roundingSize(): number { return 0; }
 
 	protected tick(): void {
 		const startingTile = this.tilePosition;
@@ -26,6 +24,9 @@ export default class GhostEntity extends PacEntity {
 
 		// We moved to a new tile
 		if (!startingTile.exactEquals(this.tilePosition)) {
+			if (this.nextDesiredDirection === undefined) this.nextDesiredDirection = this.desired;
+			this.setDesiredDirection(this.nextDesiredDirection);
+
 			const nextTile = PacEntity.move(this.tilePosition, this.desired);
 
 			const invalidOpposite = PacEntity.Direction.getOpposite(this.desired);
@@ -37,12 +38,12 @@ export default class GhostEntity extends PacEntity {
 				PacEntity.Direction.RIGHT,
 			].filter((d) => d !== invalidOpposite);
 
-			let shortestDistance = 99999;
+			let shortestDistance = Number.MAX_SAFE_INTEGER;
 			let shortestDirection;
 			for (const direction of options) {
 				const testTile = PacEntity.move(nextTile, direction);
 				if (this.map.canMoveToTile(testTile)) {
-					const distanceToTarget = testTile.dist(this.targetTile);
+					const distanceToTarget = testTile.sqrDist(this.targetTile);
 					if (distanceToTarget < shortestDistance) {
 						shortestDistance = distanceToTarget;
 						shortestDirection = direction;
@@ -50,8 +51,7 @@ export default class GhostEntity extends PacEntity {
 				}
 			}
 
-			if (shortestDirection) {
-				this.setDesiredDirection(this.nextDesiredDirection);
+			if (shortestDirection !== undefined) {
 				this.nextDesiredDirection = shortestDirection;
 			}
 			else {
