@@ -1,5 +1,5 @@
 import { Map, OriginalMap } from 'Pacman/Map';
-import { PacEntity, Blinky, GhostEntity, Pacman } from 'Pacman/Entity';
+import { PacEntity, Blinky, Pinky, Inky, Clyde, GhostEntity, Pacman } from 'Pacman/Entity';
 
 import { Color, Random } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';
@@ -12,7 +12,10 @@ export default class PacmanGame extends Game {
 
 	private scene: Entity;
 	private pacman: PacEntity;
-	private blinky: GhostEntity;
+	private blinky: Blinky;
+	private pinky: Pinky;
+	private inky: Inky;
+	private clyde: Clyde;
 
 	protected left: boolean;
 	protected right: boolean;
@@ -35,6 +38,15 @@ export default class PacmanGame extends Game {
 
 		this.blinky = new Blinky(this.map, this.pacman);
 		this.blinky.setParent(this.scene);
+
+		this.pinky = new Pinky(this.map, this.pacman);
+		this.pinky.setParent(this.scene);
+
+		this.inky = new Inky(this.map, this.pacman);
+		this.inky.setParent(this.scene);
+
+		this.clyde = new Clyde(this.map, this.pacman);
+		this.clyde.setParent(this.scene);
 	}
 
 	public onkeydown(event: KeyboardEvent): boolean {
