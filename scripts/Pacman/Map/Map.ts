@@ -135,11 +135,11 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 				const pixelInfo = MapTile.getPixelInfo(tileEnum);
 				const pixelRow = pixelInfo[pixelY];
 				switch (tileEnum) {
-					case MapTile._PS: startingPositions.pacman = new vec2(tileX, tileY);
-					case MapTile.GSB: startingPositions.blinky = new vec2(tileX, tileY);
-					case MapTile.GSP: startingPositions.pinky = new vec2(tileX, tileY);
-					case MapTile.GSI: startingPositions.inky = new vec2(tileX, tileY);
-					case MapTile.GSC: startingPositions.clyde = new vec2(tileX, tileY);
+					case MapTile._PS: startingPositions.pacman = new vec2(tileX, tileY); break;
+					case MapTile.GSB: startingPositions.blinky = new vec2(tileX, tileY); break;
+					case MapTile.GSP: startingPositions.pinky = new vec2(tileX, tileY); break;
+					case MapTile.GSI: startingPositions.inky = new vec2(tileX, tileY); break;
+					case MapTile.GSC: startingPositions.clyde = new vec2(tileX, tileY); break;
 				}
 
 				for (let pixelX = Map.PIXELS_PER_TILE - 1; pixelX >= 0; pixelX--) {

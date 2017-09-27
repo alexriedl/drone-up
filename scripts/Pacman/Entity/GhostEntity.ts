@@ -2,21 +2,21 @@ import PacEntity from './PacEntity';
 import { Map } from '../Map';
 
 import { vec2 } from 'Engine/Math';
-import { Color, Random } from 'Engine/Utils';
+import { Color } from 'Engine/Utils';
 
-export default class GhostEntity extends PacEntity {
-	public readonly pacmanTarget: PacEntity;
+export default abstract class GhostEntity extends PacEntity {
+	protected readonly pacmanTarget: PacEntity;
 	protected nextDesiredDirection: PacEntity.Direction;
 
 	public constructor(startTile: vec2, facingDirection: PacEntity.Direction, color: Color,
-		map: Map, randomizer: Random, pacmanTarget: PacEntity) {
-		super(startTile, facingDirection, color, map, randomizer);
-
+		map: Map, pacmanTarget: PacEntity) {
+		super(startTile, facingDirection, color, map);
 		this.pacmanTarget = pacmanTarget;
 	}
 
-	public get targetTile(): vec2 { return this.pacmanTarget.tilePosition; }
 	protected get roundingSize(): number { return 0; }
+
+	public abstract getTargetTile(): vec2;
 
 	protected tick(): void {
 		const startingTile = this.tilePosition;
@@ -43,7 +43,7 @@ export default class GhostEntity extends PacEntity {
 			for (const direction of options) {
 				const testTile = PacEntity.move(nextTile, direction);
 				if (this.map.canMoveToTile(testTile)) {
-					const distanceToTarget = testTile.sqrDist(this.targetTile);
+					const distanceToTarget = testTile.sqrDist(this.getTargetTile());
 					if (distanceToTarget < shortestDistance) {
 						shortestDistance = distanceToTarget;
 						shortestDirection = direction;

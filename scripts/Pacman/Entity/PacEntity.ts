@@ -1,24 +1,23 @@
 import { MapTile, Map, OriginalMap } from 'Pacman/Map';
 
-import { Color, Random } from 'Engine/Utils';
+import { Color } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';
 import { SimpleTextureRectangle, SimpleRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
-class PacEntity extends Entity {
+abstract class PacEntity extends Entity {
 	protected facing: PacEntity.Direction;
 	protected desired: PacEntity.Direction;
 	public tilePosition: vec2;
 	public pixelPosition: vec2;
 
-	private randomizer: Random;
 	public map: Map;
 
 	private burn: number = 0;
 	private showDesired: Entity;
 
 	// TODO: Map should not need to be passed into entity
-	public constructor(startTile: vec2, facingDirection: PacEntity.Direction, color: Color, map: Map, randomizer: Random) {
+	public constructor(startTile: vec2, facingDirection: PacEntity.Direction, color: Color, map: Map) {
 		super(new SimpleRectangle(color));
 
 		// TODO: Conversion between tiles and pixels in entity is strange...
@@ -28,7 +27,6 @@ class PacEntity extends Entity {
 		this.facing = facingDirection;
 		this.desired = facingDirection;
 		this.map = map;
-		this.randomizer = randomizer;
 
 		const sdModel = new SimpleRectangle(Color.RED);
 		this.showDesired = new Entity(sdModel, new vec3(), new vec3(1 / 8, 1 / 8, 1));

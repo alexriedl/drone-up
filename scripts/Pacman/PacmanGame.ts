@@ -1,5 +1,5 @@
 import { Map, OriginalMap } from 'Pacman/Map';
-import { PacEntity, GhostEntity } from 'Pacman/Entity';
+import { PacEntity, Blinky, GhostEntity, Pacman } from 'Pacman/Entity';
 
 import { Color, Random } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';
@@ -8,7 +8,6 @@ import { vec2 } from 'Engine/Math';
 
 export default class PacmanGame extends Game {
 	private static readonly background = Color.BLACK;
-	private randomizer: Random;
 	public map: Map;
 
 	private scene: Entity;
@@ -25,22 +24,16 @@ export default class PacmanGame extends Game {
 		super(canvasId, map.pixelDimensions);
 		this.scene = new Entity();
 		this.map = map;
-
-		// TODO: Actually set the random seed
-		this.randomizer = new Random(0);
 	}
 
 	protected initialize(gl: WebGLRenderingContext): void {
 		this.map.initialize(gl);
 		this.map.setParent(this.scene);
 
-		const startingPositions = this.map.startingPositions;
-		this.pacman = new PacEntity(startingPositions.pacman, PacEntity.Direction.LEFT, Color.YELLOW,
-			this.map, this.randomizer);
+		this.pacman = new Pacman(this.map);
 		this.pacman.setParent(this.scene);
 
-		this.blinky = new GhostEntity(startingPositions.blinky, PacEntity.Direction.LEFT, Color.RED,
-			this.map, this.randomizer, this.pacman);
+		this.blinky = new Blinky(this.map, this.pacman);
 		this.blinky.setParent(this.scene);
 	}
 
