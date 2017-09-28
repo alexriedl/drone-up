@@ -1,3 +1,4 @@
+import { Direction } from 'Pacman/Utils';
 import { MapTile, Map, OriginalMap } from 'Pacman/Map';
 
 import { Color } from 'Engine/Utils';
@@ -5,9 +6,9 @@ import { Entity } from 'Engine/Entity';
 import { SimpleTextureRectangle, SimpleRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
-abstract class PacEntity extends Entity {
-	public facing: PacEntity.Direction;
-	public desired: PacEntity.Direction;
+export default abstract class PacEntity extends Entity {
+	public facing: Direction;
+	public desired: Direction;
 	public tilePosition: vec2;
 	public pixelPosition: vec2;
 
@@ -17,7 +18,7 @@ abstract class PacEntity extends Entity {
 	private showDesired: Entity;
 
 	// TODO: Map should not need to be passed into entity
-	public constructor(startTile: vec2, facingDirection: PacEntity.Direction, color: Color, map: Map) {
+	public constructor(startTile: vec2, facingDirection: Direction, color: Color, map: Map) {
 		super(new SimpleRectangle(color));
 
 		// TODO: Conversion between tiles and pixels in entity is strange...
@@ -51,14 +52,14 @@ abstract class PacEntity extends Entity {
 	public set position(value: vec3) { console.log("Ignoring direct set of PacEntity's position value"); }
 	protected get roundingSize(): number { return 4; }
 
-	public setDesiredDirection(direction: PacEntity.Direction): void {
+	public setDesiredDirection(direction: Direction): void {
 		this.desired = direction;
 		this.showDesired.position = PacEntity.move(new vec2(), direction).scale(0.6).toVec3(0);
 	}
 
 	public update(deltaTime: number): boolean {
 		this.burn += deltaTime;
-		const step = 100;
+		const step = 20;
 
 		while (this.burn >= step) {
 			this.burn -= step;
@@ -75,13 +76,13 @@ abstract class PacEntity extends Entity {
 		let nextTile: vec2;
 		if (this.desired !== this.facing) {
 			if (
-				((this.desired === PacEntity.Direction.LEFT || this.desired === PacEntity.Direction.RIGHT) &&
+				((this.desired === Direction.LEFT || this.desired === Direction.RIGHT) &&
 					Math.abs(this.pixelPosition.y - yCenter) <= this.roundingSize) ||
-				((this.desired === PacEntity.Direction.UP || this.desired === PacEntity.Direction.DOWN) &&
+				((this.desired === Direction.UP || this.desired === Direction.DOWN) &&
 					Math.abs(this.pixelPosition.x - xCenter) <= this.roundingSize)) {
 
 				nextTile = PacEntity.move(this.tilePosition, this.desired);
-				const canMove = this.map.canMoveToTile(nextTile);
+				const canMove = this.map.canMoveToTile(nextTile, this.desired);
 				if (canMove) {
 					this.facing = this.desired;
 					this.pixelPosition = PacEntity.move(this.pixelPosition, this.facing);
@@ -94,12 +95,12 @@ abstract class PacEntity extends Entity {
 
 		if (!nextTile) {
 			const nextPixel = PacEntity.move(this.pixelPosition, this.facing);
-			if ((this.facing === PacEntity.Direction.LEFT && nextPixel.x < xCenter) ||
-				(this.facing === PacEntity.Direction.RIGHT && nextPixel.x > xCenter) ||
-				(this.facing === PacEntity.Direction.UP && nextPixel.y < yCenter) ||
-				(this.facing === PacEntity.Direction.DOWN && nextPixel.y > yCenter)) {
+			if ((this.facing === Direction.LEFT && nextPixel.x < xCenter) ||
+				(this.facing === Direction.RIGHT && nextPixel.x > xCenter) ||
+				(this.facing === Direction.UP && nextPixel.y < yCenter) ||
+				(this.facing === Direction.DOWN && nextPixel.y > yCenter)) {
 				nextTile = PacEntity.move(this.tilePosition, this.facing);
-				const canMove = this.map.canMoveToTile(nextTile);
+				const canMove = this.map.canMoveToTile(nextTile, this.facing);
 				if (canMove) this.pixelPosition = nextPixel;
 			}
 			else {
@@ -109,7 +110,7 @@ abstract class PacEntity extends Entity {
 		}
 
 		let adjust;
-		if (this.facing === PacEntity.Direction.UP || this.facing === PacEntity.Direction.DOWN) {
+		if (this.facing === Direction.UP || this.facing === Direction.DOWN) {
 			adjust = new vec2(Math.sign(xCenter - this.pixelPosition.x), 0);
 		}
 		else {
@@ -124,38 +125,8 @@ abstract class PacEntity extends Entity {
 			this.pixelPosition = this.pixelPosition.cmod(Map.PIXELS_PER_TILE);
 		}
 	}
-}
 
-// tslint:disable-next-line:no-namespace
-namespace PacEntity {
-	export enum Direction { RIGHT = 'RIGHT', LEFT = 'LEFT', UP = 'UP', DOWN = 'DOWN' }
-	export namespace Direction {
-		export function getOpposite(d: Direction): Direction {
-			switch (d) {
-				case Direction.RIGHT: return Direction.LEFT;
-				case Direction.LEFT: return Direction.RIGHT;
-				case Direction.UP: return Direction.DOWN;
-				case Direction.DOWN: return Direction.UP;
-			}
-		}
-
-		export function isOpposite(d1: Direction, d2: Direction): boolean {
-			return PacEntity.Direction.getOpposite(d1) === d2;
-		}
-
-		export function getVector(d: Direction): vec2 {
-			switch (d) {
-				case Direction.RIGHT: return new vec2(+1, +0);
-				case Direction.LEFT:  return new vec2(-1, +0);
-				case Direction.UP:    return new vec2(+0, -1);
-				case Direction.DOWN:  return new vec2(+0, +1);
-			}
-		}
-	}
-
-	export function move(pos: vec2, direction: Direction): vec2 {
-		return pos.add(PacEntity.Direction.getVector(direction));
+	protected static move(pos: vec2, direction: Direction): vec2 {
+		return pos.add(Direction.getVector(direction));
 	}
 }
-
-export default PacEntity;
