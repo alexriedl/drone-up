@@ -1,3 +1,4 @@
+import { Direction } from 'Pacman/Utils';
 import { Map, OriginalMap } from 'Pacman/Map';
 import { PacEntity, Blinky, Pinky, Inky, Clyde, GhostEntity, Pacman } from 'Pacman/Entity';
 
@@ -11,6 +12,7 @@ class GhostParent extends Entity {
 	private static nextModeDuration: number = 7 * 1000;
 	private currentGhostMode: GhostEntity.GhostMode;
 	private ghostModeDuration: number = 0;
+	private swaps = 4;
 
 	// TODO: Change ghost update. This could cause timing issues with ghost modes the way it works It
 	// is possible to run more than a single tick per update, and updating mode time is only
@@ -18,13 +20,14 @@ class GhostParent extends Entity {
 	// tick, but before the second tick for the ghosts
 	public update(deltaTime: number): boolean {
 		this.ghostModeDuration -= deltaTime;
-		if (this.ghostModeDuration <= 0) {
+		if (this.ghostModeDuration <= 0 && this.swaps > 0) {
+			this.swaps--;
 			this.currentGhostMode = this.currentGhostMode === GhostEntity.GhostMode.SCATTER ?
 				GhostEntity.GhostMode.CHASE : GhostEntity.GhostMode.SCATTER;
 			this.ghostModeDuration += GhostParent.nextModeDuration;
 
 			this.children.forEach((child) => {
-				child.setGhostMode(this.currentGhostMode, false);
+				child.setGhostMode(this.currentGhostMode);
 			});
 		}
 
@@ -38,14 +41,15 @@ class GhostParent extends Entity {
 		const pinky = new Pinky(map, pacman);
 		pinky.setParent(this);
 
-		const inky = new Inky(map, pacman);
+		const inky = new Inky(map, pacman, blinky);
 		inky.setParent(this);
 
 		const clyde = new Clyde(map, pacman);
 		clyde.setParent(this);
 
-		// NOTE: Used to force set all ghosts modes to the same value specified by the ghost parent
-		this.update(0);
+		this.children.forEach((child) => {
+			child.setGhostMode(GhostEntity.GhostMode.SCATTER, true);
+		});
 	}
 }
 
@@ -101,10 +105,10 @@ export default class PacmanGame extends Game {
 
 	protected update(deltaTime: number): void {
 		let d;
-		if (this.left) d = PacEntity.Direction.LEFT;
-		if (this.right) d = PacEntity.Direction.RIGHT;
-		if (this.up) d = PacEntity.Direction.UP;
-		if (this.down) d = PacEntity.Direction.DOWN;
+		if (this.left) d = Direction.LEFT;
+		if (this.right) d = Direction.RIGHT;
+		if (this.up) d = Direction.UP;
+		if (this.down) d = Direction.DOWN;
 		if (d !== undefined) {
 			this.pacman.setDesiredDirection(d);
 		}

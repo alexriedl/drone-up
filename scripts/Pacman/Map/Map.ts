@@ -3,12 +3,14 @@ import { Entity } from 'Engine/Entity';
 import { Model, SimpleTextureRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
+import { Direction } from 'Pacman/Utils';
 import MapTile from './MapTile';
 
 interface IMapMetaData {
 	staticContentTextureData: Uint8Array;
 	startingTiles: IEntityPositions;
 	scatterTargets: IEntityPositions;
+	basicTileInfo: BasicTileInfo[][];
 }
 
 interface IEntityPositions {
@@ -38,9 +40,12 @@ export default abstract class Map extends Entity {
 	public readonly pixelDimensions: vec2;
 	public readonly tileDimensions: vec2;
 
-	private tiles: MapTile[][];
-
 	public metadata: IMapMetaData;
+
+	/**
+	 * Do not use this value. After the map is initialized, this is blown away
+	 */
+	private tiles: MapTile[][];
 
 	public constructor(tiles: MapTile[][]) {
 		const numXTiles = tiles[0].length;
@@ -58,16 +63,22 @@ export default abstract class Map extends Entity {
 	}
 
 	public initialize(gl: WebGLRenderingContext): void {
-		this.metadata = parseMapInfo(this.tiles);
+		this.metadata = parseMapInfo(this.tiles); this.tiles = undefined;
 		const texture = generateLevelTexture(gl, this.metadata.staticContentTextureData, this.pixelDimensions);
 		this.model = new SimpleTextureRectangle(texture);
 	}
 
-	public canMoveToTile(coords: vec2): boolean {
+	public canMoveToTile(coords: vec2, direction?: Direction): boolean {
 		if (coords.x < 0 || coords.x >= this.tileDimensions.x
 			|| coords.y < 0 || coords.y >= this.tileDimensions.y) return true;
-		const tile = this.tiles[coords.y][coords.x];
-		return canWalkOnTile(tile);
+
+		const tile = this.metadata.basicTileInfo[coords.y][coords.x];
+		switch (tile) {
+			case BasicTileInfo.BLOCK: return false;
+			case BasicTileInfo.OPEN: return true;
+			case BasicTileInfo.RESTRICTED_UP: return !direction || direction !== Direction.UP;
+			case BasicTileInfo.RESTRICTED_DOWN: return !direction || direction !== Direction.DOWN;
+		}
 	}
 
 	/**
@@ -88,7 +99,14 @@ export default abstract class Map extends Entity {
 	}
 }
 
-function canWalkOnTile(tile: MapTile): boolean {
+enum BasicTileInfo {
+	BLOCK = 'BLOCK',
+	OPEN = 'OPEN',
+	RESTRICTED_UP = 'RESTRICTED_UP',
+	RESTRICTED_DOWN = 'RESTRICTED_DOWN',
+}
+
+function getBasicTileInfo(tile: MapTile): BasicTileInfo {
 	switch (tile) {
 		case MapTile._PS:
 		case MapTile._FS:
@@ -96,22 +114,17 @@ function canWalkOnTile(tile: MapTile): boolean {
 		case MapTile.GSP:
 		case MapTile.GSI:
 		case MapTile.GSC:
-
+		case MapTile._s_:
 		case MapTile.___:
 		case MapTile._p_:
 		case MapTile._E_:
+			return BasicTileInfo.OPEN;
 
-		case MapTile._s_:
-		case MapTile.RU_:
-		case MapTile.RR_:
 		case MapTile.RUp:
+		case MapTile.RU_: return BasicTileInfo.RESTRICTED_UP;
+		case MapTile.GGG: return BasicTileInfo.RESTRICTED_DOWN;
 
-		case MapTile.GTB:
-		case MapTile.GTP:
-		case MapTile.GTI:
-		case MapTile.GTC:
-			return true;
-		default: return false;
+		default: return BasicTileInfo.BLOCK;
 	}
 }
 
@@ -121,14 +134,18 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 	const textureData = [];
 	const scatterTargets = { pacman: undefined, blinky: undefined, pinky: undefined, inky: undefined, clyde: undefined };
 	const startingTiles = { pacman: undefined, blinky: undefined, pinky: undefined, inky: undefined, clyde: undefined };
+	const basicTileInfo = [];
 	for (let tileY = 0; tileY < numYTiles; tileY++) {
 		const tileRow = tiles[tileY];
+		const basicRowInfo = [];
+		basicTileInfo.push(basicRowInfo);
 		for (let pixelY = 0; pixelY < Map.PIXELS_PER_TILE; pixelY++) {
 			for (let tileX = 0; tileX < numXTiles; tileX++) {
 				const tileEnum = tileRow[tileX];
 				const color = getTileColor(tileEnum);
 				const pixelInfo = MapTile.getPixelInfo(tileEnum);
 				const pixelRow = pixelInfo[pixelY];
+				basicRowInfo.push(getBasicTileInfo(tileEnum));
 				switch (tileEnum) {
 					case MapTile._PS: startingTiles.pacman = new vec2(tileX, tileY); break;
 					case MapTile.GSB: startingTiles.blinky = new vec2(tileX, tileY); break;
@@ -150,10 +167,13 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 		}
 	}
 
+	console.log(basicTileInfo);
+
 	return {
 		staticContentTextureData: new Uint8Array(textureData),
 		startingTiles,
 		scatterTargets,
+		basicTileInfo,
 	};
 }
 

@@ -57,7 +57,6 @@ enum MapTile {
 	// Special
 	_s_, // Slow (Empty)
 	RU_, // Restrict Up
-	RR_, // Restrict Right
 	RUp, // Restrict Up (with a pac)
 	GTB, // Ghost Target Blinky
 	GTP, // Ghost Target Pinky
@@ -69,7 +68,6 @@ enum MapTile {
 	___, // Empty
 }
 
-// tslint:disable-next-line:no-namespace
 namespace MapTile {
 	/**
 	 * For a given tile, generate an array to indicate which pixels are lite up.

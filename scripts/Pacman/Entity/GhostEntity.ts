@@ -1,19 +1,20 @@
+import { Direction } from 'Pacman/Utils';
+import { Map } from 'Pacman/Map';
 import PacEntity from './PacEntity';
-import { Map } from '../Map';
 
 import { vec2 } from 'Engine/Math';
 import { Color } from 'Engine/Utils';
 
 abstract class GhostEntity extends PacEntity {
-	protected readonly pacmanTarget: PacEntity;
-	protected nextDesiredDirection: PacEntity.Direction;
+	protected readonly pacman: PacEntity;
+	protected nextDesiredDirection: Direction;
 
 	public ghostMode: GhostEntity.GhostMode;
 
-	public constructor(startTile: vec2, facingDirection: PacEntity.Direction, color: Color,
-		map: Map, pacmanTarget: PacEntity) {
+	public constructor(startTile: vec2, facingDirection: Direction, color: Color,
+		map: Map, pacman: PacEntity) {
 		super(startTile, facingDirection, color, map);
-		this.pacmanTarget = pacmanTarget;
+		this.pacman = pacman;
 	}
 
 	protected get roundingSize(): number { return 0; }
@@ -24,7 +25,7 @@ abstract class GhostEntity extends PacEntity {
 		console.log(`Changing ghost mode for ${this.constructor.name} to be ${newMode}`);
 		this.ghostMode = newMode;
 		if (reverse) {
-			this.facing = PacEntity.Direction.getOpposite(this.facing);
+			this.facing = Direction.getOpposite(this.facing);
 			this.nextDesiredDirection = undefined;
 			this.desired = this.facing;
 			this.updateDesiredDirection();
@@ -51,20 +52,20 @@ abstract class GhostEntity extends PacEntity {
 
 		const nextTile = PacEntity.move(this.tilePosition, this.desired);
 
-		const invalidOpposite = PacEntity.Direction.getOpposite(this.desired);
+		const invalidOpposite = Direction.getOpposite(this.desired);
 		// NOTE: The order of this array is the tie-breaker order
 		const options = [
-			PacEntity.Direction.UP,
-			PacEntity.Direction.LEFT,
-			PacEntity.Direction.DOWN,
-			PacEntity.Direction.RIGHT,
+			Direction.UP,
+			Direction.LEFT,
+			Direction.DOWN,
+			Direction.RIGHT,
 		].filter((d) => d !== invalidOpposite);
 
 		let shortestDistance = Number.MAX_SAFE_INTEGER;
 		let shortestDirection;
 		for (const direction of options) {
 			const testTile = PacEntity.move(nextTile, direction);
-			if (this.map.canMoveToTile(testTile)) {
+			if (this.map.canMoveToTile(testTile, direction)) {
 				const distanceToTarget = testTile.sqrDist(this.getTargetTile());
 				if (distanceToTarget < shortestDistance) {
 					shortestDistance = distanceToTarget;
@@ -82,7 +83,6 @@ abstract class GhostEntity extends PacEntity {
 	}
 }
 
-// tslint:disable-next-line:no-namespace
 namespace GhostEntity {
 	export enum GhostMode {
 		CHASE = 'CHASE',
