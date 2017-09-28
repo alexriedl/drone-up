@@ -18,6 +18,7 @@ abstract class GhostEntity extends PacEntity {
 	}
 
 	protected get roundingSize(): number { return 0; }
+	protected get followRestrictions(): boolean { return true; }
 
 	public abstract getTargetTile(): vec2;
 

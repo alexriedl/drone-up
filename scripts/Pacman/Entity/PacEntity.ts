@@ -51,6 +51,7 @@ export default abstract class PacEntity extends Entity {
 	public get position(): vec3 { return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(0); }
 	public set position(value: vec3) { console.log("Ignoring direct set of PacEntity's position value"); }
 	protected get roundingSize(): number { return 4; }
+	protected get followRestrictions(): boolean { return false; }
 
 	public setDesiredDirection(direction: Direction): void {
 		this.desired = direction;
@@ -82,7 +83,7 @@ export default abstract class PacEntity extends Entity {
 					Math.abs(this.pixelPosition.x - xCenter) <= this.roundingSize)) {
 
 				nextTile = PacEntity.move(this.tilePosition, this.desired);
-				const canMove = this.map.canMoveToTile(nextTile, this.desired);
+				const canMove = this.map.canMoveToTile(nextTile, this.followRestrictions ? this.desired : undefined);
 				if (canMove) {
 					this.facing = this.desired;
 					this.pixelPosition = PacEntity.move(this.pixelPosition, this.facing);
@@ -100,7 +101,7 @@ export default abstract class PacEntity extends Entity {
 				(this.facing === Direction.UP && nextPixel.y < yCenter) ||
 				(this.facing === Direction.DOWN && nextPixel.y > yCenter)) {
 				nextTile = PacEntity.move(this.tilePosition, this.facing);
-				const canMove = this.map.canMoveToTile(nextTile, this.facing);
+				const canMove = this.map.canMoveToTile(nextTile, this.followRestrictions ? this.facing : undefined);
 				if (canMove) this.pixelPosition = nextPixel;
 			}
 			else {
