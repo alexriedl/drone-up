@@ -62,11 +62,10 @@ abstract class Shader {
 	}
 
 	private static instances = {};
-	protected static create<T extends Shader>(type: { new(): T }, modifier?: string): T {
-		const key = modifier ? `${type.name}-${modifier}` : type.name;
-		if (Shader.instances[key]) return Shader.instances[key];
-		Shader.instances[key] = new type();
-		return Shader.instances[key];
+	protected static create<T extends Shader>(type: { new(): T }): T {
+		if (Shader.instances[type.name]) return Shader.instances[type.name];
+		Shader.instances[type.name] = new type();
+		return Shader.instances[type.name];
 	}
 }
 

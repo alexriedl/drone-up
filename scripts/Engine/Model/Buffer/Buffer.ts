@@ -1,6 +1,6 @@
 import { Register } from 'Engine/Utils';
 
-abstract class Buffer {
+export default abstract class Buffer {
 	private buffer: WebGLBuffer;
 
 	public constructor() {
@@ -8,22 +8,21 @@ abstract class Buffer {
 	}
 
 	public initialize(gl: WebGLRenderingContext): void {
-		this.buffer = this.initializeBuffer(gl);
+		this.buffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.getValues()), gl.STATIC_DRAW);
 	}
 
 	public getBuffer(): WebGLBuffer {
 		return this.buffer;
 	}
 
-	public abstract initializeBuffer(gl: WebGLRenderingContext): WebGLBuffer;
+	protected abstract getValues(): number[];
 
 	private static instances = {};
-	protected static create<T extends Buffer>(type: { new (): T }, modifier?: string): T {
-		const key = modifier ? `${type.name}-${modifier}` : type.name;
-		if (Buffer.instances[key]) return Buffer.instances[key];
-		Buffer.instances[key] = new type();
-		return Buffer.instances[key];
+	protected static create<T extends Buffer>(type: { new (): T }): T {
+		if (Buffer.instances[type.name]) return Buffer.instances[type.name];
+		Buffer.instances[type.name] = new type();
+		return Buffer.instances[type.name];
 	}
 }
-
-export default Buffer;
