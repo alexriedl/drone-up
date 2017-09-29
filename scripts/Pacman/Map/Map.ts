@@ -68,7 +68,7 @@ export default abstract class Map extends Entity {
 		this.model = new SimpleTextureRectangle(texture);
 	}
 
-	public canMoveToTile(coords: vec2, direction?: Direction): boolean {
+	public canMoveToTile(coords: vec2, direction?: Direction, allowGhostGate: boolean = false): boolean {
 		if (coords.x < 0 || coords.x >= this.tileDimensions.x
 			|| coords.y < 0 || coords.y >= this.tileDimensions.y) return true;
 
@@ -77,7 +77,7 @@ export default abstract class Map extends Entity {
 			case BasicTileInfo.BLOCK: return false;
 			case BasicTileInfo.OPEN: return true;
 			case BasicTileInfo.RESTRICTED_UP: return !direction || direction !== Direction.UP;
-			case BasicTileInfo.RESTRICTED_DOWN: return !direction || direction !== Direction.DOWN;
+			case BasicTileInfo.GHOST_GATE: return allowGhostGate;
 		}
 	}
 
@@ -103,7 +103,7 @@ enum BasicTileInfo {
 	BLOCK = 'BLOCK',
 	OPEN = 'OPEN',
 	RESTRICTED_UP = 'RESTRICTED_UP',
-	RESTRICTED_DOWN = 'RESTRICTED_DOWN',
+	GHOST_GATE = 'GHOST_GATE',
 }
 
 function getBasicTileInfo(tile: MapTile): BasicTileInfo {
@@ -122,7 +122,7 @@ function getBasicTileInfo(tile: MapTile): BasicTileInfo {
 
 		case MapTile.RUp:
 		case MapTile.RU_: return BasicTileInfo.RESTRICTED_UP;
-		case MapTile.GGG: return BasicTileInfo.RESTRICTED_DOWN;
+		case MapTile.GGG: return BasicTileInfo.GHOST_GATE;
 
 		default: return BasicTileInfo.BLOCK;
 	}

@@ -23,9 +23,9 @@ abstract class GhostEntity extends PacEntity {
 	public abstract getTargetTile(): vec2;
 
 	public setGhostMode(newMode: GhostEntity.GhostMode, reverse: boolean = true) {
-		console.log(`Changing ghost mode for ${this.constructor.name} to be ${newMode}`);
 		this.ghostMode = newMode;
 		if (reverse) {
+			// TODO: If ghost is in a tile against a wall, the ghost could turn around into the wall and get stuck
 			this.facing = Direction.getOpposite(this.facing);
 			this.nextDesiredDirection = undefined;
 			this.desired = this.facing;
