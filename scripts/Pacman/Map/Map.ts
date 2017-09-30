@@ -64,7 +64,7 @@ export default abstract class Map extends Entity {
 
 	public initialize(gl: WebGLRenderingContext): void {
 		this.metadata = parseMapInfo(this.tiles); this.tiles = undefined;
-		const texture = generateLevelTexture(gl, this.metadata.staticContentTextureData, this.pixelDimensions);
+		const texture = createTexture(gl, this.metadata.staticContentTextureData, this.pixelDimensions);
 		this.model = new SimpleTextureRectangle(texture);
 	}
 
@@ -177,7 +177,8 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 	};
 }
 
-function generateLevelTexture(gl: WebGLRenderingContext, data: Uint8Array, dimensions: vec2): WebGLTexture {
+// TODO: Move this function to a more general spot
+function createTexture(gl: WebGLRenderingContext, data: Uint8Array, dimensions: vec2): WebGLTexture {
 	const texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);

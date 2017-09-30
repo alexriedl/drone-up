@@ -1,11 +1,11 @@
+import { Buffer, RectangleBuffer } from 'Engine/Model/Buffer';
 import { Color } from 'Engine/Utils';
 import { mat4 } from 'Engine/Math';
-import { RectangleBuffer } from 'Engine/Model/Buffer';
 import { SimpleShader } from 'Engine/Model/Shader';
 import Model from './Model';
 
 class SimpleRectangle extends Model {
-	protected buffer: RectangleBuffer;
+	protected buffer: Buffer;
 	protected shader: SimpleShader;
 	protected color: Color;
 
@@ -18,7 +18,7 @@ class SimpleRectangle extends Model {
 		return SimpleShader.createShader();
 	}
 
-	protected createBuffer(): RectangleBuffer {
+	protected createVertexBuffer(): Buffer {
 		return RectangleBuffer.createBuffer();
 	}
 

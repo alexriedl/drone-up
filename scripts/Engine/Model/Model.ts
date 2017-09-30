@@ -1,14 +1,16 @@
 import { Buffer } from 'Engine/Model/Buffer';
 import { mat4 } from 'Engine/Math';
 import { Shader } from 'Engine/Model/Shader';
+import { Register } from 'Engine/Utils';
 
 abstract class Model {
 	protected shader: Shader;
 	protected buffer: Buffer;
 
 	public constructor() {
+		Register.registerGLItem(this);
 		this.shader = this.createShader();
-		this.buffer = this.createBuffer();
+		this.buffer = this.createVertexBuffer();
 	}
 
 	public useShader(gl: WebGLRenderingContext): void {
@@ -21,8 +23,12 @@ abstract class Model {
 		this.draw(gl);
 	}
 
+	public initialize(gl: WebGLRenderingContext): void {
+		return;
+	}
+
 	protected abstract createShader(): Shader;
-	protected abstract createBuffer(): Buffer;
+	protected abstract createVertexBuffer(): Buffer;
 	protected abstract updateAttributes(gl: WebGLRenderingContext): void;
 	protected abstract updateUniforms(gl: WebGLRenderingContext, mvpMatrix: mat4): void;
 	protected abstract draw(gl: WebGLRenderingContext): void;
