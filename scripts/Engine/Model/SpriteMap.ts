@@ -16,12 +16,12 @@ export interface IMapInfo {
 function buildBuffer(mapInfo: IMapInfo): number[] {
 	const buffer = [];
 	let count = 0;
-	for (let x = mapInfo.leftPadding;
-		x < mapInfo.textureWidth && count < mapInfo.totalSprites;
-		x += mapInfo.spritWidth) {
-		for (let y = mapInfo.topPadding;
-			y < mapInfo.textureHeight && count < mapInfo.totalSprites;
-			y += mapInfo.spritHeight) {
+	for (let y = mapInfo.topPadding;
+		y < mapInfo.textureHeight && count < mapInfo.totalSprites;
+		y += mapInfo.spritHeight) {
+		for (let x = mapInfo.leftPadding;
+			x < mapInfo.textureWidth && count < mapInfo.totalSprites;
+			x += mapInfo.spritWidth) {
 			count++;
 			const left = x / mapInfo.textureWidth;
 			const right = (x + mapInfo.spritWidth) / mapInfo.textureWidth;
@@ -84,7 +84,7 @@ export default class SpriteMap extends SimpleRectangle {
 		const textureBuffer = this.textureBuffer.getBuffer();
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
-		gl.vertexAttribPointer(shader.attributeTexCoordLocation, 2, gl.FLOAT, false, 0, this.frame * 8);
+		gl.vertexAttribPointer(shader.attributeTexCoordLocation, 2, gl.FLOAT, false, 0, this.frame * 8 * 4);
 		gl.enableVertexAttribArray(shader.attributeTexCoordLocation);
 
 		gl.bindTexture(gl.TEXTURE_2D, this.texture);

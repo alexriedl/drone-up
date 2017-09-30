@@ -167,8 +167,6 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 		}
 	}
 
-	console.log(basicTileInfo);
-
 	return {
 		staticContentTextureData: new Uint8Array(textureData),
 		startingTiles,
