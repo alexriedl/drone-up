@@ -1,5 +1,5 @@
-import { BlinkyModel } from 'Pacman/Model';
 import { Direction } from 'Pacman/Utils';
+import { GhostModel } from 'Pacman/Model';
 import { Map } from '../Map';
 import GhostEntity from './GhostEntity';
 import PacEntity from './PacEntity';
@@ -9,7 +9,7 @@ import { Color, Random } from 'Engine/Utils';
 
 export default class Pinky extends GhostEntity {
 	public constructor(map: Map, pacman: PacEntity) {
-		super(new BlinkyModel(), map.metadata.startingTiles.pinky, Direction.UP, map, pacman);
+		super(new GhostModel('Images/pinky.png'), map.metadata.startingTiles.pinky, Direction.UP, map, pacman);
 	}
 
 	public getTargetTile(): vec2 {

@@ -6,6 +6,13 @@ export default abstract class PacMap extends SpriteMap {
 	private currentFrames: number[];
 	private currentFrame: number;
 
+	protected abstract spriteCount: number;
+	protected abstract source: string;
+	protected abstract left: number[];
+	protected abstract right: number[];
+	protected abstract up: number[];
+	protected abstract down: number[];
+
 	public constructor() {
 		super();
 
@@ -17,13 +24,6 @@ export default abstract class PacMap extends SpriteMap {
 	public goRight(): void { this.currentFrames = this.right; }
 	public goUp(): void { this.currentFrames = this.up; }
 	public goDown(): void { this.currentFrames = this.down; }
-
-	protected abstract get spriteCount(): number;
-	protected abstract get source(): string;
-	protected abstract get left(): number[];
-	protected abstract get right(): number[];
-	protected abstract get up(): number[];
-	protected abstract get down(): number[];
 
 	public nextFrame(): void {
 		this.currentFrame = (this.currentFrame + 1) % this.currentFrames.length;

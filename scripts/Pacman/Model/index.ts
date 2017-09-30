@@ -1,9 +1,9 @@
-import BlinkyModel from './BlinkyModel';
+import GhostModel from './GhostModel';
 import PacmanModel from './PacmanModel';
 import PacMap from './PacMap';
 
 export {
-	BlinkyModel,
+	GhostModel,
 	PacmanModel,
 	PacMap,
 };
