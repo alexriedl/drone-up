@@ -1,5 +1,6 @@
 import { Direction } from 'Pacman/Utils';
 import { Map } from '../Map';
+import { BlinkyModel } from 'Pacman/Model';
 import GhostEntity from './GhostEntity';
 import PacEntity from './PacEntity';
 
@@ -8,7 +9,7 @@ import { Color, Random } from 'Engine/Utils';
 
 export default class Clyde extends GhostEntity {
 	public constructor(map: Map, pacman: PacEntity) {
-		super(map.metadata.startingTiles.clyde, Direction.DOWN, Map.COLOR.CLYDE.normalize(), map, pacman);
+		super(new BlinkyModel(), map.metadata.startingTiles.clyde, Direction.DOWN, map, pacman);
 	}
 
 	public getTargetTile(): vec2 {

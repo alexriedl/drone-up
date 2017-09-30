@@ -1,5 +1,6 @@
 import { Direction } from 'Pacman/Utils';
 import { MapTile, Map, OriginalMap } from 'Pacman/Map';
+import { PacMap } from 'Pacman/Model';
 
 import { Color } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';
@@ -7,6 +8,7 @@ import { SimpleTextureRectangle, SimpleRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
 export default abstract class PacEntity extends Entity {
+	protected model: PacMap;
 	public facing: Direction;
 	public desired: Direction;
 	public tilePosition: vec2;
@@ -18,8 +20,8 @@ export default abstract class PacEntity extends Entity {
 	private showDesired: Entity;
 
 	// TODO: Map should not need to be passed into entity
-	public constructor(startTile: vec2, facingDirection: Direction, color: Color, map: Map) {
-		super(new SimpleRectangle(color));
+	public constructor(model: PacMap, startTile: vec2, facingDirection: Direction, map: Map) {
+		super(model);
 
 		// TODO: Conversion between tiles and pixels in entity is strange...
 		this.tilePosition = startTile;
@@ -32,24 +34,10 @@ export default abstract class PacEntity extends Entity {
 		const sdModel = new SimpleRectangle(Color.RED);
 		this.showDesired = new Entity(sdModel, new vec3(), new vec3(1 / 8, 1 / 8, 1));
 		this.showDesired.setParent(this);
-
-		/*
-		Expected things that will need to be passed to each PacEntity are listed below. It is expected
-		each type of entity would extend this class and pass the obvious requirements down directly.
-
-		- Model
-			- Models per direction?
-			- Models per animation frame?
-		- Movement behavior
-		- ?? How does ghost modes work? directly to behavior, and that passes the differences down, or
-		change the behavior to the new mode when it needs to.
-		- ?? How to show ghost vs frightened?
-		- ?? How to entity speeds get updated for different levels / or within a single level?
-		*/
 	}
 
 	public get position(): vec3 { return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(0); }
-	public set position(value: vec3) { console.log("Ignoring direct set of PacEntity's position value"); }
+	public set position(value: vec3) { return; }
 	protected get roundingSize(): number { return 4; }
 	protected get followRestrictions(): boolean { return false; }
 

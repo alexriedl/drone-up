@@ -1,5 +1,6 @@
 import { Direction } from 'Pacman/Utils';
 import { Map } from 'Pacman/Map';
+import { PacMap } from 'Pacman/Model';
 import PacEntity from './PacEntity';
 
 import { vec2 } from 'Engine/Math';
@@ -11,9 +12,8 @@ abstract class GhostEntity extends PacEntity {
 
 	public ghostMode: GhostEntity.GhostMode;
 
-	public constructor(startTile: vec2, facingDirection: Direction, color: Color,
-		map: Map, pacman: PacEntity) {
-		super(startTile, facingDirection, color, map);
+	public constructor(model: PacMap, startTile: vec2, facingDirection: Direction, map: Map, pacman: PacEntity) {
+		super(model, startTile, facingDirection, map);
 		this.pacman = pacman;
 	}
 
@@ -40,6 +40,13 @@ abstract class GhostEntity extends PacEntity {
 		// We moved to a new tile
 		if (!startingTile.exactEquals(this.tilePosition)) {
 			this.updateDesiredDirection();
+			switch (this.facing) {
+				case Direction.LEFT: this.model.goLeft(); break;
+				case Direction.RIGHT: this.model.goRight(); break;
+				case Direction.UP: this.model.goUp(); break;
+				case Direction.DOWN: this.model.goDown(); break;
+			}
+			this.model.nextFrame();
 		}
 	}
 

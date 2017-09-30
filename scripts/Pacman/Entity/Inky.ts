@@ -1,5 +1,6 @@
 import { Direction } from 'Pacman/Utils';
 import { Map } from '../Map';
+import { BlinkyModel } from 'Pacman/Model';
 import GhostEntity from './GhostEntity';
 import PacEntity from './PacEntity';
 
@@ -10,7 +11,7 @@ export default class Inky extends GhostEntity {
 	private blinky: PacEntity;
 
 	public constructor(map: Map, pacman: PacEntity, blinky: PacEntity) {
-		super(map.metadata.startingTiles.inky, Direction.DOWN, Map.COLOR.INKY.normalize(), map, pacman);
+		super(new BlinkyModel(), map.metadata.startingTiles.inky, Direction.DOWN, map, pacman);
 		this.blinky = blinky;
 	}
 

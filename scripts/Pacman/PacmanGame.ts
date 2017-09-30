@@ -64,11 +64,14 @@ export default class PacmanGame extends Game {
 	protected up: boolean;
 	protected down: boolean;
 
+	protected introTime: number;
+
 	public constructor(canvasId: string) {
 		const map = new OriginalMap();
 		super(canvasId, map.pixelDimensions);
 		this.map = map;
 		this.backgroundColor = Color.BLACK;
+		this.introTime = 3 * 1000;
 	}
 
 	protected initialize(gl: WebGLRenderingContext): void {
@@ -113,6 +116,11 @@ export default class PacmanGame extends Game {
 			this.pacman.setDesiredDirection(d);
 		}
 
-		super.update(deltaTime);
+		if (this.introTime > 0) {
+			this.introTime -= deltaTime;
+		}
+		else {
+			super.update(deltaTime);
+		}
 	}
 }

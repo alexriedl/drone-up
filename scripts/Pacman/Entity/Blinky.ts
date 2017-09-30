@@ -1,5 +1,6 @@
 import { Direction } from 'Pacman/Utils';
-import { Map } from '../Map';
+import { Map } from 'Pacman/Map';
+import { BlinkyModel } from 'Pacman/Model';
 import GhostEntity from './GhostEntity';
 import PacEntity from './PacEntity';
 
@@ -7,8 +8,10 @@ import { vec2 } from 'Engine/Math';
 import { Color, Random } from 'Engine/Utils';
 
 export default class Blinky extends GhostEntity {
+	protected model: BlinkyModel;
+
 	public constructor(map: Map, pacman: PacEntity) {
-		super(map.metadata.startingTiles.blinky, Direction.LEFT, Map.COLOR.BLINKY.normalize(), map, pacman);
+		super(new BlinkyModel(), map.metadata.startingTiles.blinky, Direction.LEFT, map, pacman);
 	}
 
 	public getTargetTile(): vec2 {
