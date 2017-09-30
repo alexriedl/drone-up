@@ -1,6 +1,4 @@
-import { Color } from 'Engine/Utils';
 import { SpriteMap } from 'Engine/Model';
-import { vec2 } from 'Engine/Math';
 
 export default abstract class PacMap extends SpriteMap {
 	private currentFrames: number[];

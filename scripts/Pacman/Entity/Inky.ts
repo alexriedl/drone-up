@@ -23,7 +23,7 @@ export default class Inky extends GhostEntity {
 				const diff = this.blinky.tilePosition.sub(crossTile);
 				const target = crossTile.sub(diff);
 				return target;
-			case GhostEntity.GhostMode.SCATTER: return this.map.metadata.scatterTargets.pinky;
+			case GhostEntity.GhostMode.SCATTER: return this.map.metadata.scatterTargets.inky;
 			// TODO: Add logic to get frightened target tile, or change the logic to not use target tiles during that mode
 		}
 	}

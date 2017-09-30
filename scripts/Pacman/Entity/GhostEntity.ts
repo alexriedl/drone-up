@@ -82,12 +82,7 @@ abstract class GhostEntity extends PacEntity {
 			}
 		}
 
-		if (shortestDirection !== undefined) {
-			this.nextDesiredDirection = shortestDirection;
-		}
-		else {
-			console.log('Some how got an invalid next direction..');
-		}
+		this.nextDesiredDirection = shortestDirection;
 	}
 }
 
