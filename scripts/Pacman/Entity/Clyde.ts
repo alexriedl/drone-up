@@ -1,6 +1,6 @@
 import { Direction } from 'Pacman/Utils';
 import { GhostModel } from 'Pacman/Model';
-import { Map } from '../Map';
+import { Map } from 'Pacman/Map';
 import GhostEntity from './GhostEntity';
 import PacEntity from './PacEntity';
 
