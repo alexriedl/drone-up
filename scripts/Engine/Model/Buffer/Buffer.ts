@@ -9,14 +9,16 @@ export default abstract class Buffer {
 
 	public initialize(gl: WebGLRenderingContext): void {
 		this.buffer = gl.createBuffer();
+		this.setFullBuffer(gl, this.getValues());
+	}
+
+	protected setFullBuffer(gl: WebGLRenderingContext, values: number[]): void {
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.getValues()), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(values), this.getUsage(gl));
 	}
 
-	public getBuffer(): WebGLBuffer {
-		return this.buffer;
-	}
-
+	public getBuffer(): WebGLBuffer { return this.buffer; }
+	protected getUsage(gl: WebGLRenderingContext): number { return gl.STATIC_DRAW; }
 	protected abstract getValues(): number[];
 
 	private static instances = {};
