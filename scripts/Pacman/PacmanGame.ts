@@ -9,7 +9,7 @@ import { vec2 } from 'Engine/Math';
 
 class GhostParent extends Entity {
 	protected readonly children?: GhostEntity[] = [];
-	private static nextModeDuration: number = 7 * 1000;
+	private static nextModeDuration: number = 7.5 * 1000;
 	private currentGhostMode: GhostEntity.GhostMode;
 	private ghostModeDuration: number = 0;
 	private swaps = 4;

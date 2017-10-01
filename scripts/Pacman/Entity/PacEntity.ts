@@ -2,9 +2,7 @@ import { Direction } from 'Pacman/Utils';
 import { MapTile, Map, OriginalMap } from 'Pacman/Map';
 import { PacMap } from 'Pacman/Model';
 
-import { Color } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';
-import { SimpleRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
 export default abstract class PacEntity extends Entity {
@@ -18,7 +16,6 @@ export default abstract class PacEntity extends Entity {
 
 	protected speed: number = 1;
 	private burn: number = 0;
-	private showDesired: Entity;
 
 	// TODO: Map should not need to be passed into entity
 	public constructor(model: PacMap, startTile: vec2, facingDirection: Direction, map: Map) {
@@ -31,10 +28,6 @@ export default abstract class PacEntity extends Entity {
 		this.facing = facingDirection;
 		this.desired = facingDirection;
 		this.map = map;
-
-		const sdModel = new SimpleRectangle(Color.RED);
-		this.showDesired = new Entity(sdModel, new vec3(), new vec3(1 / 8, 1 / 8, 1));
-		this.showDesired.setParent(this);
 	}
 
 	public get position(): vec3 { return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(0); }
@@ -44,7 +37,6 @@ export default abstract class PacEntity extends Entity {
 
 	public setDesiredDirection(direction: Direction): void {
 		this.desired = direction;
-		this.showDesired.position = PacEntity.move(new vec2(), direction).scale(0.6).toVec3(0);
 	}
 
 	public update(deltaTime: number): boolean {
