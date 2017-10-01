@@ -1,6 +1,6 @@
 import { Color } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';
-import { Model, SimpleTextureRectangle } from 'Engine/Model';
+import { SimpleTextureRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
 import { Direction } from 'Pacman/Utils';
@@ -10,7 +10,7 @@ interface IMapMetaData {
 	staticContentTextureData: Uint8Array;
 	startingTiles: IEntityPositions;
 	scatterTargets: IEntityPositions;
-	basicTileInfo: BasicTileInfo[][];
+	basicTileInfo: Map.BasicTileInfo[][];
 }
 
 interface IEntityPositions {
@@ -21,7 +21,7 @@ interface IEntityPositions {
 	clyde: vec2;
 }
 
-export default abstract class Map extends Entity {
+abstract class Map extends Entity {
 	// NOTE: This is a constant. If this needs to change, all of the hand drawn
 	// tiles would need to be updated
 	public static readonly PIXELS_PER_TILE = 8;
@@ -68,17 +68,22 @@ export default abstract class Map extends Entity {
 		this.model = new SimpleTextureRectangle(texture);
 	}
 
-	public canMoveToTile(coords: vec2, direction?: Direction, allowGhostGate: boolean = false): boolean {
+	public canMoveToTile(coords: vec2, direction?: Direction): boolean {
 		if (coords.x < 0 || coords.x >= this.tileDimensions.x
 			|| coords.y < 0 || coords.y >= this.tileDimensions.y) return true;
 
-		const tile = this.metadata.basicTileInfo[coords.y][coords.x];
-		switch (tile) {
-			case BasicTileInfo.BLOCK: return false;
-			case BasicTileInfo.OPEN: return true;
-			case BasicTileInfo.RESTRICTED_UP: return !direction || direction !== Direction.UP;
-			case BasicTileInfo.GHOST_GATE: return allowGhostGate;
+		switch (this.getTileInfo(coords)) {
+			case Map.BasicTileInfo.GHOST_PEN:
+			case Map.BasicTileInfo.BLOCK: return false;
+			case Map.BasicTileInfo.OPEN: return true;
+			case Map.BasicTileInfo.RESTRICTED_UP: return !direction || direction !== Direction.UP;
 		}
+	}
+
+	public getTileInfo(coords: vec2): Map.BasicTileInfo {
+		if (coords.x < 0 || coords.x >= this.tileDimensions.x
+			|| coords.y < 0 || coords.y >= this.tileDimensions.y) return undefined;
+		return this.metadata.basicTileInfo[coords.y][coords.x];
 	}
 
 	/**
@@ -99,32 +104,35 @@ export default abstract class Map extends Entity {
 	}
 }
 
-enum BasicTileInfo {
-	BLOCK = 'BLOCK',
-	OPEN = 'OPEN',
-	RESTRICTED_UP = 'RESTRICTED_UP',
-	GHOST_GATE = 'GHOST_GATE',
+namespace Map {
+	export enum BasicTileInfo {
+		BLOCK = 'BLOCK',
+		OPEN = 'OPEN',
+		RESTRICTED_UP = 'RESTRICTED_UP',
+		GHOST_PEN = 'GHOST_PEN',
+	}
 }
 
-function getBasicTileInfo(tile: MapTile): BasicTileInfo {
+function getBasicTileInfo(tile: MapTile): Map.BasicTileInfo {
 	switch (tile) {
 		case MapTile._PS:
 		case MapTile._FS:
 		case MapTile.GSB:
-		case MapTile.GSP:
-		case MapTile.GSI:
-		case MapTile.GSC:
 		case MapTile._s_:
 		case MapTile.___:
 		case MapTile._p_:
 		case MapTile._E_:
-			return BasicTileInfo.OPEN;
+			return Map.BasicTileInfo.OPEN;
 
 		case MapTile.RUp:
-		case MapTile.RU_: return BasicTileInfo.RESTRICTED_UP;
-		case MapTile.GGG: return BasicTileInfo.GHOST_GATE;
+		case MapTile.RU_: return Map.BasicTileInfo.RESTRICTED_UP;
 
-		default: return BasicTileInfo.BLOCK;
+		case MapTile.GSP:
+		case MapTile.GSI:
+		case MapTile.GSC:
+		case MapTile.GGG: case MapTile.GP_: return Map.BasicTileInfo.GHOST_PEN;
+
+		default: return Map.BasicTileInfo.BLOCK;
 	}
 }
 
@@ -213,3 +221,5 @@ function isBitSet(bit: number, value: number): boolean {
 	// tslint:disable-next-line:no-bitwise
 	return !!(value & (1 << bit));
 }
+
+export default Map;

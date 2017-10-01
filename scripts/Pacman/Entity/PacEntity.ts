@@ -4,7 +4,7 @@ import { PacMap } from 'Pacman/Model';
 
 import { Color } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';
-import { SimpleTextureRectangle, SimpleRectangle } from 'Engine/Model';
+import { SimpleRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
 export default abstract class PacEntity extends Entity {
@@ -16,6 +16,7 @@ export default abstract class PacEntity extends Entity {
 
 	public map: Map;
 
+	protected speed: number = 1;
 	private burn: number = 0;
 	private showDesired: Entity;
 
@@ -25,7 +26,7 @@ export default abstract class PacEntity extends Entity {
 
 		// TODO: Conversion between tiles and pixels in entity is strange...
 		this.tilePosition = startTile;
-		this.pixelPosition = new vec2(Map.PIXELS_PER_TILE - 1, Map.PIXELS_PER_TILE / 2);
+		this.pixelPosition = new vec2(0, Map.PIXELS_PER_TILE / 2);
 		this.scale = new vec3(16, 16, 1);
 		this.facing = facingDirection;
 		this.desired = facingDirection;
@@ -48,7 +49,7 @@ export default abstract class PacEntity extends Entity {
 
 	public update(deltaTime: number): boolean {
 		this.burn += deltaTime;
-		const step = 20;
+		const step = 20 / this.speed;
 
 		while (this.burn >= step) {
 			this.burn -= step;

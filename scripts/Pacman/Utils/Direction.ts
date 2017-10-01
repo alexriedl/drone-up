@@ -24,6 +24,13 @@ export namespace Direction {
 			case Direction.DOWN: return new vec2(+0, +1);
 		}
 	}
+
+	export function fromVector(d: vec2): Direction {
+		if (d.x > 0) return Direction.RIGHT;
+		if (d.x < 0) return Direction.LEFT;
+		if (d.y > 0) return Direction.DOWN;
+		if (d.y < 0) return Direction.UP;
+	}
 }
 
 export default Direction;
