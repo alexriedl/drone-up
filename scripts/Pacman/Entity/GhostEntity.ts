@@ -88,8 +88,7 @@ abstract class GhostEntity extends PacEntity {
 			// We moved to a new tile
 			if (!startingTile.exactEquals(this.tilePosition)) {
 				this.updateDesiredDirection();
-				// TODO: Updating this here causes ghosts eyes to update late (not at center of tile when they change direction)
-				switch (this.facing) {
+				switch (this.desired) {
 					case Direction.LEFT: this.model.goLeft(); break;
 					case Direction.RIGHT: this.model.goRight(); break;
 					case Direction.UP: this.model.goUp(); break;
@@ -164,12 +163,12 @@ abstract class GhostEntity extends PacEntity {
 		}
 		else if (this.penState.direction === Direction.UP &&
 			this.tilePosition.exactEquals(this.danceTile.addValues(0, -1)) &&
-			this.pixelPosition.y >= 4) {
+			this.pixelPosition.y > 4) {
 			this.penState.direction = Direction.DOWN;
 		}
 		else if (this.penState.direction === Direction.DOWN &&
 			this.tilePosition.exactEquals(this.danceTile.addValues(0, 1)) &&
-			this.pixelPosition.y <= 3) {
+			this.pixelPosition.y < 4) {
 			this.penState.direction = Direction.UP;
 		}
 	}
