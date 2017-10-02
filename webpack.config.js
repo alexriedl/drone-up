@@ -20,10 +20,8 @@ module.exports = {
 		'pacman': './scripts/pacman.ts'
 	},
 	resolve: {
-		extensions: ['', '.js', '.jsx', '.ts', '.tsx'],
-		root: [
-			path.resolve('./scripts')
-		],
+		extensions: ['.js', '.jsx', '.ts', '.tsx'],
+		modules: [ 'node_modules', 'scripts/' ]
 	},
 	output: {
 		path: path.join(__dirname, bundleOutputDir),
