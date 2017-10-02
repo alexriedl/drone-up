@@ -22,9 +22,9 @@ export default class PacModel extends SimpleRectangle {
 	protected updateBuffer(): number[] {
 		const data: number[] = [];
 		for (const coord of this.pacs) {
-			const l = (coord.x - 0) * Map.PIXELS_PER_TILE + 2;
+			const l = coord.x * Map.PIXELS_PER_TILE + 2;
 			const r = l + 2;
-			const t = (coord.y - 0) * Map.PIXELS_PER_TILE + 2;
+			const t = coord.y * Map.PIXELS_PER_TILE + 2;
 			const b = t + 2;
 
 			data.push(l, t, r, t, r, b);
