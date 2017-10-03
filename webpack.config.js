@@ -19,7 +19,7 @@ module.exports = {
 		'pacman': './scripts/pacman.ts'
 	},
 	resolve: {
-		extensions: ['.js', '.jsx', '.ts', '.tsx'],
+		extensions: ['.js', '.ts'],
 		modules: [ 'node_modules', 'scripts/' ]
 	},
 	output: {
@@ -29,9 +29,9 @@ module.exports = {
 	},
 	module: {
 		loaders: [
-			{ test: /\.js(x?)$/, loaders: ['babel-loader?' + JSON.stringify(babelSettings)], exclude: /node_modules[\\/](?!@duel)/ },
-			{ test: /\.ts(x?)$/, include: /scripts/, loader: 'babel-loader' },
-			{ test: /\.ts(x?)$/, loader: 'ts-loader', query: { silent: true } },
+			{ test: /\.js$/, loaders: ['babel-loader?' + JSON.stringify(babelSettings)], exclude: /node_modules[\\/]/ },
+			{ test: /\.ts$/, include: /scripts/, loader: 'babel-loader' },
+			{ test: /\.ts$/, loader: 'ts-loader', query: { silent: true } },
 		]
 	},
 	plugins: [/* Default, all builds plugins */]
