@@ -71,10 +71,10 @@ enum MapTile {
 
 namespace MapTile {
 	/**
-	 * For a given tile, generate an array to indicate which pixels are lite up.
+	 * For a given tile, generate an array to indicate which pixels are lit up.
 	 *
 	 * Returns an array of ints. Each element in the array is a row of pixels in the
-	 * tile. Each bit in each element indicates which pixels are lite. Bit 0, is x
+	 * tile. Each bit in each element indicates which pixels are lit. Bit 0, is x
 	 * 0.
 	 */
 	export function getPixelInfo(tile: MapTile): number[] {
