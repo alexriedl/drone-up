@@ -5,7 +5,6 @@ var webpack = require('webpack');
 var bundleOutputDir = './wwwroot/dist';
 
 var babelSettings = {
-	presets: ['es2015'],
 	plugins: [
 		'transform-class-properties',
 		'transform-object-rest-spread',
