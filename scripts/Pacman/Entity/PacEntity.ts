@@ -1,5 +1,5 @@
 import { Direction } from 'Pacman/Utils';
-import { MapTile, Map, OriginalMap } from 'Pacman/Map';
+import { Map } from 'Pacman/Map';
 import { PacMap } from 'Pacman/Model';
 
 import { Entity } from 'Engine/Entity';

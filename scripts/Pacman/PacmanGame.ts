@@ -1,10 +1,7 @@
 import { Direction } from 'Pacman/Utils';
 import { Map, OriginalMap } from 'Pacman/Map';
 
-import { Color, Random } from 'Engine/Utils';
-import { Entity } from 'Engine/Entity';
-import { Game, Renderer } from 'Engine/Game';
-import { vec2 } from 'Engine/Math';
+import { Game } from 'Engine/Game';
 
 export default class PacmanGame extends Game {
 	protected scene: Map;

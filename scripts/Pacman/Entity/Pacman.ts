@@ -1,5 +1,4 @@
 import { Direction } from 'Pacman/Utils';
-import { Map } from 'Pacman/Map';
 import { PacmanModel } from 'Pacman/Model';
 import PacEntity from './PacEntity';
 

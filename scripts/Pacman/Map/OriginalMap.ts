@@ -1,8 +1,6 @@
 import MT from './MapTile';
 import Map from './Map';
 
-import { vec2 } from 'Engine/Math';
-
 // tslint:disable:max-line-length
 const tiles = [
 	[MT.___, MT.___, MT.GTP, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.___, MT.GTB, MT.___, MT.___],

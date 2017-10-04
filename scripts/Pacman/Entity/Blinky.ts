@@ -1,11 +1,9 @@
 import { Direction } from 'Pacman/Utils';
 import { GhostModel } from 'Pacman/Model';
-import { Map } from 'Pacman/Map';
 import GhostEntity from './GhostEntity';
 import PacEntity from './PacEntity';
 
 import { vec2 } from 'Engine/Math';
-import { Color, Random } from 'Engine/Utils';
 
 export default class Blinky extends GhostEntity {
 	protected model: GhostModel;

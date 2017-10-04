@@ -3,8 +3,7 @@ import { Map } from 'Pacman/Map';
 import { PacMap } from 'Pacman/Model';
 import PacEntity from './PacEntity';
 
-import { vec2, vec3 } from 'Engine/Math';
-import { Color } from 'Engine/Utils';
+import { vec2 } from 'Engine/Math';
 
 interface IPenState {
 	entering: boolean;

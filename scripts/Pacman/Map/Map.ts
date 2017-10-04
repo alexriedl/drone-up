@@ -1,7 +1,7 @@
 import { Color } from 'Engine/Utils';
 import { Entity } from 'Engine/Entity';
 import { SimpleTextureRectangle } from 'Engine/Model';
-import { vec2, vec3 } from 'Engine/Math';
+import { vec2 } from 'Engine/Math';
 
 import { Direction } from 'Pacman/Utils';
 import { GhostEntity, Pacman, Blinky, Pinky, Inky, Clyde } from 'Pacman/Entity';
@@ -93,6 +93,7 @@ abstract class Map extends Entity {
 		this.pacModel = new PacModel(this.metadata.pacs);
 		new Entity(this.pacModel).setParent(this);
 		const energizerModel = this.energizerModel = new PacModel(this.metadata.energizers, 6);
+		// TODO: This is hacky just to get it to work
 		// tslint:disable-next-line:max-classes-per-file
 		new (class extends Entity {
 			private flip = 300;
