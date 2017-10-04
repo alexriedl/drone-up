@@ -55,7 +55,7 @@ abstract class Map extends Entity {
 
 	public metadata: IMapMetaData;
 	private pacModel: PacModel;
-	private energizeModel: PacModel;
+	private energizerModel: PacModel;
 	private pacman: Pacman;
 
 	/**
@@ -92,8 +92,20 @@ abstract class Map extends Entity {
 
 		this.pacModel = new PacModel(this.metadata.pacs);
 		new Entity(this.pacModel).setParent(this);
-		this.energizeModel = new PacModel(this.metadata.energizers, 4);
-		new Entity(this.energizeModel).setParent(this);
+		const energizerModel = this.energizerModel = new PacModel(this.metadata.energizers, 6);
+		// tslint:disable-next-line:max-classes-per-file
+		new (class extends Entity {
+			private flip = 300;
+			public update(deltaTime: number): boolean {
+				this.flip -= deltaTime;
+				if (this.flip <= 0) {
+					this.flip += 300;
+					this.model = !!this.model ? undefined : energizerModel;
+				}
+				return super.update(deltaTime);
+			}
+		})(this.energizerModel)
+		.setParent(this);
 
 		const startingTiles = this.metadata.startingTiles;
 		this.pacman = new Pacman(startingTiles.pacman);
@@ -112,7 +124,7 @@ abstract class Map extends Entity {
 	}
 
 	public removePacAt(coords: vec2): number {
-		if (this.energizeModel.removePacAt(coords)) return 3;
+		if (this.energizerModel.removePacAt(coords)) return 3;
 		if (this.pacModel.removePacAt(coords)) return 1;
 		return 0;
 	}
