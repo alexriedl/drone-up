@@ -7,8 +7,8 @@ export default abstract class Game {
 	protected readonly renderer: Renderer;
 
 	// TODO: Perhaps extend entity to make a real scene? Allow a color to be set
-	private scene: Entity;
-	public backgroundColor: Color;
+	protected scene: Entity;
+	protected backgroundColor: Color;
 
 	private then: number;
 	private running: boolean = false;
@@ -25,9 +25,10 @@ export default abstract class Game {
 	 * Set the scene for the game. The default update/render functions redirect logic to this scene.
 	 * The old scene will be returned
 	 */
-	public setScene(scene: Entity): Entity {
+	public setScene(scene: Entity, backgroundColor: Color = Color.BLACK): Entity {
 		const old = this.scene;
 		this.scene = scene;
+		this.backgroundColor = backgroundColor;
 		return old;
 	}
 

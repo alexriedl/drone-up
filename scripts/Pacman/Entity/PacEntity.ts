@@ -17,8 +17,7 @@ export default abstract class PacEntity extends Entity {
 	protected speed: number = 1;
 	private burn: number = 0;
 
-	// TODO: Map should not need to be passed into entity
-	public constructor(model: PacMap, startTile: vec2, facingDirection: Direction, map: Map) {
+	public constructor(model: PacMap, startTile: vec2, facingDirection: Direction) {
 		super(model);
 
 		// TODO: Conversion between tiles and pixels in entity is strange...

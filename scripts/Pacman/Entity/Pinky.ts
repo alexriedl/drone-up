@@ -8,8 +8,8 @@ import { vec2 } from 'Engine/Math';
 import { Color, Random } from 'Engine/Utils';
 
 export default class Pinky extends GhostEntity {
-	public constructor(map: Map, pacman: PacEntity) {
-		super(new GhostModel('Images/pinky.png'), map.metadata.startingTiles.pinky, Direction.UP, map, pacman);
+	public constructor(startTile: vec2, pacman: PacEntity) {
+		super(new GhostModel('Images/pinky.png'), startTile, Direction.UP, pacman);
 	}
 
 	public getTargetTile(): vec2 {

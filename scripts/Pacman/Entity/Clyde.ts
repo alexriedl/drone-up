@@ -8,8 +8,8 @@ import { vec2 } from 'Engine/Math';
 import { Color, Random } from 'Engine/Utils';
 
 export default class Clyde extends GhostEntity {
-	public constructor(map: Map, pacman: PacEntity) {
-		super(new GhostModel('Images/clyde.png'), map.metadata.startingTiles.clyde, Direction.DOWN, map, pacman);
+	public constructor(startTile: vec2, pacman: PacEntity) {
+		super(new GhostModel('Images/clyde.png'), startTile, Direction.DOWN, pacman);
 	}
 
 	public getTargetTile(): vec2 {

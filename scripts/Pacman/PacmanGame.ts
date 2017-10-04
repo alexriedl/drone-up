@@ -1,5 +1,4 @@
 import { Direction } from 'Pacman/Utils';
-import { GhostEntity, Pacman, Blinky, Pinky, Inky, Clyde } from 'Pacman/Entity';
 import { Map, OriginalMap } from 'Pacman/Map';
 
 import { Color, Random } from 'Engine/Utils';
@@ -8,9 +7,7 @@ import { Game, Renderer } from 'Engine/Game';
 import { vec2 } from 'Engine/Math';
 
 export default class PacmanGame extends Game {
-	public map: Map;
-
-	private pacman: Pacman;
+	protected scene: Map;
 
 	protected left: boolean;
 	protected right: boolean;
@@ -22,24 +19,12 @@ export default class PacmanGame extends Game {
 	public constructor(canvasId: string) {
 		const map = new OriginalMap();
 		super(canvasId, map.pixelDimensions);
-		this.map = map;
-		this.backgroundColor = Color.BLACK;
 		this.introTime = 3 * 1000;
+		this.setScene(map);
 	}
 
 	protected initialize(gl: WebGLRenderingContext): void {
-		this.map.initialize(gl);
-		this.setScene(this.map);
-
-		this.addToScene(this.pacman = new Pacman(this.map));
-
-		let blinky;
-		this.addToScene(blinky = new Blinky(this.map, this.pacman));
-		this.addToScene(new Pinky(this.map, this.pacman));
-		this.addToScene(new Inky(this.map, this.pacman, blinky));
-		this.addToScene(new Clyde(this.map, this.pacman));
-
-		this.map.setGhostMode(GhostEntity.GhostMode.SCATTER, false);
+		this.scene.initialize(gl);
 	}
 
 	public onkeydown(event: KeyboardEvent): boolean {
@@ -69,7 +54,7 @@ export default class PacmanGame extends Game {
 		if (this.up) d = Direction.UP;
 		if (this.down) d = Direction.DOWN;
 		if (d !== undefined) {
-			this.pacman.setDesiredDirection(d);
+			this.scene.setPlayerDirection(d);
 		}
 
 		if (this.introTime > 0) {

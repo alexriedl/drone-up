@@ -22,8 +22,8 @@ abstract class GhostEntity extends PacEntity {
 	protected penState: IPenState;
 	protected danceTile: vec2;
 
-	public constructor(model: PacMap, startTile: vec2, facingDirection: Direction, map: Map, pacman: PacEntity) {
-		super(model, startTile, facingDirection, map);
+	public constructor(model: PacMap, startTile: vec2, facingDirection: Direction, pacman: PacEntity) {
+		super(model, startTile, facingDirection);
 		this.pacman = pacman;
 		this.danceTile = startTile;
 

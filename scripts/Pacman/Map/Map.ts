@@ -4,7 +4,7 @@ import { SimpleTextureRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
 import { Direction } from 'Pacman/Utils';
-import { GhostEntity } from 'Pacman/Entity';
+import { GhostEntity, Pacman, Blinky, Pinky, Inky, Clyde } from 'Pacman/Entity';
 import { PacModel } from 'Pacman/Model';
 import MapTile from './MapTile';
 
@@ -54,6 +54,7 @@ abstract class Map extends Entity {
 
 	public metadata: IMapMetaData;
 	protected pacModel: PacModel;
+	private pacman: Pacman;
 
 	/**
 	 * Do not use this value. After the map is initialized, this is blown away
@@ -90,6 +91,21 @@ abstract class Map extends Entity {
 		this.pacModel = new PacModel(this.metadata.pacs);
 		const pacsEntity = new Entity(this.pacModel);
 		pacsEntity.setParent(this);
+
+		const startingTiles = this.metadata.startingTiles;
+		this.pacman = new Pacman(startingTiles.pacman);
+		const blinky = new Blinky(startingTiles.blinky, this.pacman);
+		const pinky = new Pinky(startingTiles.pinky, this.pacman);
+		const inky = new Inky(startingTiles.inky, this.pacman, blinky);
+		const clyde = new Clyde(startingTiles.clyde, this.pacman);
+
+		this.pacman.setParent(this);
+		blinky.setParent(this);
+		pinky.setParent(this);
+		inky.setParent(this);
+		clyde.setParent(this);
+
+		this.setGhostMode(GhostEntity.GhostMode.SCATTER, false);
 	}
 
 	public removePacAt(coords: vec2): boolean {
@@ -104,6 +120,10 @@ abstract class Map extends Entity {
 				child.setGhostMode(newMode, reverse);
 			}
 		});
+	}
+
+	public setPlayerDirection(direction: Direction): void {
+		this.pacman.setDesiredDirection(direction);
 	}
 
 	// TODO: Change ghost update. This could cause timing issues with ghost modes the way it works It

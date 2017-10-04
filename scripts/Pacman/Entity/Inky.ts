@@ -10,8 +10,8 @@ import { Color, Random } from 'Engine/Utils';
 export default class Inky extends GhostEntity {
 	private blinky: PacEntity;
 
-	public constructor(map: Map, pacman: PacEntity, blinky: PacEntity) {
-		super(new GhostModel('Images/inky.png'), map.metadata.startingTiles.inky, Direction.DOWN, map, pacman);
+	public constructor(startTile: vec2, pacman: PacEntity, blinky: PacEntity) {
+		super(new GhostModel('Images/inky.png'), startTile, Direction.DOWN, pacman);
 		this.blinky = blinky;
 	}
 

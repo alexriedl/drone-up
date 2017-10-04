@@ -3,12 +3,14 @@ import { Map } from 'Pacman/Map';
 import { PacmanModel } from 'Pacman/Model';
 import PacEntity from './PacEntity';
 
+import { vec2 } from 'Engine/Math';
+
 export default class Pacman extends PacEntity {
 	protected model: PacmanModel;
 	protected deadTicks: number = 0;
 
-	public constructor(map: Map) {
-		super(new PacmanModel(), map.metadata.startingTiles.pacman, Direction.LEFT, map);
+	public constructor(startTile: vec2) {
+		super(new PacmanModel(), startTile, Direction.LEFT);
 	}
 
 	protected tick(): void {
