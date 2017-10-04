@@ -56,7 +56,7 @@ abstract class GhostEntity extends PacEntity {
 	protected tick(): void {
 		const startingTile = this.tilePosition;
 
-		const inPen = this.map.getTileInfo(this.tilePosition) === Map.BasicTileInfo.GHOST_PEN;
+		const inPen = this.parent.getTileInfo(this.tilePosition) === Map.BasicTileInfo.GHOST_PEN;
 		if (inPen) {
 			if (!this.penState) {
 				this.speed = 0.3;
@@ -196,7 +196,7 @@ abstract class GhostEntity extends PacEntity {
 		let shortestDirection;
 		for (const direction of options) {
 			const testTile = PacEntity.move(nextTile, direction);
-			if (this.map.canMoveToTile(testTile, direction)) {
+			if (this.parent.canMoveToTile(testTile, direction)) {
 				const distanceToTarget = testTile.sqrDist(this.getTargetTile());
 				if (distanceToTarget < shortestDistance) {
 					shortestDistance = distanceToTarget;

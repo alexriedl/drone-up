@@ -17,7 +17,7 @@ export default class Blinky extends GhostEntity {
 	public getTargetTile(): vec2 {
 		switch (this.ghostMode) {
 			case GhostEntity.GhostMode.CHASE: return this.pacman.tilePosition;
-			case GhostEntity.GhostMode.SCATTER: return this.map.metadata.scatterTargets.blinky;
+			case GhostEntity.GhostMode.SCATTER: return this.parent.metadata.scatterTargets.blinky;
 			// TODO: Add logic to get frightened target tile, or change the logic to not use target tiles during that mode
 		}
 	}

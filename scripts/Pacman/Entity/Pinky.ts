@@ -17,7 +17,7 @@ export default class Pinky extends GhostEntity {
 			case GhostEntity.GhostMode.CHASE:
 				// TODO: Need to introduce pinky target bug
 				return this.pacman.tilePosition.add(Direction.getVector(this.pacman.facing).scale(4));
-			case GhostEntity.GhostMode.SCATTER: return this.map.metadata.scatterTargets.pinky;
+			case GhostEntity.GhostMode.SCATTER: return this.parent.metadata.scatterTargets.pinky;
 			// TODO: Add logic to get frightened target tile, or change the logic to not use target tiles during that mode
 		}
 	}

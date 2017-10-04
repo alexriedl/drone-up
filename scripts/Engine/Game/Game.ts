@@ -31,6 +31,7 @@ export default abstract class Game {
 		return old;
 	}
 
+	// TODO: This could be very confusing when compared to simply calling setparent directly
 	public addToScene(entity: Entity): void {
 		if (this.scene) entity.setParent(this.scene);
 	}

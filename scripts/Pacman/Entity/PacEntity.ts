@@ -12,7 +12,7 @@ export default abstract class PacEntity extends Entity {
 	public tilePosition: vec2;
 	public pixelPosition: vec2;
 
-	public map: Map;
+	protected parent?: Map;
 
 	protected speed: number = 1;
 	private burn: number = 0;
@@ -27,7 +27,6 @@ export default abstract class PacEntity extends Entity {
 		this.scale = new vec3(16, 16, 1);
 		this.facing = facingDirection;
 		this.desired = facingDirection;
-		this.map = map;
 	}
 
 	public get position(): vec3 { return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(0); }
@@ -64,7 +63,7 @@ export default abstract class PacEntity extends Entity {
 					Math.abs(this.pixelPosition.x - xCenter) <= this.roundingSize)) {
 
 				nextTile = PacEntity.move(this.tilePosition, this.desired);
-				const canMove = this.map.canMoveToTile(nextTile, this.followRestrictions ? this.desired : undefined);
+				const canMove = this.parent.canMoveToTile(nextTile, this.followRestrictions ? this.desired : undefined);
 				if (canMove) {
 					this.facing = this.desired;
 					this.pixelPosition = PacEntity.move(this.pixelPosition, this.facing);
@@ -82,7 +81,7 @@ export default abstract class PacEntity extends Entity {
 				(this.facing === Direction.UP && nextPixel.y < yCenter) ||
 				(this.facing === Direction.DOWN && nextPixel.y > yCenter)) {
 				nextTile = PacEntity.move(this.tilePosition, this.facing);
-				const canMove = this.map.canMoveToTile(nextTile, this.followRestrictions ? this.facing : undefined);
+				const canMove = this.parent.canMoveToTile(nextTile, this.followRestrictions ? this.facing : undefined);
 				if (canMove) this.pixelPosition = nextPixel;
 			}
 			else {
@@ -103,7 +102,7 @@ export default abstract class PacEntity extends Entity {
 		// NOTE: Ensure pixel and tile position is valid, and re-orient if not.
 		if (this.pixelPosition.x >= Map.PIXELS_PER_TILE || this.pixelPosition.x < 0 ||
 			this.pixelPosition.y >= Map.PIXELS_PER_TILE || this.pixelPosition.y < 0) {
-			this.tilePosition = this.tilePosition.exactEquals(nextTile) ? nextTile : this.map.orientCoords(nextTile);
+			this.tilePosition = this.tilePosition.exactEquals(nextTile) ? nextTile : this.parent.orientCoords(nextTile);
 			this.pixelPosition = this.pixelPosition.cmod(Map.PIXELS_PER_TILE);
 		}
 	}

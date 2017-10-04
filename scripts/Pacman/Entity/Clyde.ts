@@ -17,8 +17,8 @@ export default class Clyde extends GhostEntity {
 			case GhostEntity.GhostMode.CHASE:
 				const distance = this.tilePosition.dist(this.pacman.tilePosition);
 				if (distance >= 8) return this.pacman.tilePosition;
-				else return this.map.metadata.scatterTargets.clyde;
-			case GhostEntity.GhostMode.SCATTER: return this.map.metadata.scatterTargets.clyde;
+				else return this.parent.metadata.scatterTargets.clyde;
+			case GhostEntity.GhostMode.SCATTER: return this.parent.metadata.scatterTargets.clyde;
 			// TODO: Add logic to get frightened target tile, or change the logic to not use target tiles during that mode
 		}
 	}

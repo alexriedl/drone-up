@@ -1,5 +1,5 @@
 import { Direction } from 'Pacman/Utils';
-import { GhostParent, Pacman } from 'Pacman/Entity';
+import { GhostEntity, Pacman, Blinky, Pinky, Inky, Clyde } from 'Pacman/Entity';
 import { Map, OriginalMap } from 'Pacman/Map';
 
 import { Color, Random } from 'Engine/Utils';
@@ -29,14 +29,17 @@ export default class PacmanGame extends Game {
 
 	protected initialize(gl: WebGLRenderingContext): void {
 		this.map.initialize(gl);
-		this.addToScene(this.map);
+		this.setScene(this.map);
 
-		this.pacman = new Pacman(this.map);
-		this.addToScene(this.pacman);
+		this.addToScene(this.pacman = new Pacman(this.map));
 
-		const ghostParent = new GhostParent();
-		ghostParent.setupGhosts(this.map, this.pacman);
-		this.addToScene(ghostParent);
+		let blinky;
+		this.addToScene(blinky = new Blinky(this.map, this.pacman));
+		this.addToScene(new Pinky(this.map, this.pacman));
+		this.addToScene(new Inky(this.map, this.pacman, blinky));
+		this.addToScene(new Clyde(this.map, this.pacman));
+
+		this.map.setGhostMode(GhostEntity.GhostMode.SCATTER, false);
 	}
 
 	public onkeydown(event: KeyboardEvent): boolean {

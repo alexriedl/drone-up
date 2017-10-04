@@ -4,6 +4,7 @@ import { SimpleTextureRectangle } from 'Engine/Model';
 import { vec2, vec3 } from 'Engine/Math';
 
 import { Direction } from 'Pacman/Utils';
+import { GhostEntity } from 'Pacman/Entity';
 import { PacModel } from 'Pacman/Model';
 import MapTile from './MapTile';
 
@@ -21,6 +22,12 @@ interface IEntityPositions {
 	pinky: vec2;
 	inky: vec2;
 	clyde: vec2;
+}
+
+interface IGhostModeInfo {
+	currentGhostMode: GhostEntity.GhostMode;
+	ghostModeDuration: number;
+	swaps: number;
 }
 
 abstract class Map extends Entity {
@@ -42,6 +49,9 @@ abstract class Map extends Entity {
 	public readonly pixelDimensions: vec2;
 	public readonly tileDimensions: vec2;
 
+	private readonly ghostModeInfo: IGhostModeInfo;
+	private static readonly ghostModeDuration: number = 7.5 * 1000;
+
 	public metadata: IMapMetaData;
 	protected pacModel: PacModel;
 
@@ -51,35 +61,66 @@ abstract class Map extends Entity {
 	private tiles: MapTile[][];
 
 	public constructor(tiles: MapTile[][]) {
+		super();
+
 		const numXTiles = tiles[0].length;
 		const numYTiles = tiles.length;
 		const width = numXTiles * Map.PIXELS_PER_TILE;
 		const height = numYTiles * Map.PIXELS_PER_TILE;
 
-		super(undefined, new vec3(width / 2, height / 2));
-
 		this.tiles = tiles;
 		this.pixelDimensions = new vec2(width, height);
 		this.tileDimensions = new vec2(numXTiles, numYTiles);
+
+		this.ghostModeInfo = {
+			currentGhostMode: undefined,
+			ghostModeDuration: Map.ghostModeDuration,
+			swaps: 5,
+		};
 	}
 
 	public initialize(gl: WebGLRenderingContext): void {
 		this.metadata = parseMapInfo(this.tiles); this.tiles = undefined;
 		const texture = createTexture(gl, this.metadata.staticContentTextureData, this.pixelDimensions);
 
-		const fullScale = this.pixelDimensions.toVec3(1);
-
 		const mapModel = new SimpleTextureRectangle(texture);
-		const worldEntity = new Entity(mapModel, new vec3(), fullScale);
+		const worldEntity = new Entity(mapModel, this.pixelDimensions.scale(0.5).toVec3(), this.pixelDimensions.toVec3(1));
 		worldEntity.setParent(this);
 
 		this.pacModel = new PacModel(this.metadata.pacs);
-		const pacsEntity = new Entity(this.pacModel, this.pixelDimensions.negate().scale(0.5).toVec3());
+		const pacsEntity = new Entity(this.pacModel);
 		pacsEntity.setParent(this);
 	}
 
 	public removePacAt(coords: vec2): boolean {
 		return this.pacModel.removePacAt(coords);
+	}
+
+	public setGhostMode(newMode: GhostEntity.GhostMode, reverse: boolean = true) {
+		this.ghostModeInfo.currentGhostMode = newMode;
+		this.ghostModeInfo.ghostModeDuration = Map.ghostModeDuration;
+		this.children.forEach((child) => {
+			if (child instanceof GhostEntity) {
+				child.setGhostMode(newMode, reverse);
+			}
+		});
+	}
+
+	// TODO: Change ghost update. This could cause timing issues with ghost modes the way it works It
+	// is possible to run more than a single tick per update, and updating mode time is only
+	// happening once per update. The issue could be that the mode should change after the first
+	// tick, but before the second tick for the ghosts
+	public update(deltaTime: number): boolean {
+		this.ghostModeInfo.ghostModeDuration -= deltaTime;
+
+		if (this.ghostModeInfo.ghostModeDuration <= 0 && this.ghostModeInfo.swaps > 0) {
+			this.ghostModeInfo.swaps--;
+
+			this.setGhostMode(this.ghostModeInfo.currentGhostMode === GhostEntity.GhostMode.SCATTER ?
+				GhostEntity.GhostMode.CHASE : GhostEntity.GhostMode.SCATTER);
+		}
+
+		return super.update(deltaTime);
 	}
 
 	public canMoveToTile(coords: vec2, direction?: Direction): boolean {
