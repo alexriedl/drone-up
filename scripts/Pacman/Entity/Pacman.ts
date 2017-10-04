@@ -35,8 +35,8 @@ export default class Pacman extends PacEntity {
 		}
 
 		if (!startingTile.exactEquals(this.tilePosition)) {
-			const atePac = this.parent.removePacAt(this.tilePosition);
-			if (atePac) this.deadTicks++;
+			const deadFrames = this.parent.removePacAt(this.tilePosition);
+			this.deadTicks += deadFrames;
 		}
 	}
 }

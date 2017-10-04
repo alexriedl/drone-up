@@ -14,6 +14,7 @@ interface IMapMetaData {
 	scatterTargets: IEntityPositions;
 	basicTileInfo: Map.BasicTileInfo[][];
 	pacs: vec2[];
+	energizers: vec2[];
 }
 
 interface IEntityPositions {
@@ -53,7 +54,8 @@ abstract class Map extends Entity {
 	private static readonly ghostModeDuration: number = 7.5 * 1000;
 
 	public metadata: IMapMetaData;
-	protected pacModel: PacModel;
+	private pacModel: PacModel;
+	private energizeModel: PacModel;
 	private pacman: Pacman;
 
 	/**
@@ -89,8 +91,9 @@ abstract class Map extends Entity {
 		worldEntity.setParent(this);
 
 		this.pacModel = new PacModel(this.metadata.pacs);
-		const pacsEntity = new Entity(this.pacModel);
-		pacsEntity.setParent(this);
+		new Entity(this.pacModel).setParent(this);
+		this.energizeModel = new PacModel(this.metadata.energizers, 4);
+		new Entity(this.energizeModel).setParent(this);
 
 		const startingTiles = this.metadata.startingTiles;
 		this.pacman = new Pacman(startingTiles.pacman);
@@ -108,8 +111,10 @@ abstract class Map extends Entity {
 		this.setGhostMode(GhostEntity.GhostMode.SCATTER, false);
 	}
 
-	public removePacAt(coords: vec2): boolean {
-		return this.pacModel.removePacAt(coords);
+	public removePacAt(coords: vec2): number {
+		if (this.energizeModel.removePacAt(coords)) return 3;
+		if (this.pacModel.removePacAt(coords)) return 1;
+		return 0;
 	}
 
 	public setGhostMode(newMode: GhostEntity.GhostMode, reverse: boolean = true) {
@@ -236,6 +241,7 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 	const startingTiles = { pacman: undefined, blinky: undefined, pinky: undefined, inky: undefined, clyde: undefined };
 	const basicTileInfo = [];
 	const pacs = [];
+	const energizers = [];
 	for (let tileY = 0; tileY < numYTiles; tileY++) {
 		const tileRow = tiles[tileY];
 		const basicRowInfo = [];
@@ -256,6 +262,7 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 				case MapTile.GTC: scatterTargets.clyde = new vec2(tileX, tileY); break;
 
 				case MapTile._p_: case MapTile.RUp: pacs.push(new vec2(tileX, tileY)); break;
+				case MapTile._E_: energizers.push(new vec2(tileX, tileY)); break;
 			}
 		}
 	}
@@ -266,6 +273,7 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 		scatterTargets,
 		basicTileInfo,
 		pacs,
+		energizers,
 	};
 }
 

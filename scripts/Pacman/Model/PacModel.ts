@@ -7,12 +7,14 @@ import { vec2 } from 'Engine/Math';
 
 export default class PacModel extends SimpleRectangle {
 	protected buffer: DynamicBuffer;
-	private pacs: vec2[];
+	private readonly pacs: vec2[];
+	private readonly size: number;
 	private hasBeenInitialized: boolean = false;
 
-	public constructor(pacs: vec2[]) {
+	public constructor(pacs: vec2[], size: number = 2) {
 		super(new Color(1, 1, 1));
 		this.pacs = pacs;
+		this.size = size;
 	}
 
 	protected createVertexBuffer(): DynamicBuffer {
@@ -21,11 +23,12 @@ export default class PacModel extends SimpleRectangle {
 
 	protected updateBuffer(): number[] {
 		const data: number[] = [];
+		const start = Map.PIXELS_PER_TILE / 2 - this.size / 2;
 		for (const coord of this.pacs) {
-			const l = coord.x * Map.PIXELS_PER_TILE + 2;
-			const r = l + 2;
-			const t = coord.y * Map.PIXELS_PER_TILE + 2;
-			const b = t + 2;
+			const l = coord.x * Map.PIXELS_PER_TILE + start;
+			const r = l + this.size;
+			const t = coord.y * Map.PIXELS_PER_TILE + start;
+			const b = t + this.size;
 
 			data.push(l, t, r, t, r, b);
 			data.push(r, b, l, b, l, t);
