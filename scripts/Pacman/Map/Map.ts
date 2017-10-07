@@ -158,6 +158,14 @@ abstract class Map extends Entity {
 				GhostEntity.GhostMode.CHASE : GhostEntity.GhostMode.SCATTER);
 		}
 
+		/*
+		Frame Rate: 1 frame is 1/60 of a second (60 fps)
+
+		NOT CONFIRMED:
+		pacman moves 11 tiles per second. so 88 pixels per second
+
+		*/
+
 		return super.update(deltaTime);
 	}
 

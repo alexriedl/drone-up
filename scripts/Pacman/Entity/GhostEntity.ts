@@ -26,7 +26,7 @@ abstract class GhostEntity extends PacEntity {
 		this.pacman = pacman;
 		this.danceTile = startTile;
 
-		this.speed = 0.3;
+		this.speed = 30;
 		this.penState = {
 			entering: false,
 			leaving: this.constructor.name === 'Pinky',
@@ -52,13 +52,29 @@ abstract class GhostEntity extends PacEntity {
 		}
 	}
 
-	protected tick(): void {
-		const startingTile = this.tilePosition;
+	protected onPixelChange(oldPixelPos: vec2): void {
+		if (this.penState) return;
+	}
 
+	protected onTileChange(oldPixelPos: vec2): void {
+		if (this.penState) return;
+
+		this.updateDesiredDirection();
+
+		switch (this.desired) {
+			case Direction.LEFT: this.model.goLeft(); break;
+			case Direction.RIGHT: this.model.goRight(); break;
+			case Direction.UP: this.model.goUp(); break;
+			case Direction.DOWN: this.model.goDown(); break;
+		}
+		this.model.nextFrame();
+	}
+
+	protected tick(): void {
 		const inPen = this.parent.getTileInfo(this.tilePosition) === Map.BasicTileInfo.GHOST_PEN;
 		if (inPen) {
 			if (!this.penState) {
-				this.speed = 0.3;
+				this.speed = 30;
 				this.penState = {
 					entering: false,
 					leaving: false,
@@ -70,32 +86,12 @@ abstract class GhostEntity extends PacEntity {
 		}
 		else if (this.penState) {
 			this.penState = undefined;
-			this.speed = 1;
+			this.speed = PacEntity.MAX_SPEED;
 			this.facing = this.desired = Direction.LEFT;
 		}
 
-		if (this.penState) {
-			this.inPenTick();
-		}
-		else {
-			const startingPixel = this.pixelPosition;
-			super.tick();
-			if (startingPixel.exactEquals(this.pixelPosition)) {
-				this.updateDesiredDirection();
-			}
-
-			// We moved to a new tile
-			if (!startingTile.exactEquals(this.tilePosition)) {
-				this.updateDesiredDirection();
-				switch (this.desired) {
-					case Direction.LEFT: this.model.goLeft(); break;
-					case Direction.RIGHT: this.model.goRight(); break;
-					case Direction.UP: this.model.goUp(); break;
-					case Direction.DOWN: this.model.goDown(); break;
-				}
-				this.model.nextFrame();
-			}
-		}
+		if (this.penState) this.inPenTick();
+		else super.tick();
 	}
 
 	protected inPenTick(): void {

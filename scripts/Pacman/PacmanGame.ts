@@ -3,6 +3,8 @@ import { Map, OriginalMap } from 'Pacman/Map';
 
 import { Game } from 'Engine/Game';
 
+const MILLISECONDS_PER_FRAME = (1 / 60) * 1000;
+
 export default class PacmanGame extends Game {
 	protected scene: Map;
 
@@ -11,13 +13,16 @@ export default class PacmanGame extends Game {
 	protected up: boolean;
 	protected down: boolean;
 
+	protected frameTime: number;
 	protected introTime: number;
 
 	public constructor(canvasId: string) {
 		const map = new OriginalMap();
 		super(canvasId, map.pixelDimensions);
-		this.introTime = 3 * 1000;
 		this.setScene(map);
+
+		this.frameTime = 0;
+		this.introTime = 3 * 1000;
 	}
 
 	protected initialize(gl: WebGLRenderingContext): void {
@@ -45,6 +50,11 @@ export default class PacmanGame extends Game {
 	}
 
 	protected update(deltaTime: number): void {
+		if (this.introTime > 0) {
+			this.introTime -= deltaTime;
+			return;
+		}
+
 		let d;
 		if (this.left) d = Direction.LEFT;
 		if (this.right) d = Direction.RIGHT;
@@ -54,11 +64,10 @@ export default class PacmanGame extends Game {
 			this.scene.setPlayerDirection(d);
 		}
 
-		if (this.introTime > 0) {
-			this.introTime -= deltaTime;
-		}
-		else {
-			super.update(deltaTime);
+		this.frameTime += deltaTime;
+		while (this.frameTime >= MILLISECONDS_PER_FRAME) {
+			this.frameTime -= MILLISECONDS_PER_FRAME;
+			super.update(MILLISECONDS_PER_FRAME);
 		}
 	}
 }

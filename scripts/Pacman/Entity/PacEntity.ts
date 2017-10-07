@@ -14,8 +14,9 @@ export default abstract class PacEntity extends Entity {
 
 	protected parent?: Map;
 
-	protected speed: number = 1;
-	private burn: number = 0;
+	public static readonly MAX_SPEED = 100;
+	protected speed: number = PacEntity.MAX_SPEED;
+	private traveled: number;
 
 	public constructor(model: PacMap, startTile: vec2, facingDirection: Direction) {
 		super(model);
@@ -26,24 +27,37 @@ export default abstract class PacEntity extends Entity {
 		this.scale = new vec3(16, 16, 1);
 		this.facing = facingDirection;
 		this.desired = facingDirection;
+
+		this.traveled = 0;
 	}
 
 	public get position(): vec3 { return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(0); }
 	public set position(value: vec3) { return; }
 	protected get roundingSize(): number { return 4; }
 	protected get followRestrictions(): boolean { return false; }
+	protected onPixelChange(oldPixelPos: vec2): void { return; }
+	protected onTileChange(oldPixelPos: vec2): void { return; }
 
 	public setDesiredDirection(direction: Direction): void {
 		this.desired = direction;
 	}
 
 	public update(deltaTime: number): boolean {
-		this.burn += deltaTime;
-		const step = 20 / this.speed;
+		this.traveled += this.speed;
+		while (this.traveled >= PacEntity.MAX_SPEED) {
+			this.traveled -= PacEntity.MAX_SPEED;
 
-		while (this.burn >= step) {
-			this.burn -= step;
+			const startingTile = this.tilePosition;
+			const startingPixel = this.pixelPosition;
+
 			this.tick();
+
+			if (!startingPixel.exactEquals(this.pixelPosition)) {
+				this.onPixelChange(startingPixel);
+			}
+			if (!startingTile.exactEquals(this.tilePosition)) {
+				this.onTileChange(startingTile);
+			}
 		}
 
 		return super.update(deltaTime);
