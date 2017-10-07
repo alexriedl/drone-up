@@ -24,6 +24,7 @@ export default abstract class PacMap extends SpriteMap {
 	public goDown(): void { this.currentFrames = this.down; }
 
 	public nextFrame(): void {
+		if (!this.currentFrames || this.currentFrames.length <= 0) return;
 		this.currentFrame = (this.currentFrame + 1) % this.currentFrames.length;
 		this.setFrame(this.currentFrames[this.currentFrame]);
 	}

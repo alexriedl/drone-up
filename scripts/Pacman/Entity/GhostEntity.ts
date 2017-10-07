@@ -41,6 +41,19 @@ abstract class GhostEntity extends PacEntity {
 
 	public abstract getTargetTile(): vec2;
 
+	public get desired(): Direction { return super.desired; }
+	public set desired(direction: Direction) {
+		if (!direction || direction === super.desired) return;
+		super.desired = direction;
+		switch (this.desired) {
+			case Direction.LEFT: this.model.goLeft(); break;
+			case Direction.RIGHT: this.model.goRight(); break;
+			case Direction.UP: this.model.goUp(); break;
+			case Direction.DOWN: this.model.goDown(); break;
+		}
+		this.model.nextFrame();
+	}
+
 	public setGhostMode(newMode: GhostEntity.GhostMode, reverse: boolean = true) {
 		this.ghostMode = newMode;
 		if (reverse) {
@@ -52,22 +65,9 @@ abstract class GhostEntity extends PacEntity {
 		}
 	}
 
-	protected onPixelChange(oldPixelPos: vec2): void {
-		if (this.penState) return;
-	}
-
 	protected onTileChange(oldPixelPos: vec2): void {
 		if (this.penState) return;
-
 		this.updateDesiredDirection();
-
-		switch (this.desired) {
-			case Direction.LEFT: this.model.goLeft(); break;
-			case Direction.RIGHT: this.model.goRight(); break;
-			case Direction.UP: this.model.goUp(); break;
-			case Direction.DOWN: this.model.goDown(); break;
-		}
-		this.model.nextFrame();
 	}
 
 	protected tick(): void {
@@ -171,10 +171,13 @@ abstract class GhostEntity extends PacEntity {
 	/**
 	 * Update the desired direction of this ghost to the next direction. Scan surrounding tiles of the
 	 * next tile to figure out where this ghost will move next
+	 *
+	 * TODO: This method has an issue if a ghost is right behind pacman. The ghost will end up trying
+	 * to turn just before catching the player
 	 */
 	protected updateDesiredDirection(): void {
 		if (this.nextDesiredDirection === undefined) this.nextDesiredDirection = this.desired;
-		this.setDesiredDirection(this.nextDesiredDirection);
+		this.desired = this.nextDesiredDirection;
 
 		const nextTile = PacEntity.move(this.tilePosition, this.desired);
 

@@ -8,9 +8,10 @@ import { vec2, vec3 } from 'Engine/Math';
 export default abstract class PacEntity extends Entity {
 	protected model: PacMap;
 	public facing: Direction;
-	public desired: Direction;
 	public tilePosition: vec2;
 	public pixelPosition: vec2;
+
+	private _desired: Direction;
 
 	protected parent?: Map;
 
@@ -38,9 +39,8 @@ export default abstract class PacEntity extends Entity {
 	protected onPixelChange(oldPixelPos: vec2): void { return; }
 	protected onTileChange(oldPixelPos: vec2): void { return; }
 
-	public setDesiredDirection(direction: Direction): void {
-		this.desired = direction;
-	}
+	public get desired(): Direction { return this._desired; }
+	public set desired(direction: Direction) { this._desired = direction; }
 
 	public update(deltaTime: number): boolean {
 		this.traveled += this.speed;

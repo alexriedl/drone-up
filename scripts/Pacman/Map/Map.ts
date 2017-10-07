@@ -141,7 +141,7 @@ abstract class Map extends Entity {
 	}
 
 	public setPlayerDirection(direction: Direction): void {
-		this.pacman.setDesiredDirection(direction);
+		this.pacman.desired = direction;
 	}
 
 	// TODO: Change ghost update. This could cause timing issues with ghost modes the way it works It
