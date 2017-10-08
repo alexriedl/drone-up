@@ -52,7 +52,7 @@ abstract class Map extends Entity {
 	public readonly tileDimensions: vec2;
 
 	private readonly ghostModeInfo: IGhostModeInfo;
-	private static readonly ghostModeDuration: number = 7.5 * 1000;
+	private static readonly ghostModeDuration: number = 60 * 7; // 60fps = 7 seconds
 
 	public metadata: IMapMetaData;
 	private pacModel: PacModel;
@@ -152,12 +152,8 @@ abstract class Map extends Entity {
 		this.pacman.setDesired(direction);
 	}
 
-	// TODO: Change ghost update. This could cause timing issues with ghost modes the way it works It
-	// is possible to run more than a single tick per update, and updating mode time is only
-	// happening once per update. The issue could be that the mode should change after the first
-	// tick, but before the second tick for the ghosts
 	public update(deltaTime: number): boolean {
-		this.ghostModeInfo.ghostModeDuration -= deltaTime;
+		this.ghostModeInfo.ghostModeDuration--;
 
 		if (this.ghostModeInfo.ghostModeDuration <= 0 && this.ghostModeInfo.swaps > 0) {
 			this.ghostModeInfo.swaps--;
@@ -165,14 +161,6 @@ abstract class Map extends Entity {
 			this.setGhostMode(this.ghostModeInfo.currentGhostMode === GhostEntity.GhostMode.SCATTER ?
 				GhostEntity.GhostMode.CHASE : GhostEntity.GhostMode.SCATTER);
 		}
-
-		/*
-		Frame Rate: 1 frame is 1/60 of a second (60 fps)
-
-		NOT CONFIRMED:
-		pacman moves 11 tiles per second. so 88 pixels per second
-
-		*/
 
 		return super.update(deltaTime);
 	}
