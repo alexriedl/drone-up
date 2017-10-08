@@ -139,6 +139,7 @@ abstract class Map extends Entity {
 	public removePelletAt(coords: vec2): number {
 		if (this.energizers.removePelletAt(coords)) return 3;
 		if (this.pellets.removePelletAt(coords)) return 1;
+		// TODO: Check for level complete
 		return 0;
 	}
 
