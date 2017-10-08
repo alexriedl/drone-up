@@ -178,9 +178,6 @@ abstract class Map extends Entity {
 	}
 
 	public canMoveToTile(coords: vec2, direction?: Direction): boolean {
-		if (coords.x < 0 || coords.x >= this.tileDimensions.x
-			|| coords.y < 0 || coords.y >= this.tileDimensions.y) return true;
-
 		switch (this.getTileInfo(coords)) {
 			case Map.BasicTileInfo.GHOST_PEN:
 			case Map.BasicTileInfo.BLOCK: return false;
@@ -190,8 +187,7 @@ abstract class Map extends Entity {
 	}
 
 	public getTileInfo(coords: vec2): Map.BasicTileInfo {
-		if (coords.x < 0 || coords.x >= this.tileDimensions.x
-			|| coords.y < 0 || coords.y >= this.tileDimensions.y) return undefined;
+		coords = this.orientCoords(coords);
 		return this.metadata.basicTileInfo[coords.y][coords.x];
 	}
 
