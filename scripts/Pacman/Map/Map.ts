@@ -39,12 +39,12 @@ abstract class Map extends Entity {
 		BORDER: new Color(0x21, 0x21, 0xFF, 0xFF),
 		GATE: new Color(0xFF, 0xB8, 0xFF, 0xFF),
 		EMPTY: new Color(0x00, 0x00, 0x00, 0xFF),
-		PAC: new Color(0xFF, 0xDE, 0xD2, 0xFF),
+		PAC: new Color(0xFF, 0xB5, 0x94, 0xFF),
 		PACMAN: new Color(0xFF, 0xCC, 0x00, 0xFF),
 		BLINKY: new Color(0xFF, 0x00, 0x00, 0xFF),
-		PINKY: new Color(0xFF, 0xB8, 0xFF, 0xFF),
-		INKY: new Color(0x00, 0xFF, 0xFF, 0xFF),
-		CLYDE: new Color(0xFF, 0xB8, 0x51, 0xFF),
+		PINKY: new Color(0xFF, 0x9C, 0xCE, 0xFF),
+		INKY: new Color(0x31, 0xFF, 0xFF, 0xFF),
+		CLYDE: new Color(0xFF, 0xCE, 0x31, 0xFF),
 	};
 	public static readonly DISPLAY_TARGET_TILE = true;
 
@@ -162,7 +162,17 @@ abstract class Map extends Entity {
 				GhostEntity.GhostMode.CHASE : GhostEntity.GhostMode.SCATTER);
 		}
 
-		return super.update(deltaTime);
+		const result = super.update(deltaTime);
+
+		if (this.pacman.isAlive) {
+			this.children.forEach((c) => {
+				if (c instanceof GhostEntity && c.tilePosition.exactEquals(this.pacman.tilePosition)) {
+					this.pacman.collide(c);
+				}
+			});
+		}
+
+		return result;
 	}
 
 	public canMoveToTile(coords: vec2, direction?: Direction): boolean {

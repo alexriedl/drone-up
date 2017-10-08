@@ -1,6 +1,5 @@
 import { Map } from 'Pacman/Map';
 
-import { Color } from 'Engine/Utils';
 import { DynamicBuffer } from 'Engine/Model/Buffer';
 import { SimpleRectangle } from 'Engine/Model';
 import { vec2 } from 'Engine/Math';
@@ -12,7 +11,7 @@ export default class PacModel extends SimpleRectangle {
 	private hasBeenInitialized: boolean = false;
 
 	public constructor(pacs: vec2[], size: number = 2) {
-		super(new Color(1, 1, 1));
+		super(Map.COLOR.PAC.normalize());
 		this.pacs = pacs;
 		this.size = size;
 	}
