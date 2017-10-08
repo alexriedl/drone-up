@@ -44,21 +44,21 @@ enum MapTile {
 	WSW, // West (barrior) South West
 
 	// Starting Points
-	_PS, // Pac Start
+	_PS, // Pacman Start
 	_FS, // Fruit Start
 	GSB, // Ghost Start Blinky
 	GSP, // Ghost Start Pinky
 	GSI, // Ghost Start Inky
 	GSC, // Ghost Start Clyde
 
-	// Pacs
-	_p_, // Pac
+	// Pellets
+	_p_, // Pellet
 	_E_, // Energizer
 
 	// Special
 	_s_, // Slow (Empty)
 	RU_, // Restrict Up
-	RUp, // Restrict Up (with a pac)
+	RUp, // Restrict Up (with a Pellet)
 	GTB, // Ghost Target Blinky
 	GTP, // Ghost Target Pinky
 	GTI, // Ghost Target Inky

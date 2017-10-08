@@ -27,7 +27,7 @@ export default class Pacman extends PacEntity {
 	}
 
 	protected onTileChange(oldPixelPos: vec2): void {
-		const deadFrames = this.parent.removePacAt(this.tilePosition);
+		const deadFrames = this.parent.removePelletAt(this.tilePosition);
 		if (deadFrames > 0) {
 			this.deadTicks += deadFrames;
 		}

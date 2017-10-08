@@ -5,7 +5,7 @@ import { vec2 } from 'Engine/Math';
 
 import { Direction } from 'Pacman/Utils';
 import { GhostEntity, Pacman, Blinky, Pinky, Inky, Clyde, TargetTile } from 'Pacman/Entity';
-import { PacModel } from 'Pacman/Model';
+import { PelletModel } from 'Pacman/Model';
 import MapTile from './MapTile';
 
 interface IMapMetaData {
@@ -13,7 +13,7 @@ interface IMapMetaData {
 	startingTiles: IEntityPositions;
 	scatterTargets: IEntityPositions;
 	basicTileInfo: Map.BasicTileInfo[][];
-	pacs: vec2[];
+	pellets: vec2[];
 	energizers: vec2[];
 }
 
@@ -39,7 +39,7 @@ abstract class Map extends Entity {
 		BORDER: new Color(0x21, 0x21, 0xFF, 0xFF),
 		GATE: new Color(0xFF, 0xB8, 0xFF, 0xFF),
 		EMPTY: new Color(0x00, 0x00, 0x00, 0xFF),
-		PAC: new Color(0xFF, 0xB5, 0x94, 0xFF),
+		PELLET: new Color(0xFF, 0xB5, 0x94, 0xFF),
 		PACMAN: new Color(0xFF, 0xCC, 0x00, 0xFF),
 		BLINKY: new Color(0xFF, 0x00, 0x00, 0xFF),
 		PINKY: new Color(0xFF, 0x9C, 0xCE, 0xFF),
@@ -55,8 +55,8 @@ abstract class Map extends Entity {
 	private static readonly ghostModeDuration: number = 60 * 7; // 60fps = 7 seconds
 
 	public metadata: IMapMetaData;
-	private pacModel: PacModel;
-	private energizerModel: PacModel;
+	private pelletModel: PelletModel;
+	private energizerModel: PelletModel;
 	private pacman: Pacman;
 
 	/**
@@ -91,9 +91,9 @@ abstract class Map extends Entity {
 		const worldEntity = new Entity(mapModel, this.pixelDimensions.scale(0.5).toVec3(), this.pixelDimensions.toVec3(1));
 		worldEntity.setParent(this);
 
-		this.pacModel = new PacModel(this.metadata.pacs);
-		new Entity(this.pacModel).setParent(this);
-		const energizerModel = this.energizerModel = new PacModel(this.metadata.energizers, 6);
+		this.pelletModel = new PelletModel(this.metadata.pellets);
+		new Entity(this.pelletModel).setParent(this);
+		const energizerModel = this.energizerModel = new PelletModel(this.metadata.energizers, 6);
 		// TODO: This is hacky just to get it to work
 		// tslint:disable-next-line:max-classes-per-file
 		new (class extends Entity {
@@ -132,9 +132,9 @@ abstract class Map extends Entity {
 		this.setGhostMode(GhostEntity.GhostMode.SCATTER, false);
 	}
 
-	public removePacAt(coords: vec2): number {
-		if (this.energizerModel.removePacAt(coords)) return 3;
-		if (this.pacModel.removePacAt(coords)) return 1;
+	public removePelletAt(coords: vec2): number {
+		if (this.energizerModel.removePelletAt(coords)) return 3;
+		if (this.pelletModel.removePelletAt(coords)) return 1;
 		return 0;
 	}
 
@@ -255,7 +255,7 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 	const scatterTargets = { pacman: undefined, blinky: undefined, pinky: undefined, inky: undefined, clyde: undefined };
 	const startingTiles = { pacman: undefined, blinky: undefined, pinky: undefined, inky: undefined, clyde: undefined };
 	const basicTileInfo = [];
-	const pacs = [];
+	const pellets = [];
 	const energizers = [];
 	for (let tileY = 0; tileY < numYTiles; tileY++) {
 		const tileRow = tiles[tileY];
@@ -276,7 +276,7 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 				case MapTile.GTI: scatterTargets.inky = new vec2(tileX, tileY); break;
 				case MapTile.GTC: scatterTargets.clyde = new vec2(tileX, tileY); break;
 
-				case MapTile._p_: case MapTile.RUp: pacs.push(new vec2(tileX, tileY)); break;
+				case MapTile._p_: case MapTile.RUp: pellets.push(new vec2(tileX, tileY)); break;
 				case MapTile._E_: energizers.push(new vec2(tileX, tileY)); break;
 			}
 		}
@@ -287,7 +287,7 @@ function parseMapInfo(tiles: MapTile[][]): IMapMetaData {
 		startingTiles,
 		scatterTargets,
 		basicTileInfo,
-		pacs,
+		pellets,
 		energizers,
 	};
 }
@@ -311,7 +311,7 @@ function createTexture(gl: WebGLRenderingContext, data: Uint8Array, dimensions: 
 function getTileColor(tile: MapTile): number[] {
 	switch (tile) {
 		case MapTile.___: return Map.COLOR.EMPTY.rgba;
-		case MapTile.RUp: case MapTile._p_: case MapTile._E_: return Map.COLOR.PAC.rgba;
+		case MapTile.RUp: case MapTile._p_: case MapTile._E_: return Map.COLOR.PELLET.rgba;
 		case MapTile.GGG: return Map.COLOR.GATE.rgba;
 		case MapTile._PS: return Map.COLOR.PACMAN.rgba;
 		case MapTile.GSB: case MapTile.GTB: return Map.COLOR.BLINKY.rgba;

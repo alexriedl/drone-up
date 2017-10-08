@@ -1,11 +1,11 @@
 import GhostModel from './GhostModel';
 import PacmanModel from './PacmanModel';
 import PacMap from './PacMap';
-import PacModel from './PacModel';
+import PelletModel from './PelletModel';
 
 export {
 	GhostModel,
 	PacmanModel,
 	PacMap,
-	PacModel,
+	PelletModel,
 };
