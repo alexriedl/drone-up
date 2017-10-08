@@ -22,14 +22,20 @@ export default abstract class PacEntity extends Entity {
 	public constructor(model: PacMap, startTile: vec2, facingDirection: Direction) {
 		super(model);
 
-		// TODO: Conversion between tiles and pixels in entity is strange...
 		this.tilePosition = startTile;
 		this.pixelPosition = new vec2(0, Map.PIXELS_PER_TILE / 2);
 		this.scale = new vec3(16, 16, 1);
 		this.facing = facingDirection;
-		this.desired = facingDirection;
+		this.setDesired(facingDirection);
 
 		this.traveled = 0;
+	}
+
+	public logEntity(log: string, prefix: string = '', onlyFor?: string) {
+		const name = this.constructor.name;
+		if (!onlyFor || name === onlyFor) {
+			console.log(`${prefix}${name} ${log}`);
+		}
 	}
 
 	public get position(): vec3 { return this.tilePosition.scale(Map.PIXELS_PER_TILE).add(this.pixelPosition).toVec3(0); }
@@ -40,7 +46,7 @@ export default abstract class PacEntity extends Entity {
 	protected onTileChange(oldPixelPos: vec2): void { return; }
 
 	public get desired(): Direction { return this._desired; }
-	public set desired(direction: Direction) { this._desired = direction; }
+	public setDesired(direction: Direction): void { this._desired = direction; }
 
 	public update(deltaTime: number): boolean {
 		this.traveled += this.speed;

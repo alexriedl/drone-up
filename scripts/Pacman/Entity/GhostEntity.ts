@@ -26,14 +26,7 @@ abstract class GhostEntity extends PacEntity {
 		this.pacman = pacman;
 		this.danceTile = startTile;
 
-		this.speed = 30;
-		this.penState = {
-			entering: false,
-			leaving: this.constructor.name === 'Pinky',
-			direction: facingDirection,
-			exitTile: new vec2(14, 17),
-			remainingTicks: this.constructor.name === 'Inky' ? 50 : this.constructor.name === 'Clyde' ? 100 : 0,
-		};
+		this.enterPen(facingDirection);
 	}
 
 	protected get roundingSize(): number { return 0; }
@@ -41,11 +34,10 @@ abstract class GhostEntity extends PacEntity {
 
 	public abstract getTargetTile(): vec2;
 
-	public get desired(): Direction { return super.desired; }
-	public set desired(direction: Direction) {
-		if (!direction || direction === super.desired) return;
-		super.desired = direction;
-		switch (this.desired) {
+	public setDesired(direction: Direction) {
+		if (!direction) return;
+		super.setDesired(direction);
+		switch (direction) {
 			case Direction.LEFT: this.model.goLeft(); break;
 			case Direction.RIGHT: this.model.goRight(); break;
 			case Direction.UP: this.model.goUp(); break;
@@ -60,9 +52,21 @@ abstract class GhostEntity extends PacEntity {
 			// TODO: If ghost is in a tile against a wall, the ghost could turn around into the wall and get stuck
 			this.facing = Direction.getOpposite(this.facing);
 			this.nextDesiredDirection = undefined;
-			this.desired = this.facing;
+			this.setDesired(this.facing);
 			this.updateDesiredDirection();
 		}
+	}
+
+	protected enterPen(facing: Direction = Direction.DOWN): void {
+		this.speed = 30;
+		this.penState = {
+			entering: false,
+			leaving: this.constructor.name === 'Pinky',
+			direction: facing,
+			exitTile: new vec2(14, 17),
+			remainingTicks: this.constructor.name === 'Inky' ? 50 : this.constructor.name === 'Clyde' ? 100 : 0,
+		};
+		this.setDesired(this.penState.direction);
 	}
 
 	protected onTileChange(oldPixelPos: vec2): void {
@@ -74,20 +78,14 @@ abstract class GhostEntity extends PacEntity {
 		const inPen = this.parent.getTileInfo(this.tilePosition) === Map.BasicTileInfo.GHOST_PEN;
 		if (inPen) {
 			if (!this.penState) {
-				this.speed = 30;
-				this.penState = {
-					entering: false,
-					leaving: false,
-					direction: Direction.UP,
-					exitTile: new vec2(14, 17),
-					remainingTicks: 100,
-				};
+				this.enterPen();
 			}
 		}
 		else if (this.penState) {
 			this.penState = undefined;
 			this.speed = PacEntity.MAX_SPEED;
-			this.facing = this.desired = Direction.LEFT;
+			this.facing = Direction.LEFT;
+			this.setDesired(this.facing);
 		}
 
 		if (this.penState) this.inPenTick();
@@ -103,14 +101,7 @@ abstract class GhostEntity extends PacEntity {
 		// Simple Movement
 		{
 			this.pixelPosition = PacEntity.move(this.pixelPosition, this.penState.direction);
-			switch (this.penState.direction) {
-				case Direction.LEFT: this.model.goLeft(); break;
-				case Direction.RIGHT: this.model.goRight(); break;
-				case Direction.UP: this.model.goUp(); break;
-				case Direction.DOWN: this.model.goDown(); break;
-			}
-
-			this.model.nextFrame();
+			this.setDesired(this.penState.direction);
 
 			// NOTE: Ensure pixel and tile position is valid, and re-orient if not.
 			if (this.pixelPosition.x >= Map.PIXELS_PER_TILE || this.pixelPosition.x < 0 ||
@@ -168,20 +159,23 @@ abstract class GhostEntity extends PacEntity {
 		}
 	}
 
-	/**
-	 * Update the desired direction of this ghost to the next direction. Scan surrounding tiles of the
-	 * next tile to figure out where this ghost will move next
-	 *
-	 * TODO: This method has an issue if a ghost is right behind pacman. The ghost will end up trying
-	 * to turn just before catching the player
-	 */
 	protected updateDesiredDirection(): void {
-		if (this.nextDesiredDirection === undefined) this.nextDesiredDirection = this.desired;
-		this.desired = this.nextDesiredDirection;
+		let desired = this.nextDesiredDirection || this.desired;
+		let nextTile = PacEntity.move(this.tilePosition, desired);
 
-		const nextTile = PacEntity.move(this.tilePosition, this.desired);
+		// NOTE: If new direction is pointing towards a wall, recalculate direction
+		const tileInfo = this.parent.getTileInfo(nextTile);
+		if (tileInfo === Map.BasicTileInfo.BLOCK) {
+			desired = this.getValidDirection(this.tilePosition);
+			nextTile = PacEntity.move(this.tilePosition, desired);
+		}
 
-		const invalidOpposite = Direction.getOpposite(this.desired);
+		this.setDesired(desired);
+		this.nextDesiredDirection = this.getValidDirection(nextTile, desired);
+	}
+
+	private getValidDirection(currentTile: vec2, currentDirection?: Direction): Direction {
+		const invalidOpposite = currentDirection && Direction.getOpposite(currentDirection);
 		// NOTE: The order of this array is the tie-breaker order
 		const options = [
 			Direction.UP,
@@ -193,7 +187,7 @@ abstract class GhostEntity extends PacEntity {
 		let shortestDistance = Number.MAX_SAFE_INTEGER;
 		let shortestDirection;
 		for (const direction of options) {
-			const testTile = PacEntity.move(nextTile, direction);
+			const testTile = PacEntity.move(currentTile, direction);
 			if (this.parent.canMoveToTile(testTile, direction)) {
 				const distanceToTarget = testTile.sqrDist(this.getTargetTile());
 				if (distanceToTarget < shortestDistance) {
@@ -203,7 +197,7 @@ abstract class GhostEntity extends PacEntity {
 			}
 		}
 
-		this.nextDesiredDirection = shortestDirection;
+		return shortestDirection;
 	}
 }
 
