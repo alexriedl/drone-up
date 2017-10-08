@@ -29,6 +29,6 @@ export default class EnergizerEntity extends Entity {
 	}
 
 	public removePelletAt(coords: vec2): boolean {
-		return this.model && this.model.removePelletAt(coords);
+		return this.pelletModel.removePelletAt(coords);
 	}
 }
