@@ -1,17 +1,34 @@
 import { Direction } from 'Pacman/Utils';
-import { PacmanModel } from 'Pacman/Model';
+import { PacMap, PacmanModel, DeadModel } from 'Pacman/Model';
 import GhostEntity from './GhostEntity';
 import PacEntity from './PacEntity';
 
 import { vec2 } from 'Engine/Math';
 
 export default class Pacman extends PacEntity {
-	protected model: PacmanModel;
-	protected deadTicks: number = 0;
-	protected alive: boolean = true;
+	protected model: PacMap;
+	protected deadTicks: number;
+	protected alive: boolean;
+
+	protected mainModel: PacmanModel;
+	protected deadModel: DeadModel;
+
+	private deadAnimationFinished: () => void;
 
 	public constructor(startTile: vec2) {
-		super(new PacmanModel(), startTile, Direction.LEFT);
+		const mainModel = new PacmanModel();
+		const deadModel = new DeadModel();
+
+		super(mainModel, startTile, Direction.LEFT);
+
+		this.deadTicks = 0;
+		this.alive = true;
+
+		this.mainModel = mainModel;
+		this.deadModel = deadModel;
+		this.deadAnimationFinished = () => {
+			this.model = undefined;
+		};
 	}
 
 	public get isAlive(): boolean { return this.alive; }
@@ -34,18 +51,23 @@ export default class Pacman extends PacEntity {
 	}
 
 	protected tick(): void {
-		if (!this.isAlive) return;
-
 		if (this.deadTicks > 0) {
 			this.deadTicks--;
 			return;
 		}
 
-		super.tick();
+		if (this.isAlive) {
+			super.tick();
+		}
+		else {
+			this.deadTicks = 3;
+			if (this.model) this.model.nextFrame(this.deadAnimationFinished);
+		}
 	}
 
 	public collide(ghost: GhostEntity): void {
 		this.alive = false;
-		ghost.log('collided with the player');
+		this.model = this.deadModel;
+		this.deadTicks = 3;
 	}
 }

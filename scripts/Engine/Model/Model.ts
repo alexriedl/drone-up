@@ -8,9 +8,9 @@ abstract class Model {
 	protected buffer: Buffer;
 
 	public constructor() {
-		Register.registerGLItem(this);
 		this.shader = this.createShader();
 		this.buffer = this.createVertexBuffer();
+		Register.registerGLItem(this);
 	}
 
 	public useShader(gl: WebGLRenderingContext): void {
