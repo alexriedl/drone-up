@@ -16,7 +16,11 @@ export default class Inky extends GhostEntity {
 	public getTargetTile(): vec2 {
 		switch (this.ghostMode) {
 			case GhostEntity.GhostMode.CHASE:
-				const pacmanFacing = Direction.getVector(this.pacman.facing).scale(2);
+				let pacmanFacing = Direction.getVector(this.pacman.facing).scale(2);
+
+				// NOTE: Re-implementation of original pacman bug
+				if (this.pacman.facing === Direction.UP) pacmanFacing = pacmanFacing.addValues(-2, 0);
+
 				const crossTile = this.pacman.tilePosition.add(pacmanFacing);
 				const diff = this.blinky.tilePosition.sub(crossTile);
 				const target = crossTile.sub(diff);
