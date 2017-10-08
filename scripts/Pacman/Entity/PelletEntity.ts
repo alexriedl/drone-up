@@ -4,7 +4,7 @@ import { Entity } from 'Engine/Entity';
 import { vec2 } from 'Engine/Math';
 
 export default class EnergizerEntity extends Entity {
-	private flip = 300;
+	private flip;
 	private flicker: boolean;
 	private pelletModel: PelletModel;
 	protected model: PelletModel;
@@ -14,7 +14,8 @@ export default class EnergizerEntity extends Entity {
 
 		this.flicker = flicker;
 		this.pelletModel = new PelletModel(pellets, size);
-		this.model = this.pelletModel;
+
+		this.reset();
 	}
 
 	public update(deltaTime: number): boolean {
@@ -30,5 +31,10 @@ export default class EnergizerEntity extends Entity {
 
 	public removePelletAt(coords: vec2): boolean {
 		return this.pelletModel.removePelletAt(coords);
+	}
+
+	public reset(): void {
+		this.model = this.pelletModel;
+		this.flip = 300;
 	}
 }

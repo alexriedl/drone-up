@@ -1,11 +1,10 @@
 import { Direction } from 'Pacman/Utils';
-import { PacMap, PacmanModel, DeadModel } from 'Pacman/Model';
+import { PacmanModel, DeadModel } from 'Pacman/Model';
 import PacEntity from './PacEntity';
 
 import { vec2 } from 'Engine/Math';
 
 export default class Pacman extends PacEntity {
-	protected model: PacMap;
 	protected deadTicks: number;
 	protected alive: boolean;
 
@@ -20,14 +19,20 @@ export default class Pacman extends PacEntity {
 
 		super(mainModel, startTile, Direction.LEFT);
 
-		this.deadTicks = 0;
-		this.alive = true;
-
 		this.mainModel = mainModel;
 		this.deadModel = deadModel;
 	}
 
 	public get isAlive(): boolean { return this.alive; }
+
+	public reset(): void {
+		super.reset();
+
+		this.deadTicks = 0;
+		this.alive = true;
+		this.model = this.mainModel;
+		this.model.reset();
+	}
 
 	protected onPixelChange(oldPixelPos: vec2): void {
 		switch (this.facing) {

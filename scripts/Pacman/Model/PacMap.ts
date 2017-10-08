@@ -15,9 +15,7 @@ export default abstract class PacMap extends SpriteMap {
 
 	public constructor() {
 		super();
-
-		this.currentFrames = this.right;
-		this.currentFrame = 0;
+		this.reset();
 	}
 
 	public goLeft(): void { this.currentFrames = this.left; }
@@ -41,5 +39,10 @@ export default abstract class PacMap extends SpriteMap {
 			totalSprites: this.spriteCount,
 			source: this.source,
 		};
+	}
+
+	public reset(): void {
+		this.currentFrames = this.right;
+		this.currentFrame = 0;
 	}
 }

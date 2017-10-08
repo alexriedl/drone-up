@@ -16,19 +16,17 @@ export default abstract class PacEntity extends Entity {
 	protected parent?: Map;
 
 	public static readonly MAX_SPEED = 100;
-	protected speed: number = PacEntity.MAX_SPEED;
+	protected speed: number;
 	private traveled: number;
+
+	private readonly startTile: vec2;
+	private readonly startFacing: Direction;
 
 	public constructor(model: PacMap, startTile: vec2, facingDirection: Direction) {
 		super(model);
 
-		this.tilePosition = startTile;
-		this.pixelPosition = new vec2(0, Map.PIXELS_PER_TILE / 2);
-		this.scale = new vec3(16, 16, 1);
-		this.facing = facingDirection;
-		this.setDesired(facingDirection);
-
-		this.traveled = 0;
+		this.startTile = startTile;
+		this.startFacing = facingDirection;
 	}
 
 	public log(log: string, prefix: string = '', onlyFor?: string) {
@@ -47,6 +45,19 @@ export default abstract class PacEntity extends Entity {
 
 	public get desired(): Direction { return this._desired; }
 	public setDesired(direction: Direction): void { this._desired = direction; }
+
+	public reset(): void {
+		this.tilePosition = this.startTile;
+		this.pixelPosition = new vec2(0, Map.PIXELS_PER_TILE / 2);
+		this.scale = new vec3(16, 16, 1);
+		this.facing = this.startFacing;
+		this.setDesired(this.facing);
+
+		this.speed = PacEntity.MAX_SPEED;
+		this.traveled = 0;
+
+		if (this.model) this.model.reset();
+	}
 
 	public update(deltaTime: number): boolean {
 		this.traveled += this.speed;

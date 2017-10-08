@@ -25,8 +25,6 @@ abstract class GhostEntity extends PacEntity {
 		super(model, startTile, facingDirection);
 		this.pacman = pacman;
 		this.danceTile = startTile;
-
-		this.enterPen(facingDirection);
 	}
 
 	protected get roundingSize(): number { return 0; }
@@ -67,6 +65,12 @@ abstract class GhostEntity extends PacEntity {
 			remainingTicks: this.constructor.name === 'Inky' ? 50 : this.constructor.name === 'Clyde' ? 100 : 0,
 		};
 		this.setDesired(this.penState.direction);
+	}
+
+	public reset(): void {
+		super.reset();
+		this.nextDesiredDirection = undefined;
+		this.enterPen(this.facing);
 	}
 
 	protected onTileChange(oldPixelPos: vec2): void {

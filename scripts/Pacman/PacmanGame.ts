@@ -14,7 +14,6 @@ export default class PacmanGame extends Game {
 	protected down: boolean;
 
 	protected frameTime: number;
-	protected introTime: number;
 
 	public constructor(canvasId: string) {
 		const map = new OriginalMap();
@@ -22,7 +21,6 @@ export default class PacmanGame extends Game {
 		this.setScene(map);
 
 		this.frameTime = 0;
-		this.introTime = 3 * 1000;
 	}
 
 	protected initialize(gl: WebGLRenderingContext): void {
@@ -50,11 +48,6 @@ export default class PacmanGame extends Game {
 	}
 
 	protected update(deltaTime: number): void {
-		if (this.introTime > 0) {
-			this.introTime -= deltaTime;
-			return;
-		}
-
 		let d;
 		if (this.left) d = Direction.LEFT;
 		if (this.right) d = Direction.RIGHT;

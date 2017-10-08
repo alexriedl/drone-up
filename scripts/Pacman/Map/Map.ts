@@ -4,7 +4,7 @@ import { SimpleTextureRectangle } from 'Engine/Model';
 import { vec2 } from 'Engine/Math';
 
 import { Direction } from 'Pacman/Utils';
-import { GhostEntity, Pacman, Blinky, Pinky, Inky, Clyde, TargetTile, PelletEntity } from 'Pacman/Entity';
+import { PacEntity, GhostEntity, Pacman, Blinky, Pinky, Inky, Clyde, TargetTile, PelletEntity } from 'Pacman/Entity';
 import MapTile from './MapTile';
 
 interface IMapMetaData {
@@ -54,7 +54,7 @@ abstract class Map extends Entity {
 	public readonly pixelDimensions: vec2;
 	public readonly tileDimensions: vec2;
 
-	private readonly ghostModeInfo: IGhostModeInfo;
+	private ghostModeInfo: IGhostModeInfo;
 	private static readonly ghostModeDuration: number = 60 * 7; // 60fps = 7 seconds
 
 	public metadata: IMapMetaData;
@@ -62,6 +62,8 @@ abstract class Map extends Entity {
 	private pellets: PelletEntity;
 	private energizers: PelletEntity;
 	private pacman: Pacman;
+
+	private introTime: number;
 
 	/**
 	 * Do not use this value. After the map is initialized, this is blown away
@@ -79,12 +81,6 @@ abstract class Map extends Entity {
 		this.tiles = tiles;
 		this.pixelDimensions = new vec2(width, height);
 		this.tileDimensions = new vec2(numXTiles, numYTiles);
-
-		this.ghostModeInfo = {
-			currentGhostMode: undefined,
-			ghostModeDuration: Map.ghostModeDuration,
-			swaps: 5,
-		};
 	}
 
 	public initialize(gl: WebGLRenderingContext): void {
@@ -121,7 +117,23 @@ abstract class Map extends Entity {
 			new TargetTile(Map.COLOR.CLYDE.normalize(), clyde).setParent(this);
 		}
 
+		this.reset();
+	}
+
+	public reset(): void {
+		this.introTime = 3 * 60;
+		this.playerDeadState = undefined;
+		this.ghostModeInfo = {
+			currentGhostMode: undefined,
+			ghostModeDuration: Map.ghostModeDuration,
+			swaps: 5,
+		};
 		this.setGhostMode(GhostEntity.GhostMode.SCATTER, false);
+		this.children.forEach((c) => {
+			if (c instanceof PacEntity) c.reset();
+		});
+		this.energizers.reset();
+		this.pellets.reset();
 	}
 
 	public removePelletAt(coords: vec2): number {
@@ -145,7 +157,8 @@ abstract class Map extends Entity {
 	}
 
 	public update(deltaTime: number): boolean {
-		if (this.playerDeadState) this.deadTick(deltaTime);
+		if (this.introTime) this.introTime--;
+		else if (this.playerDeadState) this.deadTick(deltaTime);
 		else this.gameTick(deltaTime);
 
 		return true;
@@ -156,8 +169,8 @@ abstract class Map extends Entity {
 			this.playerDeadState.deadPauseTimer--;
 			if (this.playerDeadState.deadPauseTimer <= 0) {
 				this.pacman.kill(() => {
-					// TODO: Reset or game over
-					return;
+					// TODO: Check for gameover
+					this.reset();
 				});
 				this.setGhostMode(GhostEntity.GhostMode.HIDDEN, false);
 			}
