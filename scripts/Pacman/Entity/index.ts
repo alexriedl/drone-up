@@ -5,6 +5,7 @@ import Inky from './Inky';
 import PacEntity from './PacEntity';
 import Pacman from './Pacman';
 import Pinky from './Pinky';
+import TargetTile from './TargetTile';
 
 export {
 	Blinky,
@@ -14,4 +15,5 @@ export {
 	PacEntity,
 	Pacman,
 	Pinky,
+	TargetTile,
 };

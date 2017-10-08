@@ -31,7 +31,7 @@ export default abstract class PacEntity extends Entity {
 		this.traveled = 0;
 	}
 
-	public logEntity(log: string, prefix: string = '', onlyFor?: string) {
+	public log(log: string, prefix: string = '', onlyFor?: string) {
 		const name = this.constructor.name;
 		if (!onlyFor || name === onlyFor) {
 			console.log(`${prefix}${name} ${log}`);

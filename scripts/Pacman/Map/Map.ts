@@ -4,7 +4,7 @@ import { SimpleTextureRectangle } from 'Engine/Model';
 import { vec2 } from 'Engine/Math';
 
 import { Direction } from 'Pacman/Utils';
-import { GhostEntity, Pacman, Blinky, Pinky, Inky, Clyde } from 'Pacman/Entity';
+import { GhostEntity, Pacman, Blinky, Pinky, Inky, Clyde, TargetTile } from 'Pacman/Entity';
 import { PacModel } from 'Pacman/Model';
 import MapTile from './MapTile';
 
@@ -46,6 +46,7 @@ abstract class Map extends Entity {
 		INKY: new Color(0x00, 0xFF, 0xFF, 0xFF),
 		CLYDE: new Color(0xFF, 0xB8, 0x51, 0xFF),
 	};
+	public static readonly DISPLAY_TARGET_TILE = true;
 
 	public readonly pixelDimensions: vec2;
 	public readonly tileDimensions: vec2;
@@ -120,6 +121,13 @@ abstract class Map extends Entity {
 		pinky.setParent(this);
 		inky.setParent(this);
 		clyde.setParent(this);
+
+		if (Map.DISPLAY_TARGET_TILE) {
+			new TargetTile(Map.COLOR.BLINKY.normalize(), blinky).setParent(this);
+			new TargetTile(Map.COLOR.PINKY.normalize(), pinky).setParent(this);
+			new TargetTile(Map.COLOR.INKY.normalize(), inky).setParent(this);
+			new TargetTile(Map.COLOR.CLYDE.normalize(), clyde).setParent(this);
+		}
 
 		this.setGhostMode(GhostEntity.GhostMode.SCATTER, false);
 	}
