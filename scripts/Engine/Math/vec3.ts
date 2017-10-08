@@ -80,8 +80,9 @@ export default class vec3 {
 	/**
 	 * Mod divide each componenet by a value using a better than default mod function
 	 */
-	public cmod(value: number): vec3 {
-		return new vec3(scalar.mod(this.x, value), scalar.mod(this.y, value), scalar.mod(this.z, value));
+	public cmod(v: number | vec3): vec3 {
+		if (!(v instanceof vec3)) v = new vec3(v, v, v);
+		return new vec3(scalar.mod(this.x, v.x), scalar.mod(this.y, v.y), scalar.mod(this.z, v.z));
 	}
 
 	/**

@@ -77,8 +77,9 @@ export default class vec2 {
 	/**
 	 * Mod divide each componenet by a value using a better than default mod function
 	 */
-	public cmod(value: number): vec2 {
-		return new vec2(scalar.mod(this.x, value), scalar.mod(this.y, value));
+	public cmod(v: number | vec2): vec2 {
+		if (!(v instanceof vec2)) v = new vec2(v, v);
+		return new vec2(scalar.mod(this.x, v.x), scalar.mod(this.y, v.y));
 	}
 
 	/**

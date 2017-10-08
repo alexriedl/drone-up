@@ -85,12 +85,13 @@ export default class vec4 {
 	/**
 	 * Mod divide each componenet by a value using a better than default mod function
 	 */
-	public cmod(value: number): vec4 {
+	public cmod(v: number | vec4): vec4 {
+		if (!(v instanceof vec4)) v = new vec4(v, v, v, v);
 		return new vec4(
-			scalar.mod(this.x, value),
-			scalar.mod(this.y, value),
-			scalar.mod(this.z, value),
-			scalar.mod(this.w, value),
+			scalar.mod(this.x, v.x),
+			scalar.mod(this.y, v.y),
+			scalar.mod(this.z, v.z),
+			scalar.mod(this.w, v.w),
 		);
 	}
 
