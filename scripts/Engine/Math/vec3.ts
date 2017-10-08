@@ -1,6 +1,4 @@
-function mod(n: number, m: number): number {
-	return ((n % m) + m) % m;
-}
+import scalar from './scalar';
 
 // tslint:disable-next-line:class-name
 export default class vec3 {
@@ -83,7 +81,7 @@ export default class vec3 {
 	 * Mod divide each componenet by a value using a better than default mod function
 	 */
 	public cmod(value: number): vec3 {
-		return new vec3(mod(this.x, value), mod(this.y, value), mod(this.z, value));
+		return new vec3(scalar.mod(this.x, value), scalar.mod(this.y, value), scalar.mod(this.z, value));
 	}
 
 	/**
