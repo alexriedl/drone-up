@@ -75,17 +75,25 @@ abstract class GhostEntity extends PacEntity {
 	}
 
 	protected tick(): void {
-		const inPen = this.parent.getTileInfo(this.tilePosition) === Map.BasicTileInfo.GHOST_PEN;
-		if (inPen) {
-			if (!this.penState) {
-				this.enterPen();
-			}
-		}
-		else if (this.penState) {
-			this.penState = undefined;
-			this.speed = PacEntity.MAX_SPEED;
-			this.facing = Direction.LEFT;
-			this.setDesired(this.facing);
+		const tileInfo = this.parent.getTileInfo(this.tilePosition);
+
+		switch (tileInfo) {
+			case Map.BasicTileInfo.GHOST_PEN:
+				if (!this.penState) {
+					this.enterPen();
+				}
+				break;
+			case Map.BasicTileInfo.SLOW:
+				this.speed = 40;
+				break;
+			default:
+				this.speed = PacEntity.MAX_SPEED;
+				if (this.penState) {
+					this.penState = undefined;
+					this.facing = Direction.LEFT;
+					this.setDesired(this.facing);
+				}
+				break;
 		}
 
 		if (this.penState) this.inPenTick();

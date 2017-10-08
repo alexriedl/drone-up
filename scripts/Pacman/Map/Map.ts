@@ -181,6 +181,7 @@ abstract class Map extends Entity {
 		switch (this.getTileInfo(coords)) {
 			case Map.BasicTileInfo.GHOST_PEN:
 			case Map.BasicTileInfo.BLOCK: return false;
+			case Map.BasicTileInfo.SLOW:
 			case Map.BasicTileInfo.OPEN: return true;
 			case Map.BasicTileInfo.RESTRICTED_UP: return !direction || direction !== Direction.UP;
 		}
@@ -203,6 +204,7 @@ namespace Map {
 	export enum BasicTileInfo {
 		BLOCK = 'BLOCK',
 		OPEN = 'OPEN',
+		SLOW = 'SLOW',
 		RESTRICTED_UP = 'RESTRICTED_UP',
 		GHOST_PEN = 'GHOST_PEN',
 	}
@@ -213,11 +215,11 @@ function getBasicTileInfo(tile: MapTile): Map.BasicTileInfo {
 		case MapTile._PS:
 		case MapTile._FS:
 		case MapTile.GSB:
-		case MapTile._s_:
-		case MapTile.___:
 		case MapTile._p_:
 		case MapTile._E_:
-			return Map.BasicTileInfo.OPEN;
+		case MapTile.___: return Map.BasicTileInfo.OPEN;
+
+		case MapTile._s_: return Map.BasicTileInfo.SLOW;
 
 		case MapTile.RUp:
 		case MapTile.RU_: return Map.BasicTileInfo.RESTRICTED_UP;
