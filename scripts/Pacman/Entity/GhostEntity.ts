@@ -3,7 +3,7 @@ import { Map } from 'Pacman/Map';
 import { PacMap } from 'Pacman/Model';
 import PacEntity from './PacEntity';
 
-import { vec2 } from 'Engine/Math';
+import { vec2, vec3, mat4 } from 'Engine/Math';
 
 interface IPenState {
 	entering: boolean;
@@ -75,6 +75,8 @@ abstract class GhostEntity extends PacEntity {
 	}
 
 	protected tick(): void {
+		switch (this.ghostMode) { case GhostEntity.GhostMode.HIDDEN: return; }
+
 		const tileInfo = this.parent.getTileInfo(this.tilePosition);
 
 		switch (tileInfo) {
@@ -207,6 +209,11 @@ abstract class GhostEntity extends PacEntity {
 
 		return shortestDirection;
 	}
+
+	public render(gl: WebGLRenderingContext, vpMatrix: mat4, overridePosition?: vec3, overrideScale?: vec3): void {
+		switch (this.ghostMode) { case GhostEntity.GhostMode.HIDDEN: return; }
+		super.render(gl, vpMatrix, overridePosition, overrideScale);
+	}
 }
 
 namespace GhostEntity {
@@ -214,6 +221,7 @@ namespace GhostEntity {
 		CHASE = 'CHASE',
 		SCATTER = 'SCATTER',
 		FRIGHTENED = 'FRIGHTENED',
+		HIDDEN = 'HIDDEN',
 	}
 }
 

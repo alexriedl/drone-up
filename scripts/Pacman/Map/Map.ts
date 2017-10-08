@@ -4,8 +4,7 @@ import { SimpleTextureRectangle } from 'Engine/Model';
 import { vec2 } from 'Engine/Math';
 
 import { Direction } from 'Pacman/Utils';
-import { GhostEntity, Pacman, Blinky, Pinky, Inky, Clyde, TargetTile } from 'Pacman/Entity';
-import { PelletModel } from 'Pacman/Model';
+import { GhostEntity, Pacman, Blinky, Pinky, Inky, Clyde, TargetTile, PelletEntity } from 'Pacman/Entity';
 import MapTile from './MapTile';
 
 interface IMapMetaData {
@@ -31,6 +30,10 @@ interface IGhostModeInfo {
 	swaps: number;
 }
 
+interface IPlayerDeadState {
+	deadPauseTimer: number;
+}
+
 abstract class Map extends Entity {
 	// NOTE: This is a constant. If this needs to change, all of the hand drawn
 	// tiles would need to be updated
@@ -46,7 +49,7 @@ abstract class Map extends Entity {
 		INKY: new Color(0x31, 0xFF, 0xFF, 0xFF),
 		CLYDE: new Color(0xFF, 0xCE, 0x31, 0xFF),
 	};
-	public static readonly DISPLAY_TARGET_TILE = true;
+	public static readonly DISPLAY_TARGET_TILE = false;
 
 	public readonly pixelDimensions: vec2;
 	public readonly tileDimensions: vec2;
@@ -55,8 +58,9 @@ abstract class Map extends Entity {
 	private static readonly ghostModeDuration: number = 60 * 7; // 60fps = 7 seconds
 
 	public metadata: IMapMetaData;
-	private pelletModel: PelletModel;
-	private energizerModel: PelletModel;
+	private playerDeadState: IPlayerDeadState;
+	private pellets: PelletEntity;
+	private energizers: PelletEntity;
 	private pacman: Pacman;
 
 	/**
@@ -91,23 +95,11 @@ abstract class Map extends Entity {
 		const worldEntity = new Entity(mapModel, this.pixelDimensions.scale(0.5).toVec3(), this.pixelDimensions.toVec3(1));
 		worldEntity.setParent(this);
 
-		this.pelletModel = new PelletModel(this.metadata.pellets);
-		new Entity(this.pelletModel).setParent(this);
-		const energizerModel = this.energizerModel = new PelletModel(this.metadata.energizers, 6);
-		// TODO: This is hacky just to get it to work
-		// tslint:disable-next-line:max-classes-per-file
-		new (class extends Entity {
-			private flip = 300;
-			public update(deltaTime: number): boolean {
-				this.flip -= deltaTime;
-				if (this.flip <= 0) {
-					this.flip += 300;
-					this.model = !!this.model ? undefined : energizerModel;
-				}
-				return super.update(deltaTime);
-			}
-		})(this.energizerModel)
-		.setParent(this);
+		this.pellets = new PelletEntity(this.metadata.pellets);
+		this.pellets.setParent(this);
+
+		this.energizers = new PelletEntity(this.metadata.energizers, 6, true);
+		this.energizers.setParent(this);
 
 		const startingTiles = this.metadata.startingTiles;
 		this.pacman = new Pacman(startingTiles.pacman);
@@ -133,8 +125,8 @@ abstract class Map extends Entity {
 	}
 
 	public removePelletAt(coords: vec2): number {
-		if (this.energizerModel.removePelletAt(coords)) return 3;
-		if (this.pelletModel.removePelletAt(coords)) return 1;
+		if (this.energizers.removePelletAt(coords)) return 3;
+		if (this.pellets.removePelletAt(coords)) return 1;
 		return 0;
 	}
 
@@ -153,6 +145,31 @@ abstract class Map extends Entity {
 	}
 
 	public update(deltaTime: number): boolean {
+		if (this.playerDeadState) this.deadTick(deltaTime);
+		else this.gameTick(deltaTime);
+
+		return true;
+	}
+
+	private deadTick(deltaTime: number): void {
+		if (this.playerDeadState.deadPauseTimer > 0) {
+			this.playerDeadState.deadPauseTimer--;
+			if (this.playerDeadState.deadPauseTimer <= 0) {
+				this.pacman.kill(() => {
+					// TODO: Reset or game over
+					return;
+				});
+				this.setGhostMode(GhostEntity.GhostMode.HIDDEN, false);
+			}
+
+			this.energizers.update(deltaTime);
+			return;
+		}
+
+		super.update(deltaTime);
+	}
+
+	private gameTick(deltaTime: number): void {
 		this.ghostModeInfo.ghostModeDuration--;
 
 		if (this.ghostModeInfo.ghostModeDuration <= 0 && this.ghostModeInfo.swaps > 0) {
@@ -162,17 +179,17 @@ abstract class Map extends Entity {
 				GhostEntity.GhostMode.CHASE : GhostEntity.GhostMode.SCATTER);
 		}
 
-		const result = super.update(deltaTime);
+		super.update(deltaTime);
 
 		if (this.pacman.isAlive) {
 			this.children.forEach((c) => {
 				if (c instanceof GhostEntity && c.tilePosition.exactEquals(this.pacman.tilePosition)) {
-					this.pacman.collide(c);
+					this.playerDeadState = {
+						deadPauseTimer: 1 * 60,
+					};
 				}
 			});
 		}
-
-		return result;
 	}
 
 	public canMoveToTile(coords: vec2, direction?: Direction): boolean {

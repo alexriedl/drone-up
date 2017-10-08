@@ -1,6 +1,5 @@
 import { Direction } from 'Pacman/Utils';
 import { PacMap, PacmanModel, DeadModel } from 'Pacman/Model';
-import GhostEntity from './GhostEntity';
 import PacEntity from './PacEntity';
 
 import { vec2 } from 'Engine/Math';
@@ -26,9 +25,6 @@ export default class Pacman extends PacEntity {
 
 		this.mainModel = mainModel;
 		this.deadModel = deadModel;
-		this.deadAnimationFinished = () => {
-			this.model = undefined;
-		};
 	}
 
 	public get isAlive(): boolean { return this.alive; }
@@ -65,9 +61,13 @@ export default class Pacman extends PacEntity {
 		}
 	}
 
-	public collide(ghost: GhostEntity): void {
+	public kill(animationFinished: () => void): void {
 		this.alive = false;
 		this.model = this.deadModel;
 		this.deadTicks = 3;
+		this.deadAnimationFinished = () => {
+			this.model = undefined;
+			animationFinished();
+		};
 	}
 }

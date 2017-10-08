@@ -4,6 +4,7 @@ import GhostEntity from './GhostEntity';
 import Inky from './Inky';
 import PacEntity from './PacEntity';
 import Pacman from './Pacman';
+import PelletEntity from './PelletEntity';
 import Pinky from './Pinky';
 import TargetTile from './TargetTile';
 
@@ -14,6 +15,7 @@ export {
 	Inky,
 	PacEntity,
 	Pacman,
+	PelletEntity,
 	Pinky,
 	TargetTile,
 };
