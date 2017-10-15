@@ -6,8 +6,8 @@ import PacEntity from './PacEntity';
 import { vec2 } from 'Engine/Math';
 
 export default class Pinky extends GhostEntity {
-	public constructor(startTile: vec2, pacman: PacEntity) {
-		super(new GhostModel('Images/pinky.png'), startTile, Direction.UP, pacman);
+	public constructor(pacman: PacEntity) {
+		super(new GhostModel('Images/pinky.png'), pacman);
 	}
 
 	public getTargetTile(): vec2 {

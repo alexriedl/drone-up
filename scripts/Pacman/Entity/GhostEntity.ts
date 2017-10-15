@@ -21,10 +21,9 @@ abstract class GhostEntity extends PacEntity {
 	protected penState: IPenState;
 	protected danceTile: vec2;
 
-	public constructor(model: PacMap, startTile: vec2, facingDirection: Direction, pacman: PacEntity) {
-		super(model, startTile, facingDirection);
+	public constructor(model: PacMap, pacman: PacEntity) {
+		super(model);
 		this.pacman = pacman;
-		this.danceTile = startTile;
 	}
 
 	protected get roundingSize(): number { return 0; }
@@ -67,8 +66,9 @@ abstract class GhostEntity extends PacEntity {
 		this.setDesired(this.penState.direction);
 	}
 
-	public reset(): void {
-		super.reset();
+	public reset(startTile: vec2, facingDirection: Direction): void {
+		super.reset(startTile, facingDirection);
+		this.danceTile = startTile;
 		this.nextDesiredDirection = undefined;
 		this.enterPen(this.facing);
 	}

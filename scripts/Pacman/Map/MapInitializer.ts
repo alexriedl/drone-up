@@ -5,19 +5,30 @@ import { vec2 } from 'Engine/Math';
 
 import { Pacman, Blinky, Pinky, Inky, Clyde, TargetTile, PelletEntity } from 'Pacman/Entity';
 import MapTile from './MapTile';
+import OriginalMap from './OriginalMap';
 
 export interface IStringMap<T> { [key: string]: T; }
 export interface INumberMap<T> { [key: number]: T; }
 
-const mapInfos: IStringMap<MapInitializer.IMapInfo> = { };
+const mapInfos: IStringMap<IMapInfo> = { };
+
+export interface IEntityPositions {
+	pacman: vec2;
+	blinky: vec2;
+	pinky: vec2;
+	inky: vec2;
+	clyde: vec2;
+}
+export interface IMapInfo {
+	mapTexture: WebGLTexture;
+	pellets: vec2[];
+	energizers: vec2[];
+	startingTiles: IEntityPositions;
+	scatterTargets: IEntityPositions;
+	basicTileInfo: MapTile.BasicMapTile[][];
+}
 
 namespace MapInitializer {
-	export interface IMapInfo {
-		mapTexture: WebGLTexture;
-		pellets: vec2[];
-		energizers: vec2[];
-	}
-
 	export enum MapType {
 		ORIGINAL = 'ORIGINAL',
 	}
@@ -27,46 +38,37 @@ namespace MapInitializer {
 		const tiles = getMapTiles(mapType);
 		const dimensions = new vec2(tiles[0].length, tiles.length);
 
-		const mapTexture = buildMapTexture(tiles, dimensions);
-
-		const info: IMapInfo = {
-			mapTexture,
-			energizers: null,
-			pellets: null,
-		};
+		const info = buildMapInfo(tiles, dimensions);
 
 		mapInfos[mapType] = info;
 		return info;
 	}
 
+	const entities = {
+		pacman: undefined,
+		blinky: undefined,
+		pinky: undefined,
+		inky: undefined,
+		clyde: undefined,
+	};
+
+	export function createMap(mapType: MapType): void {
+		entities.pacman = entities.pacman || new Pacman();
+		entities.blinky = entities.blinky || new Blinky(entities.pacman);
+		entities.pinky = entities.pinky || new Pinky(entities.pacman);
+		entities.inky = entities.inky || new Inky(entities.pacman, entities.blinky);
+		entities.clyde = entities.clyde || new Clyde(entities.pacman);
+	}
+
 	function getMapTiles(mapType: MapType): MapTile[][] {
+		switch (mapType) {
+			case MapType.ORIGINAL: return OriginalMap.getTiles();
+		}
+
 		return null;
 	}
 
-	function buildMapTexture(tiles: MapTile[][], dimensions: vec2): WebGLTexture {
-		const textureData = [];
-		for (let tileY = 0; tileY < dimensions.y; tileY++) {
-			const tileRow = tiles[tileY];
-			for (let pixelY = 0; pixelY < Map.PIXELS_PER_TILE; pixelY++) {
-				for (let tileX = 0; tileX < dimensions.x; tileX++) {
-					const tileEnum = tileRow[tileX];
-					const color = getTileColor(tileEnum);
-					const pixelInfo = MapTile.getPixelInfo(tileEnum);
-					const pixelRow = pixelInfo[pixelY];
-
-					for (let pixelX = Map.PIXELS_PER_TILE - 1; pixelX >= 0; pixelX--) {
-						const pixel = isBitSet(pixelX, pixelRow);
-						textureData.push.apply(textureData, pixel ? color : Map.COLOR.EMPTY.rgba);
-					}
-				}
-			}
-		}
-		const data = new Uint8Array(textureData);
-		const texture = WebGLHelpers.createTexture(null, data, dimensions);
-		return texture;
-	}
-
-	function buildMapMetadata(tiles: MapTile[][], dimensions: vec2): void {
+	function buildMapInfo(tiles: MapTile[][], dimensions: vec2): IMapInfo {
 		const scatterTargets = { pacman: undefined, blinky: undefined, pinky: undefined, inky: undefined, clyde: undefined };
 		const startingTiles = { pacman: undefined, blinky: undefined, pinky: undefined, inky: undefined, clyde: undefined };
 		const basicTileInfo = [];
@@ -78,7 +80,7 @@ namespace MapInitializer {
 			basicTileInfo.push(basicRowInfo);
 			for (let tileX = 0; tileX < dimensions.x; tileX++) {
 				const tileEnum = tileRow[tileX];
-				basicRowInfo.push(getBasicTileInfo(tileEnum));
+				basicRowInfo.push(MapTile.toBasicMapTile(tileEnum));
 				switch (tileEnum) {
 					case MapTile._PS: startingTiles.pacman = new vec2(tileX, tileY); break;
 					case MapTile.GSB: startingTiles.blinky = new vec2(tileX, tileY); break;
@@ -96,6 +98,50 @@ namespace MapInitializer {
 				}
 			}
 		}
+
+		return {
+			mapTexture: buildMapTexture(tiles, dimensions),
+			pellets,
+			energizers,
+			startingTiles,
+			scatterTargets,
+			basicTileInfo,
+		};
+	}
+
+	export const COLORS = {
+		BORDER: new Color(0x21, 0x21, 0xFF, 0xFF),
+		GATE: new Color(0xFF, 0xB8, 0xFF, 0xFF),
+		EMPTY: new Color(0x00, 0x00, 0x00, 0xFF),
+		PELLET: new Color(0xFF, 0xB5, 0x94, 0xFF),
+		PACMAN: new Color(0xFF, 0xCC, 0x00, 0xFF),
+		BLINKY: new Color(0xFF, 0x00, 0x00, 0xFF),
+		PINKY: new Color(0xFF, 0x9C, 0xCE, 0xFF),
+		INKY: new Color(0x31, 0xFF, 0xFF, 0xFF),
+		CLYDE: new Color(0xFF, 0xCE, 0x31, 0xFF),
+	};
+
+	function buildMapTexture(tiles: MapTile[][], dimensions: vec2): WebGLTexture {
+		const textureData = [];
+		for (let tileY = 0; tileY < dimensions.y; tileY++) {
+			const tileRow = tiles[tileY];
+			for (let pixelY = 0; pixelY < MapTile.PIXELS_PER_TILE; pixelY++) {
+				for (let tileX = 0; tileX < dimensions.x; tileX++) {
+					const tileEnum = tileRow[tileX];
+					const color = MapTile.getTileColor(tileEnum, COLORS);
+					const pixelInfo = MapTile.getPixelInfo(tileEnum);
+					const pixelRow = pixelInfo[pixelY];
+
+					for (let pixelX = MapTile.PIXELS_PER_TILE - 1; pixelX >= 0; pixelX--) {
+						const pixel = MapTile.isBitSet(pixelX, pixelRow);
+						textureData.push.apply(textureData, pixel ? color : COLORS.EMPTY.rgba);
+					}
+				}
+			}
+		}
+		const data = new Uint8Array(textureData);
+		const texture = WebGLHelpers.createTexture(null, data, dimensions);
+		return texture;
 	}
 }
 
@@ -116,48 +162,6 @@ export namespace WebGLHelpers {
 		gl.bindTexture(gl.TEXTURE_2D, null);
 		return texture;
 	}
-}
-
-namespace Map {
-	export const PIXELS_PER_TILE = 8;
-	export const DISPLAY_TARGET_TILE = false;
-
-	export enum BasicTileInfo {
-		BLOCK = 'BLOCK',
-		OPEN = 'OPEN',
-		SLOW = 'SLOW',
-		RESTRICTED_UP = 'RESTRICTED_UP',
-		GHOST_PEN = 'GHOST_PEN',
-	}
-
-	export const COLOR = {
-		BORDER: new Color(0x21, 0x21, 0xFF, 0xFF),
-		GATE: new Color(0xFF, 0xB8, 0xFF, 0xFF),
-		EMPTY: new Color(0x00, 0x00, 0x00, 0xFF),
-		PELLET: new Color(0xFF, 0xB5, 0x94, 0xFF),
-		PACMAN: new Color(0xFF, 0xCC, 0x00, 0xFF),
-		BLINKY: new Color(0xFF, 0x00, 0x00, 0xFF),
-		PINKY: new Color(0xFF, 0x9C, 0xCE, 0xFF),
-		INKY: new Color(0x31, 0xFF, 0xFF, 0xFF),
-		CLYDE: new Color(0xFF, 0xCE, 0x31, 0xFF),
-	};
-}
-
-interface IEntityPositions {
-	pacman: vec2;
-	blinky: vec2;
-	pinky: vec2;
-	inky: vec2;
-	clyde: vec2;
-}
-
-interface IMapMetaData {
-	staticContentTextureData: Uint8Array;
-	startingTiles: IEntityPositions;
-	scatterTargets: IEntityPositions;
-	basicTileInfo: Map.BasicTileInfo[][];
-	pellets: vec2[];
-	energizers: vec2[];
 }
 
 function initialize(gl: WebGLRenderingContext): void {
@@ -195,50 +199,4 @@ function initialize(gl: WebGLRenderingContext): void {
 	}
 
 	this.reset();
-}
-
-function getBasicTileInfo(tile: MapTile): Map.BasicTileInfo {
-	switch (tile) {
-		case MapTile._PS:
-		case MapTile._FS:
-		case MapTile.GSB:
-		case MapTile._p_:
-		case MapTile._E_:
-		case MapTile.___: return Map.BasicTileInfo.OPEN;
-
-		case MapTile._s_: return Map.BasicTileInfo.SLOW;
-
-		case MapTile.RUp:
-		case MapTile.RU_: return Map.BasicTileInfo.RESTRICTED_UP;
-
-		case MapTile.GSP:
-		case MapTile.GSI:
-		case MapTile.GSC:
-		case MapTile.GGG: case MapTile.GP_: return Map.BasicTileInfo.GHOST_PEN;
-
-		default: return Map.BasicTileInfo.BLOCK;
-	}
-}
-
-function getTileColor(tile: MapTile): number[] {
-	switch (tile) {
-		case MapTile.___: return Map.COLOR.EMPTY.rgba;
-		case MapTile.RUp: case MapTile._p_: case MapTile._E_: return Map.COLOR.PELLET.rgba;
-		case MapTile.GGG: return Map.COLOR.GATE.rgba;
-		case MapTile._PS: return Map.COLOR.PACMAN.rgba;
-		case MapTile.GSB: case MapTile.GTB: return Map.COLOR.BLINKY.rgba;
-		case MapTile.GSP: case MapTile.GTP: return Map.COLOR.PINKY.rgba;
-		case MapTile.GSI: case MapTile.GTI: return Map.COLOR.INKY.rgba;
-		case MapTile.GSC: case MapTile.GTC: return Map.COLOR.CLYDE.rgba;
-		default: return Map.COLOR.BORDER.rgba;
-	}
-}
-
-/**
- * Use a bit mask to check if a bit is on or off. Specify which bit to check, and
- * which value to look at.
- */
-function isBitSet(bit: number, value: number): boolean {
-	// tslint:disable-next-line:no-bitwise
-	return !!(value & (1 << bit));
 }

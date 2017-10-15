@@ -1,4 +1,3 @@
-import { Direction } from 'Pacman/Utils';
 import { GhostModel } from 'Pacman/Model';
 import GhostEntity from './GhostEntity';
 import PacEntity from './PacEntity';
@@ -6,8 +5,8 @@ import PacEntity from './PacEntity';
 import { vec2 } from 'Engine/Math';
 
 export default class Clyde extends GhostEntity {
-	public constructor(startTile: vec2, pacman: PacEntity) {
-		super(new GhostModel('Images/clyde.png'), startTile, Direction.DOWN, pacman);
+	public constructor(pacman: PacEntity) {
+		super(new GhostModel('Images/clyde.png'), pacman);
 	}
 
 	public getTargetTile(): vec2 {

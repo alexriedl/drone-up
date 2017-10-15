@@ -13,11 +13,11 @@ export default class Pacman extends PacEntity {
 
 	private deadAnimationFinished: () => void;
 
-	public constructor(startTile: vec2) {
+	public constructor() {
 		const mainModel = new PacmanModel();
 		const deadModel = new DeadModel();
 
-		super(mainModel, startTile, Direction.LEFT);
+		super(mainModel);
 
 		this.mainModel = mainModel;
 		this.deadModel = deadModel;
@@ -25,8 +25,8 @@ export default class Pacman extends PacEntity {
 
 	public get isAlive(): boolean { return this.alive; }
 
-	public reset(): void {
-		super.reset();
+	public reset(startTile: vec2): void {
+		super.reset(startTile, Direction.LEFT);
 
 		this.deadTicks = 0;
 		this.alive = true;

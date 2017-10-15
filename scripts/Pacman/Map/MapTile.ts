@@ -70,6 +70,39 @@ enum MapTile {
 }
 
 namespace MapTile {
+	export const PIXELS_PER_TILE = 8;
+
+	export enum BasicMapTile {
+		BLOCK = 'BLOCK',
+		OPEN = 'OPEN',
+		SLOW = 'SLOW',
+		RESTRICTED_UP = 'RESTRICTED_UP',
+		GHOST_PEN = 'GHOST_PEN',
+	}
+
+	export function toBasicMapTile(tile: MapTile): BasicMapTile {
+		switch (tile) {
+			case MapTile._PS:
+			case MapTile._FS:
+			case MapTile.GSB:
+			case MapTile._p_:
+			case MapTile._E_:
+			case MapTile.___: return BasicMapTile.OPEN;
+
+			case MapTile._s_: return BasicMapTile.SLOW;
+
+			case MapTile.RUp:
+			case MapTile.RU_: return BasicMapTile.RESTRICTED_UP;
+
+			case MapTile.GSP:
+			case MapTile.GSI:
+			case MapTile.GSC:
+			case MapTile.GGG: case MapTile.GP_: return BasicMapTile.GHOST_PEN;
+
+			default: return BasicMapTile.BLOCK;
+		}
+	}
+
 	/**
 	 * For a given tile, generate an array to indicate which pixels are lit up.
 	 *
@@ -125,6 +158,40 @@ namespace MapTile {
 			default:
 			case MapTile.___: return [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
 		}
+	}
+
+	export interface IColorOptions {
+		BORDER;
+		GATE;
+		EMPTY;
+		PELLET;
+		PACMAN;
+		BLINKY;
+		PINKY;
+		INKY;
+		CLYDE;
+	}
+
+	export function getTileColor(tile: MapTile, colors: IColorOptions): number[] {
+		switch (tile) {
+			case MapTile.___: return colors.EMPTY.rgba;
+			case MapTile.RUp: case MapTile._p_: case MapTile._E_: return colors.PELLET.rgba;
+			case MapTile.GGG: return colors.GATE.rgba;
+			case MapTile._PS: return colors.PACMAN.rgba;
+			case MapTile.GSB: case MapTile.GTB: return colors.BLINKY.rgba;
+			case MapTile.GSP: case MapTile.GTP: return colors.PINKY.rgba;
+			case MapTile.GSI: case MapTile.GTI: return colors.INKY.rgba;
+			case MapTile.GSC: case MapTile.GTC: return colors.CLYDE.rgba;
+			default: return colors.BORDER.rgba;
+		}
+	}
+
+	/**
+	 * Use a bit mask to check if a bit is on or off. Specify which bit to check in what value
+	 */
+	export function isBitSet(bit: number, value: number): boolean {
+		// tslint:disable-next-line:no-bitwise
+		return !!(value & (1 << bit));
 	}
 }
 

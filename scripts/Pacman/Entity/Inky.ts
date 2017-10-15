@@ -8,8 +8,8 @@ import { vec2 } from 'Engine/Math';
 export default class Inky extends GhostEntity {
 	private blinky: PacEntity;
 
-	public constructor(startTile: vec2, pacman: PacEntity, blinky: PacEntity) {
-		super(new GhostModel('Images/inky.png'), startTile, Direction.DOWN, pacman);
+	public constructor(pacman: PacEntity, blinky: PacEntity) {
+		super(new GhostModel('Images/inky.png'), pacman);
 		this.blinky = blinky;
 	}
 
